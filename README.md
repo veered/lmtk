@@ -34,45 +34,27 @@ Use `gpt-repl modes` to list available REPL modes and `gpt-repl threads` to list
 
 Inside the REPL, type `.help` for a list of commands and keyboard shortcuts. This is the current output of `.help`:
 > ### Commands
-> **.clear** or .cl: Clears the terminal screen.
->
-> **.copy** or .cp: Copies the first code block in the most recent response to the clipboard.
->
-> **.debug** or .db: Triggers a breakpoint in the mode backend
->
-> **.editor** or .e: Opens the current message in the text editor specified by $EDITOR.
->
-> **.exit**: Closes the REPL.
->
-> **.help** or help: Prints a list of available commands and a brief description of each.
->
-> **.print** or .pp: Prints the internal prompt representation
->
-> **.publish** or .pub: Publishes the current thread online and prints the URL.
->
-> **.retry**: or .r: Resubmits the most recent successful response.
->
-> **.rename**: Renames the current thread. The new name must be provided as an argument to this command, e.g. ".rename my_new_name". The old thread isn't deleted.
->
-> **.reset** or .rs: Resets the history of the thread.
->
-> **.seed** or .s: The the text following .seed will be set as the conversation seed. Set no text to clear the seed.
->
-> **.thread** or .name: Prints the current thread name.
->
-> **.threads**: Lists all threads.
+> **.clear** or .cl: Clears the terminal screen. <br />
+> **.copy** or .cp: Copies the first code block in the most recent response to the clipboard. <br />
+> **.debug** or .db: Triggers a breakpoint in the mode backend. <br />
+> **.editor** or .e: Opens the current message in the text editor specified by $EDITOR. <br />
+> **.exit**: Closes the REPL. <br />
+> **.help** or help: Prints a list of available commands and a brief description of each. <br />
+> **.print** or .pp: Prints the internal prompt representation <br />
+> **.publish** or .pub: Publishes the current thread online and prints the URL. <br />
+> **.retry**: or .r: Resubmits the most recent successful response. <br />
+> **.rename**: Renames the current thread. The new name must be provided as an argument to this command, e.g. ".rename my_new_name". The old thread isn't deleted. <br />
+> **.reset** or .rs: Resets the history of the thread. <br />
+> **.seed** or .s: The text following .seed will be set as the conversation seed. Set no text to clear the seed. <br />
+> **.thread** or .name: Prints the current thread name. <br />
+> **.threads**: Lists all threads. <br />
 >
 > ### Shortcuts
-> **Enter**: Submits the current message.
->
-> **Tab**: Adds a new line.
->
-> **C+c**: Closes the REPL.
->
-> **C+d**: Closes the REPL.
->
-> **C+r**: Search message history.
->
+> **Enter**: Submits the current message. <br />
+> **Tab**: Adds a new line. <br />
+> **C+c**: Closes the REPL. <br />
+> **C+d**: Closes the REPL. <br />
+> **C+r**: Search message history. <br />
 > **C+x-C+e**: Opens the current message in the text editor specified by $EDITOR.
 >
 > ### Tips:
