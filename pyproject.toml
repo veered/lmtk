@@ -1,0 +1,32 @@
+[build-system]
+requires = ["flit_core >=3.2,<4"]
+build-backend = "flit_core.buildapi"
+
+[project]
+name = "gpt-repl"
+authors = [{name = "Lucas Hansen", email = "lucashansen@gmail.com"}]
+readme = "README.md"
+license = {file = "LICENSE"}
+classifiers = ["License :: OSI Approved :: MIT License"]
+dynamic = ["version", "description"]
+dependencies = [
+  "click >=8.0",
+  "colorama >=0.1.0",
+  "guesslang-experimental >=2.2.3",
+  "openai >=0.25",
+  "prompt_toolkit >=3.0",
+  "pyperclip >=1.0",
+  "requests >=2.0",
+  "rich >=12.0",
+  "tiktoken >=0.1"
+]
+requires-python = ">=3.9"
+
+[project.urls]
+Home = "https://github.com/veered/gpt-repl"
+
+[project.scripts]
+gpt-repl = "gpt_repl.cli:run"
+
+[tool.flit.module]
+name = "gpt_repl"

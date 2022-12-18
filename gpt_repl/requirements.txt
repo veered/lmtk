@@ -1,0 +1,9 @@
+click >=8.0
+colorama >=0.1.0
+guesslang-experimental >=2.2.3
+openai >=0.25
+prompt_toolkit >=3.0
+pyperclip >=1.0
+requests >=2.0
+rich >=12.0
+tiktoken >=0.1
