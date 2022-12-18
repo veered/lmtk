@@ -1,5 +1,3 @@
-## NOTE: This is still under active development. It will have bugs and frequent breaking changes.
-
 <h1 align="center">gpt-repl</h1>
 <p align="center">
     Interactively play with GPT-based tools from the command line
@@ -11,6 +9,8 @@
 
 ## Description
 `gpt-repl` is a REPL interface for interacting with GPT-based tools. The base mode is `synth-chat` which mimics ChatGPT functionality using the normal OpenAI GPT-3 API and iterative self-summary.
+
+This project is still in the early stages of development. It will have bugs and frequent breaking changes.
 
 ## Install
 
