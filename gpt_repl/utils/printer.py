@@ -133,4 +133,7 @@ class Printer:
     with printer.live(transient=True) as screen:
       screen.update('\n' * n)
 
+  def clear(self, space=0):
+    self.pad_down(self.console.height - space)
+
 printer = Printer()

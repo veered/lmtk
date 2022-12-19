@@ -32,6 +32,27 @@ class REPL:
 
     self.first_run = True
 
+  def get_user_input(self):
+    default = ''
+    if len(self.autofills) > 0:
+      default = self.autofills.pop(0)
+    text = self.prompt(default=default)
+
+    (action, new_text) = Commands.exec(
+      repl=self,
+      text=text,
+      print_text=lambda s: printer.print_markdown(s)
+    )
+
+    if action == 'prompt':
+      return self.get_user_input()
+
+    if action == 'break':
+      return None
+
+    if action == 'continue':
+      return new_text
+
   def run(self):
     self.warmup()
     self.load_mode(self.mode_name)
@@ -45,18 +66,10 @@ class REPL:
         self.print_you_banner(len(self.thread["history"]) + 1)
         printer.pad_down(3)
 
-        default = ''
-        if len(self.autofills) > 0:
-          default = self.autofills.pop(0)
-
-        text = self.prompt(default=default)
-        printer.print_markdown(text)
-
-        ( text, stop ) = Commands.exec(self, text)
-        if stop:
+        text = self.get_user_input()
+        if text == None:
           continue
 
-        print('')
         self.print_gpt_banner(len(self.thread["history"]) + 2, stats=self.mode.stats())
         printer.pad_down(3)
 
@@ -80,7 +93,8 @@ class REPL:
       except (KeyboardInterrupt, EOFError):
         self.save_thread()
         printer.print_thread_closed(self.thread['id'])
-        break
+        sys.exit(0) # breaking might be better, but sys.exit is a lot faster
+        # break
 
       except Exception as e:
         breakpoint()

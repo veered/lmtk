@@ -1,4 +1,4 @@
-import os
+import os, re, pyperclip
 from itertools import chain
 
 def peek(gen):
@@ -20,3 +20,13 @@ class set_env:
       del os.environ[self.name]
     else:
       os.environ[self.name] = self.old_value
+
+def clear_screen():
+  os.system('cls' if os.name == 'nt' else 'clear')
+
+def copy_to_clipboard(text):
+  try:
+    pyperclip.copy(text)
+    return True
+  except Exception as e:
+    return False
