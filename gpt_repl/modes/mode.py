@@ -22,6 +22,7 @@ class BaseMode:
 
   title = ''
   visible = True
+  loader_latency=1.5
 
   seed = ''
 

@@ -188,7 +188,7 @@ class REPL:
         printer.preload()
 
   def ask(self, text):
-    delay = 0.25 if self.first_run else 1.5
+    delay = 0.25 if self.first_run else self.mode.loader_latency
     with Loader(show_timer=True, delay=delay) as spinner:
       gen = iter(self.mode.ask(text))
       response = peek(gen)[0]
