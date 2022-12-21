@@ -185,7 +185,7 @@ class SynthChatMode(BaseMode):
     return self.llm.complete(
       prompt,
       model=self.model,
-      temperature=self.temperature,
+      temperature=float(self.temperature),
       max_length=max_length or self.max_response_tokens or 1000,
       stop=self.get_stops(),
       stream=stream,

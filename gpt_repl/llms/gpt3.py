@@ -41,7 +41,7 @@ class GPT3:
       engine=model,
       prompt=prompt,
       max_tokens=max_length,
-      temperature=float(temperature),
+      temperature=temperature,
       top_p=1,
       frequency_penalty=0,
       presence_penalty=0,

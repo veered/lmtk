@@ -26,7 +26,7 @@ class CopyCommand(BaseCommand):
   def run(self):
     self.banner()
 
-    code_block = self.extract_code_block(self.repl.thread['history'])
+    code_block = self.extract_code_block(self.repl.thread.messages)
     if code_block == None:
       return 'No code block found'
 
@@ -37,7 +37,7 @@ class CopyCommand(BaseCommand):
       return 'Failed to copy a code block to the clipboard.'
 
   def extract_code_block(self, history):
-    responses = [ entry["text"] for entry in history if entry["type"] == 'gpt' ]
+    responses = [ entry.text for entry in history if entry.source == 'gpt' ]
     if len(responses) == 0:
       return None
     last_response = responses[-1]
@@ -113,14 +113,14 @@ class RedoCommand(BaseCommand):
   def run(self):
     self.banner()
 
-    history = self.repl.thread['history']
+    history = self.repl.thread.messages
     if len(history) < 2:
       return 'No message to redo'
 
     self.repl.mode.rollback()
     self.repl.mode.rollback()
-    last_message = history[-2]['text']
-    self.repl.thread['history'] = history[:-2]
+    last_message = history[-2].text
+    self.repl.thread.rollback(2)
 
     self.set_text(last_message)
     self.action('continue')
@@ -134,14 +134,14 @@ class UndoCommand(BaseCommand):
   def run(self):
     self.banner()
 
-    history = self.repl.thread['history']
+    history = self.repl.thread.messages
     if len(history) < 2:
       return 'No message to undo'
 
     self.repl.mode.rollback()
     self.repl.mode.rollback()
-    last_message = history[-2]['text']
-    self.repl.thread['history'] = history[:-2]
+    last_message = history[-2].text
+    self.repl.thread.rollback(2)
 
     self.repl.autofills += [ last_message ]
     self.action('break')
@@ -155,8 +155,8 @@ class RenameCommand(BaseCommand):
   def run(self):
     self.banner()
     if len(self.cmd_args) == 1:
-      self.repl.thread['id'] = self.repl.config.normalize_thread_id(self.cmd_args[0])
-      return f'Thread renamed to "{self.repl.thread["id"]}"'
+      self.repl.thread.set_name(self.cmd_args[0])
+      return f'Thread renamed to "{self.repl.thread.name}"'
     else:
       return 'Invalid thread name'
 
@@ -170,7 +170,7 @@ class ResetCommand(BaseCommand):
     self.banner()
     self.repl.reset()
     printer.clear(2)
-    return f'@{self.repl.thread["id"]} reset.'
+    return f'@{self.repl.thread.name} reset.'
 
 @Commands.register('.seed')
 class SeedCommand(BaseCommand):

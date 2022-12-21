@@ -1,6 +1,7 @@
 import os, json, re, pdb, importlib.util
 from os import path, listdir
 from .utils import printer
+from .threads import ThreadManager
 
 class Config:
 
@@ -37,15 +38,8 @@ class Config:
 
     return self.config
 
-  def set_auth(self, email, password):
-    self.config["email"] = email
-    self.config["password"] = password
-    self.save()
-
-  def get_auth(self):
-    email = self.config.get("email", None)
-    password = self.config.get("password", None)
-    return (email, password)
+  def threads(self):
+    return ThreadManager(self)
 
   def normalize_thread_id(self, thread_id):
     if thread_id == None:

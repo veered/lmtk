@@ -18,7 +18,7 @@ class REPL:
   def __init__(
       self,
       config_path="~/.config/gpt_repl",
-      thread_id=None,
+      thread_name=None,
       mode_name = None,
       autofills=[],
     ):
@@ -26,10 +26,11 @@ class REPL:
     self.config = Config(config_path)
     self.config.load_plugins()
 
-    self.thread = self.config.load_thread(thread_id)
-    self.mode_name = self.thread.get('mode') or mode_name or 'synth-chat'
-    self.autofills = autofills
+    self.thread = self.config.threads().load(thread_name)
+    self.thread.set_mode(self.thread.mode.name or mode_name or 'synth-chat')
 
+    self.mode_name = self.thread.mode.name
+    self.autofills = autofills
     self.first_run = True
 
   def get_user_input(self):
@@ -55,7 +56,7 @@ class REPL:
 
   def run(self):
     self.warmup()
-    self.load_mode(self.mode_name)
+    self.load_mode(self.mode_name, state=self.thread.mode.state, seed=self.thread.seed)
 
     print("Enter 'help' for a list of commands. Use Enter to submit and Tab to start a new line.\n")
     self.replay_thread()
@@ -63,14 +64,15 @@ class REPL:
 
     while True:
       try:
-        self.print_you_banner(len(self.thread["history"]) + 1)
+        self.print_you_banner(len(self.thread.messages) + 1)
         printer.pad_down(3)
 
         text = self.get_user_input()
         if text == None:
           continue
 
-        self.print_gpt_banner(len(self.thread["history"]) + 2, stats=self.mode.stats())
+        stats = self.mode.stats()
+        self.print_gpt_banner(len(self.thread.messages) + 2, stats=stats)
         printer.pad_down(3)
 
         try:
@@ -83,22 +85,20 @@ class REPL:
         printer.print_markdown(answer)
         print('')
 
-        self.thread["history"] += [
-          { "type": "you", "text": text },
-          { "type": "gpt", "text": answer }
-        ]
+        self.thread.add_message('you', text)
+        self.thread.add_message('gpt', answer, stats=stats)
 
         self.save_thread()
         self.first_run = False
       except (KeyboardInterrupt, EOFError):
         self.save_thread()
-        printer.print_thread_closed(self.thread['id'])
+        printer.print_thread_closed(self.thread.name)
         sys.exit(0) # breaking might be better, but sys.exit is a lot faster
         # break
 
       except Exception as e:
         breakpoint()
-        printer.print_thread_closed(self.thread['id'])
+        printer.print_thread_closed(self.thread.name)
 
         printer.exception(e)
         sys.exit(1)
@@ -136,6 +136,14 @@ class REPL:
     def _(event):
       event.current_buffer.text = '.print'
       event.current_buffer.validate_and_handle()
+    @self.kb.add("c-x", "c-c")
+    def _(event):
+      event.current_buffer.text = '.clear'
+      event.current_buffer.validate_and_handle()
+    @self.kb.add("c-x", "c-n")
+    def _(event):
+      event.current_buffer.text = '.reset'
+      event.current_buffer.validate_and_handle()
 
   def prompt(self, default=''):
     seed = self.mode.get_seed()
@@ -160,7 +168,7 @@ class REPL:
       bg_color='rgb(0,95,135)',
       text=' You:',
       prefix=f' {count} ',
-      suffix=f' @{self.thread["id"]} [ {self.mode_name} ]'
+      suffix=f' @{self.thread.name} [ {self.mode_name} ]'
     )
 
   def print_gpt_banner(self, count, stats=''):
@@ -172,42 +180,34 @@ class REPL:
     )
 
   def save_thread(self):
-    if self.thread['id'] == None:
-      return
-    self.config.save_thread(self.thread['id'], {
-      "id": self.thread['id'],
-      "mode": self.mode_name,
-      "history": self.thread["history"],
-      'state': self.mode.save(),
-    })
+    self.thread.set_mode(self.mode_name, self.mode.save())
+    self.thread.seed = self.mode.get_seed()
+    self.thread.save()
 
-  def load_mode(self, mode_name):
-    self.thread['mode'] = mode_name
-    self.mode = get_mode(mode_name)(state=self.thread['state'])
+  def load_mode(self, mode_name, state={}, seed=''):
+    self.mode = get_mode(mode_name)(state=state)
+    self.mode.set_seed(seed)
 
   def reset(self):
-    current_seed = self.mode.get_seed() if self.mode else ''
+    old_mode = self.mode
 
-    self.thread = self.config.get_empty_thread(self.thread['id'])
-
-    self.load_mode(self.mode_name)
-    self.mode.set_seed(current_seed)
-
+    self.load_mode(self.mode_name, seed=old_mode.get_seed())
+    self.thread.reset()
     self.save_thread()
 
   def replay_thread(self):
-    for i, entry in enumerate(self.thread["history"]):
-      if entry["type"] == "you":
+    for i, msg in enumerate(self.thread.messages):
+      if msg.source == 'you':
         self.print_you_banner(i + 1)
-      elif entry["type"] == "gpt":
-        self.print_gpt_banner(i + 1)
-      printer.print_markdown(entry["text"])
-      print("")
+      elif msg.source == 'gpt':
+        self.print_gpt_banner(i + 1, stats=msg.stats)
+      printer.print_markdown(msg.text)
+      print()
 
   def warmup(self):
-    messages = [ entry["text"] for entry in self.thread["history"] ] + self.autofills
+    messages = [ entry.text for entry in self.thread.messages ] + self.autofills
     if any([ '```' in m for m in messages ]):
-      with printer.print_thread_loading(self.thread['id']):
+      with printer.print_thread_loading(self.thread.name):
         printer.preload()
 
   def ask(self, text):

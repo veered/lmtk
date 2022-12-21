@@ -53,7 +53,7 @@ def run(cmd, mode, thread, file, list):
 
   repl = REPL(
     mode_name=mode,
-    thread_id=thread,
+    thread_name=thread,
     config_path=config_path,
     autofills=autofills,
   )
@@ -66,8 +66,7 @@ def run(cmd, mode, thread, file, list):
   repl.run()
 
 def get_threads(config_path):
-  config = Config(config_path)
-  return config.list_threads()
+  return Config(config_path).threads().list()
 
 if __name__ == '__main__':
   run()
