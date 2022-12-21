@@ -29,4 +29,18 @@ class CommandManager:
     command_list = self.registry.values()
     return sorted(command_list, key=lambda c: c.sort_index)
 
+  def bind_keys(self, kb):
+    for Command in self.get_command_list():
+      shortcut = Command.shortcut
+      if not shortcut or len(shortcut) == 0:
+        continue
+      self.bind_key(kb, Command.name, shortcut)
+
+  def bind_key(self, kb, cmd_name, shortcut):
+    @kb.add(*shortcut)
+    def _(event):
+      breakpoint
+      event.current_buffer.text = cmd_name
+      event.current_buffer.validate_and_handle()
+
 Commands = CommandManager()

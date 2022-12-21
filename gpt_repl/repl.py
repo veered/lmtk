@@ -9,7 +9,6 @@ from prompt_toolkit import filters as Filters
 from .utils import peek, printer, Loader
 from .config import Config
 
-# from .modes.synth_chat import SynthChatMode as ReplMode
 from .modes import get_mode
 from .commands import Commands
 
@@ -110,6 +109,8 @@ class REPL:
     )
     self.kb = KeyBindings()
 
+    Commands.bind_keys(self.kb)
+
     @Filters.Condition
     def is_not_searching():
       return not get_app().layout.is_searching
@@ -124,26 +125,6 @@ class REPL:
         event.current_buffer.validate_and_handle()
       else:
         event.current_buffer.insert_text('\n')
-    @self.kb.add("c-x", "c-u")
-    def _(event):
-      event.current_buffer.text = '.undo'
-      event.current_buffer.validate_and_handle()
-    @self.kb.add("c-x", "c-r")
-    def _(event):
-      event.current_buffer.text = '.redo'
-      event.current_buffer.validate_and_handle()
-    @self.kb.add("c-x", "c-p")
-    def _(event):
-      event.current_buffer.text = '.print'
-      event.current_buffer.validate_and_handle()
-    @self.kb.add("c-x", "c-c")
-    def _(event):
-      event.current_buffer.text = '.clear'
-      event.current_buffer.validate_and_handle()
-    @self.kb.add("c-x", "c-n")
-    def _(event):
-      event.current_buffer.text = '.reset'
-      event.current_buffer.validate_and_handle()
 
   def prompt(self, default=''):
     seed = self.mode.get_seed()

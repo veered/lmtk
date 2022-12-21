@@ -6,6 +6,7 @@ class BaseCommand:
   help = ''
   erase_input = False
   sort_index = 1
+  shortcut = []
 
   def __init__(self, repl, text, print_text):
     self.repl = repl

@@ -4,7 +4,7 @@ from .command_manager import Commands
 from .base_command import BaseCommand
 
 @Commands.register('help')
-class InvalidCommand(BaseCommand):
+class HelpCommand(BaseCommand):
 
   aliases = [ '.help', 'help()' ]
   help = 'Prints a list of available commands and a brief description of each.'

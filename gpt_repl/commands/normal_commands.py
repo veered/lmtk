@@ -11,6 +11,7 @@ class ClearCommand(BaseCommand):
 
   aliases = [ '.cl' ]
   help = 'Clears the terminal screen.'
+  shortcut = [ 'c-x', 'c-c' ]
   erase_input = True
 
   def run(self):
@@ -87,6 +88,7 @@ class PrintCommand(BaseCommand):
 
   aliases = [ '.pp' ]
   help = 'Prints the internal prompt representation'
+  shortcut = [ 'c-x', 'c-p' ]
 
   def run(self):
     self.banner()
@@ -109,6 +111,7 @@ class RedoCommand(BaseCommand):
 
   aliases = [ '.r' ]
   help = 'Resubmits the most recent successful response.'
+  shortcut = [ 'c-x', 'c-r' ]
 
   def run(self):
     self.banner()
@@ -130,6 +133,7 @@ class UndoCommand(BaseCommand):
 
   aliases = [ '.u' ]
   help = 'Rolls back the most recent question and answer'
+  shortcut = [ 'c-x', 'c-u' ]
 
   def run(self):
     self.banner()
@@ -165,6 +169,7 @@ class ResetCommand(BaseCommand):
 
   aliases = [ '.rs' ]
   help = 'Resets the history of the thread.'
+  shortcut = [ 'c-x', 'c-n' ]
 
   def run(self):
     self.banner()
