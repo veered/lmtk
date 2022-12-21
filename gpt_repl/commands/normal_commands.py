@@ -204,7 +204,10 @@ class GetCommand(BaseCommand):
     else:
       key = self.cmd_args[0]
       val = getattr(self.repl.mode, key)
-      printer.print_markdown(f'**{key}** == **{val}**')
+      if val == None or val == '':
+        printer.print_markdown(f'**{key}** is empty')
+      else:
+        printer.print_markdown(f'**{key}** == **{val}**')
     return ''
 
 @Commands.register('.set')
