@@ -8,7 +8,7 @@
 </p>
 
 ## Description
-ChatGPT is a tool, not a conversation partner. It needs to be more configurable, both in how we interact with it and how it behaves.
+ChatGPT can be a powerful tool, not just a conversation partner. It needs to be more configurable, both in how we interact with it and how it behaves.
 
 `gpt-repl` is a customizable REPL-like interface to GPT based tech. Multiple backends (or "modes") are supported, including ChatGPT, raw GPT-3, and a ChatGPT copycat called SynthChat.
 
