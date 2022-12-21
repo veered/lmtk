@@ -8,9 +8,17 @@
 </p>
 
 ## Description
-`gpt-repl` is a REPL interface for interacting with GPT-based tools. The base mode is `synth-chat` which mimics ChatGPT functionality using the normal OpenAI GPT-3 API and iterative self-summary.
+ChatGPT is a tool, not a conversation partner. It needs to be more configurable, both in how we interact with it and how it behaves.
 
-This project is still in the early stages of development. It will have bugs and frequent breaking changes.
+`gpt-repl` is a customizable REPL-like interface to GPT based tech. Multiple backends (or "modes") are supported, including ChatGPT, raw GPT-3, and a ChatGPT copycat called SynthChat.
+
+SynthChat has similar behavior to ChatGPT, but offers a lot more control. For example, you can:
+- Write the prefix of the next response
+- Give instructions that will always be followed and never forgetten
+- Control its persona (name, bio, personality)
+- Set the randomness (or "temperature") of its responses
+
+This project is still in the **early stages** of development. It will have bugs and frequent breaking changes.
 
 ## Install
 
