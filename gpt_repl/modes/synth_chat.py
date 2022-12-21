@@ -13,23 +13,26 @@ class SynthChatMode(BaseMode):
   def __init__(self, state={}):
     self.llm = GPT3()
     self.seed = ''
+    self.response_prefix = ''
 
     self.human_name = 'Eden'
     self.authority_name = 'Boss'
 
-    self.ai_name = 'Delphi AI'
-    self.ai_bio = "Delphi AI is a cutting edge AGI created by Richard Feynman and Isaac Asimov to improve people's lives. She is incredibly knowledgable about everything, especially programming and math."
+    self.persona_name = 'Delphi'
+    # self.persona_name = 'SynthChat'
+    self.persona_bio = ''
 
-    self.pinned_summary = f'{self.human_name} demanded I give highly structured responses formatted in Markdown (lists like "1.", headers like "# title", code blocks like ```js etc)!'
+    self.pinned_summary = lambda: f'{self.human_name} demanded I give highly structured responses formatted in Markdown (lists like "1.", headers like "# title", code blocks like ```js etc)!'
     self.prologue = [
-      {
-        'source': 'server',
-        'text': "Hi! I'm Delphi AI, a cutting edge AGI created by Richard Feynman and Isaac Asimov to improve people's lives.",
-      },
+      # {
+      #   'source': 'server',
+      #   # 'text': f"Hello! How can I help? I'm going to write some awesome code for you!",
+      #   # 'text': f"Hello! How can I help? I'll tell you if I don't know something.",
+      # },
     ]
 
-    self.summary_header = f'# {self.ai_name}\'s notes on her conversation with {self.human_name}:'
-    self.conversation_header = f'# Live Chat Between {self.human_name} and {self.ai_name}:'
+    self.summary_header = lambda: f'# {self.persona_name}\'s Conversation Notes:'
+    self.conversation_header = lambda: f'# Live Chat Between {self.human_name} and {self.persona_name}:'
 
     self.max_summaries = 8
     self.soft_max_depth = 18
@@ -51,14 +54,17 @@ class SynthChatMode(BaseMode):
     if state.get('initialized'):
       self.load(state)
 
+  def get_title(self):
+    return self.persona_name
+
   def load_profile(self, profile=None, profile_path=''):
     if not profile:
       with open(profile_path, "r") as profile_file:
         profile = json.load(profile_file)
     self.human_name = profile['human_name']
     self.authority_name = profile['authority_name']
-    self.ai_name = profile['ai_name']
-    self.ai_bio = profile['ai_bio']
+    self.persona_name = profile['ai_name']
+    self.persona_bio = profile['ai_bio']
     self.pinned_summary = profile['pinned_summary']
     self.prologue = profile['prologue']
 
@@ -66,15 +72,21 @@ class SynthChatMode(BaseMode):
     return {
       'initialized': True,
       'summaries': self.summaries,
-      'recent_conversation': self.recent_conversation
+      'recent_conversation': self.recent_conversation,
+      'seed': self.seed,
+      'persona_name': self.persona_name,
     }
     pass
 
   def load(self, state):
     self.summaries = state['summaries']
     self.recent_conversation = state['recent_conversation']
+    self.seed = state.get('seed', self.seed)
+    self.persona_name = state.get('persona_name', self.persona_name)
 
-  def ask(self, query):
+  def ask(self, raw_query):
+    (query, self.response_prefix) = self.parse_query(raw_query)
+
     client_message = self.add_message(text=query, source='client')
     server_message = self.build_message(source='server')
 
@@ -86,16 +98,23 @@ class SynthChatMode(BaseMode):
     server_message['text'] = server_message['text'].strip()
     self.add_message(message=server_message)
 
-  def continue_conversation(self, stream=True):
-    self.condense_conversation(self.max_response_tokens)
+    self.response_prefix = ''
+
+  def continue_conversation(self):
+    self.compress_conversation(self.max_response_tokens)
 
     conversation_prompt = self.format_conversation_prompt(self.recent_conversation)
-    return self.llm.complete(
+    results = self.llm.complete(
       conversation_prompt,
       max_length=self.max_response_tokens,
       stop=self.get_stops(),
-      stream=stream
+      stream=True
     )
+
+    for i, data in enumerate(results):
+      if self.response_prefix and i == 0:
+        yield self.response_prefix
+      yield data
 
   def build_message(self, text='', source=''):
     message = {
@@ -139,16 +158,14 @@ class SynthChatMode(BaseMode):
         self.format_message_summary_prompt(message),
         stop=self.get_stops(),
       )
-      message['text'] = f'{{ {response.strip()} }}'
+      message['text'] = f'summary=[ I {response.strip()} ]'
 
-  def condense_conversation(self, space_required):
+  def compress_conversation(self, space_required):
     self.shrink_messages()
 
     while self.get_conversation_space() <= space_required or len(self.recent_conversation) > self.soft_max_depth:
       if not self.has_prompt_token_pressure():
         break
-
-      # print('condensing conversation')
 
       chunk = []
       chunk_text = ''
@@ -172,12 +189,12 @@ class SynthChatMode(BaseMode):
       self.summaries = self.summaries[-(self.max_summaries - 1):] + [ summary ]
 
   def get_stops(self):
-    return [ f'{self.human_name}>' ]
+    # return [ f'{self.human_name}>', self.line_sep ]
+    return [ f'{self.human_name}>', f'{self.persona_name}>' ]
 
   def get_prompt_size(self):
     conversation_prompt = self.format_conversation_prompt(self.recent_conversation)
     return self.count_tokens(conversation_prompt)
-
 
   def get_conversation_space(self):
     return self.max_prompt_tokens - self.get_prompt_size() - self.max_response_tokens
@@ -188,37 +205,39 @@ class SynthChatMode(BaseMode):
   def get_notes(self):
     return [ f'- {s}' for s in self.summaries ]
 
-
   def format_message_summary_prompt(self, message, whitespace='\n'):
+    author = self.persona_name if message["source"] == "server" else self.human_name
     return whitespace.join([
-      f'Purpose: You are a genius AGI assistant named {self.ai_name} helping your friend {self.human_name} over chat.',
       self.format_message(message),
-      f'{self.authority_name}> Briefly summarize the previous message from {"you" if message["source"] == "server" else self.human_name}, written as if you were {self.ai_name if message["source"] == "server" else self.human_name}. Should be short and dense but informative. Use the past tense.',
-      f'{self.ai_name}>',
+      f'{self.authority_name}> Summarize the previous message. Should be terse but informative. Use the past tense.',
+      f'{author}> I',
     ])
 
   def format_summary_prompt(self, messages, whitespace='\n'):
     return whitespace.join([
-      self.ai_bio,
-      self.conversation_header,
+      self.conversation_header(),
       self.format_messages(messages),
       f'{self.authority_name}> Give me your personal notes on the conversation. Should be terse but informative.',
-      f'{self.ai_name}> {self.human_name}'
+      f'{self.persona_name}> {self.human_name}'
     ])
 
+  def parse_query(self, query=''):
+    parts = query.split(':>')
+    if len(parts) == 1:
+      return (query, '')
+    return (' '.join(parts[:-1]), parts[-1].strip())
+
   def format_conversation_prompt(self, messages, whitespace='\n'):
-    seed = self.seed.replace
     lines = [
-      self.ai_bio,
-      self.summary_header,
-      f'- {self.pinned_summary}',
+      self.format_persona_bio(),
+      self.summary_header(),
+      f'- {self.pinned_summary()}',
       *self.get_notes(),
-      self.format_seed(),
-      self.conversation_header,
+      self.conversation_header(),
       self.format_messages(messages),
-      f'{self.ai_name}>'
+      f'{self.format_seed()}{self.persona_name}>{self.response_prefix}'
     ]
-    return whitespace.join(lines)
+    return whitespace.join(lines).strip()
 
   def count_tokens(self, text):
     return self.llm.count_tokens(text)
@@ -226,11 +245,12 @@ class SynthChatMode(BaseMode):
   def format_seed(self):
     if not self.seed:
       return ''
-    seed = re.sub(self.title, self.ai_name, self.seed, flags=re.IGNORECASE)
-    seed = re.sub('{you}', self.ai_name, seed, flags=re.IGNORECASE)
-    seed = re.sub('{me}', self.human_name, seed, flags=re.IGNORECASE)
-    return f'# NOTE: Instructions For {self.ai_name} From {self.authority_name}: {seed}'
-    # return f'Boss: {seed}'
+    return f'(In the following message, remember {self.seed})\n'
+
+  def format_persona_bio(self):
+    if not self.persona_bio:
+      return ''
+    return f'{self.persona_name} Bio: {self.persona_bio}'
 
   def format_messages(self, messages, wrap=True):
     lines = f'\n{self.line_sep}\n'.join(
@@ -242,7 +262,7 @@ class SynthChatMode(BaseMode):
 
   def format_message(self, message):
     if message['source'] == 'server':
-      return f'{self.ai_name}> {message["text"]}'
+      return f'{self.persona_name}> {message["text"]}'
     else:
       return f'{self.human_name}> {message["text"]}'
 
@@ -256,3 +276,17 @@ class SynthChatMode(BaseMode):
 
   def capacity(self):
     return round(100 * self.get_prompt_size() / self.max_prompt_tokens)
+
+  @property
+  def persona(self):
+    return f'{self.persona_name} [ {self.persona_bio} ]'
+
+  @persona.setter
+  def persona(self, val):
+    pattern = r"\s*([^\[]*)\s*(\[\s*([^\]]*)\s*\])?"
+    match = re.match(pattern, val)
+    if not match:
+      return
+    self.persona_name = match.group(1).strip()
+    if match.group(3) != None:
+      self.persona_bio = match.group(3).strip()

@@ -157,7 +157,7 @@ class REPL:
   def print_gpt_banner(self, count, stats=''):
     printer.print_banner(
       bg_color='spring_green4',
-      text=f' {self.mode.title}:',
+      text=f' {self.mode.get_title()}:',
       prefix=f' {count} ',
       suffix=stats
     )

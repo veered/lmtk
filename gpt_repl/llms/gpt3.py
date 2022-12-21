@@ -32,6 +32,7 @@ class GPT3:
       yield data.choices[0].text
 
   def get_response(self, prompt, max_length=1000, stop=None, stream=False):
+    # max_length = 2000
     return openai.Completion.create(
       engine=self.model,
       prompt=prompt,

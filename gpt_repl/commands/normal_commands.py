@@ -42,7 +42,7 @@ class CopyCommand(BaseCommand):
       return None
     last_response = responses[-1]
 
-    # This regex is too naive but is easy
+    # This regex is too naive but is easy and usually works
     code_block_pattern = re.compile(r"```[a-zA-Z0-9]*?\n(.*?)```", re.DOTALL)
     code_blocks = code_block_pattern.findall(last_response)
 
@@ -104,12 +104,11 @@ class PrintCommand(BaseCommand):
 #     publisher = PublishGPT(self.repl.thread)
 #     return publisher.publish()
 
-@Commands.register('.retry')
-class RetryCommand(BaseCommand):
+@Commands.register('.redo')
+class RedoCommand(BaseCommand):
 
   aliases = [ '.r' ]
   help = 'Resubmits the most recent successful response.'
-  # erase_input = True
 
   def run(self):
     self.banner()
@@ -126,10 +125,31 @@ class RetryCommand(BaseCommand):
     self.set_text(last_message)
     self.action('continue')
 
+@Commands.register('.undo')
+class UndoCommand(BaseCommand):
+
+  aliases = [ '.u' ]
+  help = 'Rolls back the most recent question and answer'
+
+  def run(self):
+    self.banner()
+
+    history = self.repl.thread['history']
+    if len(history) < 2:
+      return 'No message to undo'
+
+    self.repl.mode.rollback()
+    self.repl.mode.rollback()
+    last_message = history[-2]['text']
+    self.repl.thread['history'] = history[:-2]
+
+    self.repl.autofills += [ last_message ]
+    self.action('break')
+
 @Commands.register('.rename')
 class RenameCommand(BaseCommand):
 
-  aliases = [ '.rn' ]
+  aliases = [ '.rnm' ]
   help = 'Renames the current thread. The new name must be provided as an argument to this command, e.g. ".rename my_new_name". The old thread isn\'t deleted.'
 
   def run(self):
@@ -162,3 +182,29 @@ class SeedCommand(BaseCommand):
     self.banner()
     self.repl.mode.set_seed(self.cmd_suffix)
     return 'Seed updated.'
+
+
+@Commands.register('.get')
+class GetCommand(BaseCommand):
+
+  aliases = [ '.?' ]
+
+  def run(self):
+    self.banner()
+    key = self.cmd_args[0]
+    val = getattr(self.repl.mode, key)
+    printer.print_markdown(f'**{key}** == **{val}**')
+    return ''
+
+@Commands.register('.set')
+class SetCommand(BaseCommand):
+
+  aliases = [ '.=' ]
+
+  def run(self):
+    self.banner()
+    key = self.cmd_args[0]
+    val = ' '.join(self.cmd_args[1:])
+    setattr(self.repl.mode, key, val)
+    printer.print_markdown(f'**{key}** updated')
+    return ''

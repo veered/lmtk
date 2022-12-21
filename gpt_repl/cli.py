@@ -10,7 +10,7 @@ def load_file(file_path):
     text = f.read()
     return f"Provide a brief description of the following text:\n\n[ Loaded from {file_path} ]\n```\n{text}\n```"
 
-@click.command(help='Usually just `gpt-repl @thread-name`')
+@click.command(help='Usually just `gpt-repl @thread-name [-m MODE]`')
 @click.argument("cmd", type=str, required=False)
 @click.option('-m', '--mode', default='synth-chat', help="REPL mode to load")
 @click.option('-t', '--thread', default=None, help="Thread name to open")

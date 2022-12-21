@@ -14,7 +14,7 @@ This project is still in the early stages of development. It will have bugs and 
 
 ## Install
 
-For now, Python >=3.9 is required.
+For now, Python >=3.9 is required. Use `pip3` instead of `pip` if necessary.
 
 ```bash
 pip install -U gpt-repl
@@ -72,6 +72,15 @@ Inside the REPL, type `.help` for a list of commands and keyboard shortcuts. Thi
 Add a Python file that [looks like this](https://github.com/veered/gpt-repl/blob/main/examples/bruh_mode.py) to `$GPT_REPL_CONFIG_PATH/plugins/`. By default this will be `~/.config/gpt_repl/plugins/`.
 
 See [gpt_repl/modes](https://github.com/veered/gpt-repl/tree/main/gpt_repl/modes) for more complete examples.
+
+## Development
+To install `gpt-repl` from source:
+```bash
+git clone git@github.com:veered/gpt-repl.git
+cd gpt-repl
+pip install -U flit
+flit install -s
+```
 
 ## Screenshot
 <p align="center">

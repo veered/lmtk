@@ -29,6 +29,9 @@ class BaseMode:
   def __init__(self, state={}):
     pass
 
+  def get_title(self):
+    return self.title
+
   def ask(self, text):
     yield ''
 
