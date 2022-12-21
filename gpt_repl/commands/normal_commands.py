@@ -90,7 +90,7 @@ class PrintCommand(BaseCommand):
 
   def run(self):
     self.banner()
-    self.repl.mode.print()
+    printer.print(self.repl.mode.inspect())
     return ''
 
 # @Commands.register('.publish')
@@ -191,9 +191,15 @@ class GetCommand(BaseCommand):
 
   def run(self):
     self.banner()
-    key = self.cmd_args[0]
-    val = getattr(self.repl.mode, key)
-    printer.print_markdown(f'**{key}** == **{val}**')
+    if len(self.cmd_args) == 0:
+      variables = '\n'.join(
+        sorted([ f'- {var}' for var in self.repl.mode.variables() ])
+      )
+      printer.print_markdown(f'Available mode variables:\n{variables}')
+    else:
+      key = self.cmd_args[0]
+      val = getattr(self.repl.mode, key)
+      printer.print_markdown(f'**{key}** == **{val}**')
     return ''
 
 @Commands.register('.set')
@@ -203,8 +209,14 @@ class SetCommand(BaseCommand):
 
   def run(self):
     self.banner()
-    key = self.cmd_args[0]
-    val = ' '.join(self.cmd_args[1:])
-    setattr(self.repl.mode, key, val)
-    printer.print_markdown(f'**{key}** updated')
+    if len(self.cmd_args) == 0:
+      variables = '\n'.join(
+        sorted([ f'- {var}' for var in self.repl.mode.variables() ])
+      )
+      printer.print_markdown(f'Available mode variables:\n{variables}')
+    else:
+      key = self.cmd_args[0]
+      val = ' '.join(self.cmd_args[1:])
+      setattr(self.repl.mode, key, val)
+      printer.print_markdown(f'**{key}** updated')
     return ''

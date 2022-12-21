@@ -114,9 +114,6 @@ class REPL:
     def is_not_searching():
       return not get_app().layout.is_searching
 
-    @self.kb.add('escape', 'enter', filter=is_not_searching)
-    def _(event):
-      event.current_buffer.insert_text('\n')
     @self.kb.add("tab", filter=is_not_searching)
     def _(event):
       prefix = event.current_buffer.document.leading_whitespace_in_current_line
@@ -127,6 +124,18 @@ class REPL:
         event.current_buffer.validate_and_handle()
       else:
         event.current_buffer.insert_text('\n')
+    @self.kb.add("c-x", "c-u")
+    def _(event):
+      event.current_buffer.text = '.undo'
+      event.current_buffer.validate_and_handle()
+    @self.kb.add("c-x", "c-r")
+    def _(event):
+      event.current_buffer.text = '.redo'
+      event.current_buffer.validate_and_handle()
+    @self.kb.add("c-x", "c-p")
+    def _(event):
+      event.current_buffer.text = '.print'
+      event.current_buffer.validate_and_handle()
 
   def prompt(self, default=''):
     seed = self.mode.get_seed()

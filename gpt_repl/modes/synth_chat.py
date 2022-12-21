@@ -11,18 +11,20 @@ class SynthChatMode(BaseMode):
   line_sep = '-----'
 
   def __init__(self, state={}):
+    self.model = 'text-davinci-003'
+    self.temperature = 0.7
     self.llm = GPT3()
+
+    self.profile = 'assistant'
     self.seed = ''
     self.response_prefix = ''
 
     self.human_name = 'Eden'
     self.authority_name = 'Boss'
-
     self.persona_name = 'Delphi'
-    # self.persona_name = 'SynthChat'
     self.persona_bio = ''
 
-    self.pinned_summary = lambda: f'{self.human_name} demanded I give highly structured responses formatted in Markdown (lists like "1.", headers like "# title", code blocks like ```js etc)!'
+    self.pinned_summary = lambda: f'{self.human_name} demanded I give comprehensive answers, including detailed code, writing, guides, and more. I should use Markdown formatting (lists like "1.", headers like "# title", code blocks like ```js etc). When asked a question that is nonsense, trickery, or has no clear answer, I must respond explaining what\'s wrong with the question. '
     self.prologue = [
       # {
       #   'source': 'server',
@@ -31,14 +33,14 @@ class SynthChatMode(BaseMode):
       # },
     ]
 
-    self.summary_header = lambda: f'# {self.persona_name}\'s Conversation Notes:'
-    self.conversation_header = lambda: f'# Live Chat Between {self.human_name} and {self.persona_name}:'
+    self.summary_header = lambda: f'# {self.persona_name}\'s Old Live Chat Notes:'
+    self.conversation_header = lambda: f'# Recent Live Chat Between {self.human_name} and {self.persona_name}:'
 
     self.max_summaries = 8
     self.soft_max_depth = 18
     self.min_rollup_tokens = 200
 
-    self.max_response_tokens = 750
+    self.max_response_tokens = 1000
     self.max_prompt_tokens = 4000
 
     self.soft_max_message_tokens = 150
@@ -104,10 +106,9 @@ class SynthChatMode(BaseMode):
     self.compress_conversation(self.max_response_tokens)
 
     conversation_prompt = self.format_conversation_prompt(self.recent_conversation)
-    results = self.llm.complete(
+    results = self.complete(
       conversation_prompt,
       max_length=self.max_response_tokens,
-      stop=self.get_stops(),
       stream=True
     )
 
@@ -153,11 +154,7 @@ class SynthChatMode(BaseMode):
       if self.count_tokens(message['text']) < self.soft_max_message_tokens:
         continue
 
-      # print('shrinking message')
-      response = self.llm.complete(
-        self.format_message_summary_prompt(message),
-        stop=self.get_stops(),
-      )
+      response = self.complete(self.format_message_summary_prompt(message))
       message['text'] = f'summary=[ I {response.strip()} ]'
 
   def compress_conversation(self, space_required):
@@ -179,14 +176,20 @@ class SynthChatMode(BaseMode):
         break
 
       summary_prompt = self.format_summary_prompt(chunk)
-      response = self.llm.complete(
-        summary_prompt,
-        max_length=self.max_response_tokens,
-        stop=self.get_stops(),
-      )
+      response = self.complete(summary_prompt)
       summary = f'{self.human_name} ' + response.strip()
 
       self.summaries = self.summaries[-(self.max_summaries - 1):] + [ summary ]
+
+  def complete(self, prompt, max_length=None, stream=False):
+    return self.llm.complete(
+      prompt,
+      model=self.model,
+      temperature=self.temperature,
+      max_length=max_length or self.max_response_tokens or 1000,
+      stop=self.get_stops(),
+      stream=stream,
+    )
 
   def get_stops(self):
     # return [ f'{self.human_name}>', self.line_sep ]
@@ -202,8 +205,9 @@ class SynthChatMode(BaseMode):
   def has_prompt_token_pressure(self):
     return self.count_tokens(self.format_conversation_prompt(self.recent_conversation)) > self.soft_max_prompt_tokens;
 
-  def get_notes(self):
-    return [ f'- {s}' for s in self.summaries ]
+  def format_summaries(self, include_pinned=True):
+    pinned = [ self.pinned_summary() ] if include_pinned else []
+    return [ f'- {s}' for s in pinned + self.summaries ]
 
   def format_message_summary_prompt(self, message, whitespace='\n'):
     author = self.persona_name if message["source"] == "server" else self.human_name
@@ -231,8 +235,8 @@ class SynthChatMode(BaseMode):
     lines = [
       self.format_persona_bio(),
       self.summary_header(),
-      f'- {self.pinned_summary()}',
-      *self.get_notes(),
+      # f'- {self.pinned_summary()}',
+      *self.format_summaries(),
       self.conversation_header(),
       self.format_messages(messages),
       f'{self.format_seed()}{self.persona_name}>{self.response_prefix}'
@@ -266,16 +270,24 @@ class SynthChatMode(BaseMode):
     else:
       return f'{self.human_name}> {message["text"]}'
 
-  def print(self):
-    print(self.format_conversation_prompt(self.recent_conversation))
+  def inspect(self):
+    return self.format_conversation_prompt(self.recent_conversation)
 
   def stats(self):
     history_size = len(self.recent_conversation)
     headroom = 100 - round(100 * self.get_prompt_size() / self.max_prompt_tokens)
-    return f'( depth={history_size}, free={headroom}% )'
+    return f'( depth={history_size}, free={headroom}%, profile={self.profile} )'
 
   def capacity(self):
     return round(100 * self.get_prompt_size() / self.max_prompt_tokens)
+
+  def variables(self):
+    return [
+      'model',
+      'persona',
+      'seed',
+      'temperature',
+    ]
 
   @property
   def persona(self):

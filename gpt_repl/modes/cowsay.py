@@ -12,8 +12,8 @@ class CowsayMode(BaseMode):
   def stats(self):
     return '( mood=moootastic )'
 
-  def print(self):
-    print('mooooooooooooooooooooooooooooooooooooooooooooooooooo')
+  def inspect(self):
+    return 'mooooooooooooooooooooooooooooooooooooooooooooooooooo'
 
   def build_cow(self, text):
     dialogue = f'< {text} >'

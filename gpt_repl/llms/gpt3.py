@@ -2,13 +2,11 @@ import os, openai, re, sys, tiktoken
 
 class GPT3:
 
-  def __init__(self, model='text-davinci-003', temperature=0.7):
+  def __init__(self):
     if not os.environ.get('OPENAI_API_KEY'):
       print("Please set the OPENAI_API_KEY environment variable. If you don't have one you can generate one here https://beta.openai.com/account/api-keys")
       sys.exit(0)
 
-    self.model = model
-    self.temperature = temperature
     self.tokenizer = tiktoken.get_encoding("gpt2")
 
   def count_tokens(self, text):
@@ -31,13 +29,19 @@ class GPT3:
     for data in response:
       yield data.choices[0].text
 
-  def get_response(self, prompt, max_length=1000, stop=None, stream=False):
-    # max_length = 2000
+  def get_response(self,
+      prompt,
+      max_length=1000,
+      temperature=0.7,
+      model="text-davinci-003",
+      stop=None,
+      stream=False,
+    ):
     return openai.Completion.create(
-      engine=self.model,
+      engine=model,
       prompt=prompt,
       max_tokens=max_length,
-      temperature=self.temperature,
+      temperature=float(temperature),
       top_p=1,
       frequency_penalty=0,
       presence_penalty=0,
