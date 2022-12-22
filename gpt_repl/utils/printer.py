@@ -65,8 +65,9 @@ class Printer:
   def __init__(self):
     self.console = Console(color_system="truecolor")
 
-  def preload(self):
-    GuessLexer.load()
+  def warmup(self):
+    GuessLexer.warmup()
+    # GuessLexer.load()
 
   def print(self, text):
     self.console.print(text)
@@ -117,14 +118,11 @@ class Printer:
 
     self.console.print(table)
 
-  def print_thread_loading(self, thread_id):
-    return TempLog(f"Loading \x1b[1m@{thread_id}{Style.RESET_ALL}...")
-
-  def print_thread_closed(self, thread_id):
-    print(f"\nLeaving \x1b[1m@{thread_id}{Style.RESET_ALL}")
-
   def live(self, transient=False):
     return RichLive(self.console, transient=transient)
+
+  def temp_log(self, text):
+    return TempLog(text)
 
   def exception(self, e):
     print('\n' + Fore.RED + ''.join(traceback.TracebackException.from_exception(e).format()) + Fore.RESET)

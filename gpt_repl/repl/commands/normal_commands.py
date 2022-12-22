@@ -1,7 +1,7 @@
 import os, re, pyperclip
 
-from ..utils import printer, open_in_editor, copy_to_clipboard
-from ..publish import PublishGPT
+from ...utils import printer, open_in_editor, copy_to_clipboard
+from ...publish import PublishGPT
 
 from .command_manager import Commands
 from .base_command import BaseCommand
@@ -38,7 +38,7 @@ class CopyCommand(BaseCommand):
       return 'Failed to copy a code block to the clipboard.'
 
   def extract_code_block(self, history):
-    responses = [ entry.text for entry in history if entry.source == 'gpt' ]
+    responses = [ entry.text for entry in history if entry.source == 'them' ]
     if len(responses) == 0:
       return None
     last_response = responses[-1]
@@ -72,7 +72,7 @@ class EditCommand(BaseCommand):
   erase_input = True
 
   def run(self):
-    text = open_in_editor(self.repl.session, extension='.md')
+    text = open_in_editor(self.repl.prompt.session, extension='.md')
     self.repl.auto_fills += [ text ]
     self.action('prompt')
 

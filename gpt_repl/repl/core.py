@@ -1,16 +1,13 @@
-import sys
+import sys, re
 
-from prompt_toolkit import PromptSession
-from prompt_toolkit.key_binding import KeyBindings
-from prompt_toolkit.history import FileHistory
-from prompt_toolkit.application.current import get_app
-from prompt_toolkit import filters as Filters
+from .pretty import PrettyPrintREPL
+from .prompt import Prompt
 
 from ..utils import peek, printer, Loader
 from ..config import Config
 
 from ..modes import get_mode
-from ..commands import Commands
+from .commands import Commands
 
 class REPL:
 
@@ -20,6 +17,7 @@ class REPL:
       mode_name = None,
       auto_fills=[],
     ):
+    self.pretty = PrettyPrintREPL(self)
 
     self.config = Config()
     self.config.load_plugins()
@@ -35,12 +33,12 @@ class REPL:
     default = ''
     if len(self.auto_fills) > 0:
       default = self.auto_fills.pop(0)
-    text = self.prompt(default=default)
+    text = self.input(default=default)
 
     (action, new_text) = Commands.exec(
       repl=self,
       text=text,
-      print_text=lambda s: printer.print_markdown(s)
+      print_text=lambda s: self.pretty.print(s)
     )
 
     if action == 'prompt':
@@ -53,111 +51,66 @@ class REPL:
       return new_text
 
   def run(self):
-    self.warmup()
+    if len(self.thread.messages) == 0:
+      printer.clear(1)
+    else:
+      self.warmup_thread()
+
     self.load_mode(self.mode_name, state=self.thread.mode.state, seed=self.thread.seed)
+    self.create_prompt()
 
-    print("Enter 'help' for a list of commands. Use Enter to submit and Tab to start a new line.\n")
-    self.replay_thread()
-    self.start_prompt_session()
+    self.pretty.intro()
+    self.pretty.replay_thread()
 
-    while True:
-      try:
-        self.print_you_banner(len(self.thread.messages) + 1)
-        printer.pad_down(3)
-
-        text = self.get_user_input()
-        if text == None:
-          continue
-
-        stats = self.mode.stats()
-        self.print_gpt_banner(len(self.thread.messages) + 2, stats=stats)
-        printer.pad_down(3)
-
-        try:
-          answer = self.ask(text)
-        except (KeyboardInterrupt, EOFError):
-          self.mode.rollback()
-          print('Request canceled\n')
-          continue
-
-        printer.print_markdown(answer)
-        print('')
-
-        self.thread.add_message('you', text)
-        self.thread.add_message('gpt', answer, stats=stats)
-
+    try:
+      while True:
+        self.core_loop()
+    except (Exception, KeyboardInterrupt, EOFError) as error:
+      self.pretty.leaving_thread()
+      if isinstance(error, KeyboardInterrupt) or isinstance(error, EOFError):
         self.save_thread()
-        self.first_run = False
-      except (KeyboardInterrupt, EOFError):
-        self.save_thread()
-        printer.print_thread_closed(self.thread.name)
         sys.exit(0) # breaking might be better, but sys.exit is a lot faster
-        # break
-
-      except Exception as e:
-        breakpoint()
-        printer.print_thread_closed(self.thread.name)
-
-        printer.exception(e)
+      else:
+        printer.exception(error)
         sys.exit(1)
 
-  def start_prompt_session(self):
-    self.session = PromptSession(
-      erase_when_done=True,
-      history=FileHistory(self.config.prompt_history_path),
-    )
-    self.kb = KeyBindings()
+  def core_loop(self):
+    self.pretty.your_banner(len(self.thread.messages) + 1, space=3)
 
-    Commands.bind_keys(self.kb)
+    text = self.get_user_input()
+    if text == None:
+      return
 
-    @Filters.Condition
-    def is_not_searching():
-      return not get_app().layout.is_searching
+    stats = self.mode.stats()
+    self.pretty.their_banner(len(self.thread.messages) + 2, stats=stats, space=3)
 
-    @self.kb.add("tab", filter=is_not_searching)
-    def _(event):
-      prefix = event.current_buffer.document.leading_whitespace_in_current_line
-      event.current_buffer.insert_text('\n' + prefix)
-    @self.kb.add('enter', filter=is_not_searching)
-    def _(event):
-      if len(event.current_buffer.text.strip()) > 0:
-        event.current_buffer.validate_and_handle()
-      else:
-        event.current_buffer.insert_text('\n')
+    try:
+      answer = self.ask(text)
+    except (KeyboardInterrupt, EOFError):
+      self.mode.rollback()
+      pretty.request_canceled()
+      return
 
-  def prompt(self, default=''):
+    self.pretty.print(answer, newline=True)
+
+    self.thread.add_message('you', text)
+    self.thread.add_message('them', answer, stats=stats)
+
+    self.save_thread()
+    self.first_run = False
+
+  def create_prompt(self):
+    self.prompt = Prompt(self.config)
+    self.prompt.bind_keys()
+    Commands.bind_keys(self.prompt.kb)
+
+  def input(self, default=''):
     seed = self.mode.get_seed()
     if seed:
-      bottom_toolbar = f'seed={seed}'
+      toolbar = f'seed={seed}'
     else:
-      bottom_toolbar = 'No conversation seed set'
-
-    text = self.session.prompt(
-      '',
-      multiline=True,
-      key_bindings=self.kb,
-      enable_open_in_editor=True,
-      tempfile_suffix='.md',
-      default=default,
-      bottom_toolbar=bottom_toolbar,
-    )
-    return text.strip()
-
-  def print_you_banner(self, count):
-    printer.print_banner(
-      bg_color='rgb(0,95,135)',
-      text=' You:',
-      prefix=f' {count} ',
-      suffix=f' @{self.thread.name} [ {self.mode_name} ]'
-    )
-
-  def print_gpt_banner(self, count, stats=''):
-    printer.print_banner(
-      bg_color='spring_green4',
-      text=f' {self.mode.get_title()}:',
-      prefix=f' {count} ',
-      suffix=stats
-    )
+      toolbar = 'No conversation seed set'
+    return self.prompt.input(default=default, toolbar=toolbar)
 
   def save_thread(self):
     self.thread.set_mode(self.mode_name, self.mode.save())
@@ -175,33 +128,39 @@ class REPL:
     self.thread.reset()
     self.save_thread()
 
-  def replay_thread(self):
-    for i, msg in enumerate(self.thread.messages):
-      if msg.source == 'you':
-        self.print_you_banner(i + 1)
-      elif msg.source == 'gpt':
-        self.print_gpt_banner(i + 1, stats=msg.stats)
-      printer.print_markdown(msg.text)
-      print()
-
-  def warmup(self):
-    messages = [ entry.text for entry in self.thread.messages ] + self.auto_fills
-    if any([ '```' in m for m in messages ]):
-      with printer.print_thread_loading(self.thread.name):
-        printer.preload()
-
   def ask(self, text):
     delay = 0.25 if self.first_run else self.mode.loader_latency
-    with Loader(show_timer=True, delay=delay) as spinner:
+    with Loader(show_timer=True, delay=delay):
       gen = iter(self.mode.ask(text))
+      printer.warmup()
       response = peek(gen)[0]
 
     answer = ''
     with printer.live(transient=True) as screen:
       for data in response:
         answer += data
-        markdown = printer.to_markdown(answer.lstrip() + '█', code_theme='default')
-        display_text = markdown.to_text() + '\n\n\n'
+        display_text = self.pretty.partial_response(answer)
         screen.update(display_text)
 
     return answer.strip()
+
+  # When replaying the thread, it might have to load guesslang
+  # and the UI will seem to be frozen. This avoids that. It
+  # usually won't run because SynthChat is pretty good about
+  # labeling code blocks. Kinda jank since it's not actually
+  # parsing the Markdown.
+  def warmup_thread(self):
+    messages = [ entry.text for entry in self.thread.messages ] + self.auto_fills
+    pattern1 = re.compile(r'^```.+$', re.MULTILINE)
+    pattern2 = re.compile(r'^```$', re.MULTILINE)
+
+    should_warmup = any([
+      len(re.findall(pattern1, msg)) != len(re.findall(pattern2, msg))
+      for msg in messages
+    ])
+    if not should_warmup:
+      return
+
+    printer.clear(1)
+    with self.pretty.loading_thread():
+      printer.warmup()

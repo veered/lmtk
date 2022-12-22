@@ -13,13 +13,13 @@ class GuessLexer:
   @classmethod
   def parse(cls, code):
     if code.strip() == '':
-      return "text"
+      return 'text'
     try:
       GuessLexer.load()
       return GuessLexer.guess._language_map[GuessLexer.guess.language_name(code.strip())]
     except Exception as e:
       print(e)
-      return "text"
+      return 'text'
 
   @classmethod
   def load(cls):
@@ -27,9 +27,9 @@ class GuessLexer:
       GuessLexer.guess = importlib.import_module('guesslang').Guess()
 
   @classmethod
-  def warm(cls):
-    self.load()
-    GuessLexer.guess.language_name(' ')
+  def warmup(cls):
+    cls.load()
+    GuessLexer.guess.language_name('_')
 
 
 class SmartCodeBlock(CodeBlock):

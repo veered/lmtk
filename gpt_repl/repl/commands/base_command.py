@@ -1,4 +1,4 @@
-from ..utils import printer
+from ...utils import printer
 
 class BaseCommand:
 
