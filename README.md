@@ -33,46 +33,24 @@ export OPENAI_API_KEY="<your api key>"
 
 ## Usage
 ```bash
-gpt-repl @thread-name [-m mode-name]
+gpt-repl @my-thread [-m mode-name]
 ```
 
-Use `gpt-repl modes` to list available REPL modes and `gpt-repl threads` to list open threads.
+Use `gpt-repl modes` to list available REPL modes and `gpt-repl threads` to list open threads. Inside the REPL, type `.help` for a list of commands and keyboard shortcuts.
 
-Inside the REPL, type `.help` for a list of commands and keyboard shortcuts. This is the current output of `.help`:
-> ### Commands
-> **.clear** or .cl: Clears the terminal screen. <br />
-> **.copy** or .cp: Copies the first code block in the most recent response to the clipboard. <br />
-> **.debug** or .db: Triggers a breakpoint in the mode backend. <br />
-> **.editor** or .e: Opens the current message in the text editor specified by $EDITOR. <br />
-> **.exit**: Closes the REPL. <br />
-> **.help** or help: Prints a list of available commands and a brief description of each. <br />
-> **.print** or .pp: Prints the internal prompt representation <br />
-> **.publish** or .pub: Publishes the current thread online and prints the URL. <br />
-> **.retry**: or .r: Resubmits the most recent successful response. <br />
-> **.rename**: Renames the current thread. The new name must be provided as an argument to this command, e.g. ".rename my_new_name". The old thread isn't deleted. <br />
-> **.reset** or .rs: Resets the history of the thread. <br />
-> **.seed** or .s: The text following .seed will be set as the conversation seed. Set no text to clear the seed. <br />
-> **.thread** or .name: Prints the current thread name. <br />
-> **.threads**: Lists all threads. <br />
->
-> ### Shortcuts
-> **Enter**: Submits the current message. <br />
-> **Tab**: Adds a new line. <br />
-> **C+c**: Closes the REPL. <br />
-> **C+d**: Closes the REPL. <br />
-> **C+r**: Search message history. <br />
-> **C+x-C+e**: Opens the current message in the text editor specified by $EDITOR.
->
-> ### Tips:
-> - To shape your conversation, consider setting a conversation seed using the `.seed DESCRIPTION` command. Some examples:
->     - `.seed You must use Markdown headers on every message`
->     - `.seed You must contantly use exclamation marks`
->     - `.seed You must speak in rhymes`
->
->   Seeds work best when set early in a conversation and are best phrased as commands.
-> - If you don't like the most recent response, retry it with `.retry`
-> - If the thread has gone completely off the rails, reset it with `.reset`
->  - Many commands have shorter aliases e.g. `.seed` has `.s`. See the command list for more info.
+Setting a conversation seed is helpful for constraining behavior. For example:
+```
+.seed You must write your message using only lowercase letters
+```
+Seeds are best phrased as statements of fact or commands. See `.help` for examples.
+
+If you aren't getting a response you like, you can force how the next response must start. For example, if you send:
+```
+Give me Pong in Pygame :> Here is the code:
+```
+Then the response will start with `Here is the code:`.
+
+Use `.redo` (or `C-x + C-r`) to resample the most recent response and `.undo` (or `C-x + C-u`) to rewrite your most recent message.
 
 ## Custom Modes
 Add a Python file that [looks like this](https://github.com/veered/gpt-repl/blob/main/examples/bruh_mode.py) to `$GPT_REPL_CONFIG_PATH/plugins/`. By default this will be `~/.config/gpt_repl/plugins/`.
