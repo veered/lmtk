@@ -34,7 +34,9 @@ export OPENAI_API_KEY="<your api key>"
 gpt-repl @my-thread [-m mode-name]
 ```
 
-Use `gpt-repl modes` to list available REPL modes and `gpt-repl threads` to list open threads. Inside the REPL, type `.help` for a list of commands and keyboard shortcuts.
+Use `gpt-repl modes` to list available REPL modes and `gpt-repl threads` to list open threads.
+
+Inside the REPL, type `.help` for a list of commands and keyboard shortcuts.
 
 ## Tips
 
