@@ -97,16 +97,16 @@ class PrintCommand(BaseCommand):
     printer.print(self.repl.mode.inspect())
     return ''
 
-# @Commands.register('.publish')
-# class PublishCommand(BaseCommand):
+@Commands.register('.publish')
+class PublishCommand(BaseCommand):
 
-#   help = 'Publishes the current thread online and prints the URL.'
-#   aliases = [ '.pub' ]
+  help = 'Publishes the current thread online and prints the URL.'
+  aliases = [ '.pub' ]
 
-#   def run(self):
-#     self.banner()
-#     publisher = PublishGPT(self.repl.thread)
-#     return publisher.publish()
+  def run(self):
+    self.banner()
+    publisher = PublishGPT(self.repl.thread)
+    return publisher.publish()
 
 @Commands.register('.redo')
 class RedoCommand(BaseCommand):

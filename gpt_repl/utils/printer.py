@@ -76,8 +76,8 @@ class Printer:
       text = '  \n'.join(text.split('\n'))
     return SmartMarkdown(text, code_theme=code_theme)
 
-  def print_markdown(self, *args, **kwargs):
-    self.console.print(self.to_markdown(*args, **kwargs))
+  def print_markdown(self, text):
+    self.console.print(self.to_markdown(text))
 
   def build_text(self, text_parts):
     text = Text()
