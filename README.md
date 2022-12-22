@@ -10,11 +10,11 @@
 ## Description
 ChatGPT is extremely useful, but it needs a power-user mode. `gpt-repl` gives you a terminal based UI and highly configurable ChatGPT-like backends.
 
-The default backend is SynthChat, which has similar behavior to ChatGPT, but offers a lot more control. For example, you can:
+The default mode lets you:
 - Write the prefix of the next response
 - Give instructions that will always be followed and never forgetten
 
-There is also a ChatGPT mode, but it is built on a unofficial API.
+There is also a ChatGPT mode built on the unofficial API.
 
 This project is still in the **early stages** of development. It will have bugs and frequent breaking changes.
 
