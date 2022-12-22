@@ -2,6 +2,7 @@ import click, os, datetime
 from os.path import abspath
 
 from .repl import REPL
+from .repl.search import fuzzy_search_input
 from .config import Config
 from .modes import list_modes
 
@@ -29,6 +30,13 @@ def run(cmd, mode, thread):
 
   if str(cmd) == '-':
     thread = config.threads().list()[0]
+
+  if cmd == '@':
+    thread = fuzzy_search_input('thread = @', config.threads().list())
+
+  if cmd == 'i':
+    thread = fuzzy_search_input('thread = @', config.threads().list())
+    mode = fuzzy_search_input('mode = ', list_modes())
 
   if thread == None:
     thread = config.threads().make_name()
