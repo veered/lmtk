@@ -6,11 +6,11 @@ from prompt_toolkit.history import FileHistory
 from prompt_toolkit.application.current import get_app
 from prompt_toolkit import filters as Filters
 
-from .utils import peek, printer, Loader
-from .config import Config
+from ..utils import peek, printer, Loader
+from ..config import Config
 
-from .modes import get_mode
-from .commands import Commands
+from ..modes import get_mode
+from ..commands import Commands
 
 class REPL:
 
