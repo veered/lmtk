@@ -38,11 +38,12 @@ gpt-repl @my-thread [-m mode-name]
 
 Use `gpt-repl modes` to list available REPL modes and `gpt-repl threads` to list open threads. Inside the REPL, type `.help` for a list of commands and keyboard shortcuts.
 
+## Tips
 Setting a conversation seed is helpful for constraining behavior. For example:
 ```
 .seed You must write your message using only lowercase letters
 ```
-Seeds are best phrased as statements of fact or commands. See `.help` for examples.
+All future responses will only use lowercase letters (usually). Seeds are best phrased as statements of fact or commands. See `.help` for examples.
 
 If you aren't getting a response you like, you can force how the next response must start. For example, if you send:
 ```
