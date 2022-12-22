@@ -166,11 +166,12 @@ class RenameCommand(BaseCommand):
     else:
       return 'Invalid thread name'
 
-@Commands.register('.reset')
-class ResetCommand(BaseCommand):
+# I would prefer to call it ".reset", but .redo is more important
+@Commands.register('.new')
+class NewCommand(BaseCommand):
 
-  aliases = [ '.rs' ]
-  help = 'Resets the history of the thread.'
+  aliases = [ '.n', '.reset' ]
+  help = 'Resets the thread.'
   shortcut = [ 'C-x', 'C-n' ]
 
   def run(self):

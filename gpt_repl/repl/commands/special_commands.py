@@ -67,7 +67,7 @@ class HelpCommand(BaseCommand):
     - `.seed You must speak in rhymes`
   Seeds are best phrased as commands or statements of fact.
 - If you don't like the most recent response, regenerate it with `.redo`
-- If the thread has gone completely off the rails, reset it with `.reset`
+- If the thread has gone completely off the rails, reset it with `.new`
  - Many commands have shorter aliases e.g. `.seed` has `.s`. See the command list for more info.
 """.strip()
 
