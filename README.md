@@ -37,19 +37,27 @@ gpt-repl @my-thread [-m mode-name]
 Use `gpt-repl modes` to list available REPL modes and `gpt-repl threads` to list open threads. Inside the REPL, type `.help` for a list of commands and keyboard shortcuts.
 
 ## Tips
-Setting a conversation seed is helpful for constraining behavior. For example:
+
+### Conversation Seeds
+Conversation seeds give you extremely strong influence over the chatbot's behavior.
 ```
 .seed You must write your message using only lowercase letters
 ```
-All future responses will only use lowercase letters (usually). Seeds are best phrased as statements of fact or commands. See `.help` for examples.
+All future responses will only use lowercase letters (usually). Seeds are never forgotten. Seeds are best phrased as statements of fact or commands. See `.help` for examples.
 
-If you aren't getting a response you like, you can force how the next response must start. For example, if you send:
+### Forced Response Prefix
+If you aren't getting a response you like, you can directly specify how the next response must start using `:>`. For example, if you send:
 ```
 Give me Pong in Pygame :> Here is the code:
 ```
 Then the response will start with `Here is the code:`.
 
-Use `.redo` (or `C-x + C-r`) to resample the most recent response and `.undo` (or `C-x + C-u`) to rewrite your most recent message.
+### Useful Commands
+See `.help` for a full list, but these are some particularly important commands:
+- `.clear` or `C-x + C-c` to clear the screen
+- `.redo`  or `C-x + C-r` to resample the response
+- `.reset` or `C-x + C-n` to reset the thread
+- `.undo`  or `C-x + C-u` to rewrite your most recent message
 
 ## Custom Modes
 Add a Python file that [looks like this](https://github.com/veered/gpt-repl/blob/main/examples/bruh_mode.py) to `$GPT_REPL_CONFIG_PATH/plugins/`. By default this will be `~/.config/gpt_repl/plugins/`.
