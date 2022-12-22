@@ -1,6 +1,6 @@
 <h1 align="center">gpt-repl</h1>
 <p align="center">
-    Interactively play with GPT-based tools from the command line
+    Interactively play with GPT-based tools from the terminal
     <br />
     <br />
     <a href="https://pypi.python.org/pypi/gpt-repl/"><img alt="PyPi" src="https://img.shields.io/pypi/v/gpt-repl.svg?style=flat-square"></a>
@@ -8,15 +8,13 @@
 </p>
 
 ## Description
-ChatGPT can be a powerful tool, not just a conversation partner. It needs to be more configurable, both in how we interact with it and how it behaves.
+ChatGPT is extremely useful, but it needs a power-user mode. `gpt-repl` gives you a terminal based UI and highly configurable ChatGPT-like backends.
 
-`gpt-repl` is a customizable REPL-like interface to GPT based tech. Multiple backends (or "modes") are supported, including ChatGPT, raw GPT-3, and a ChatGPT copycat called SynthChat.
-
-SynthChat has similar behavior to ChatGPT, but offers a lot more control. For example, you can:
+The default backend is SynthChat, which has similar behavior to ChatGPT, but offers a lot more control. For example, you can:
 - Write the prefix of the next response
 - Give instructions that will always be followed and never forgetten
-- Control its persona (name, bio, personality)
-- Set the randomness (or "temperature") of its responses
+
+There is also a ChatGPT mode, but it is built on a unofficial API.
 
 This project is still in the **early stages** of development. It will have bugs and frequent breaking changes.
 
