@@ -34,8 +34,8 @@ class SynthChatMode(BaseMode):
       # },
     ]
 
-    self.summary_header = lambda: f'# {self.persona_name}\'s Old Live Chat Notes:'
-    self.conversation_header = lambda: f'# Recent Live Chat Between {self.human_name} and {self.persona_name}:'
+    self.summary_header = lambda: f'!! {self.persona_name}\'s Old Live Chat Notes:'
+    self.conversation_header = lambda: f'!! Recent Live Chat Between {self.human_name} and {self.persona_name}:'
 
     self.max_summaries = 8
     self.soft_max_depth = 18
@@ -60,17 +60,6 @@ class SynthChatMode(BaseMode):
   def get_title(self):
     return self.persona_name
 
-  def load_profile(self, profile=None, profile_path=''):
-    if not profile:
-      with open(profile_path, "r") as profile_file:
-        profile = json.load(profile_file)
-    self.human_name = profile['human_name']
-    self.authority_name = profile['authority_name']
-    self.persona_name = profile['ai_name']
-    self.persona_bio = profile['ai_bio']
-    self.pinned_summary = profile['pinned_summary']
-    self.prologue = profile['prologue']
-
   def save(self):
     return {
       'initialized': True,
@@ -79,7 +68,6 @@ class SynthChatMode(BaseMode):
       'seed': self.seed,
       'persona_name': self.persona_name,
     }
-    pass
 
   def load(self, state):
     self.summaries = state['summaries']
@@ -194,7 +182,6 @@ class SynthChatMode(BaseMode):
     )
 
   def get_stops(self):
-    # return [ f'{self.human_name}>', self.line_sep ]
     return [ f'{self.human_name}>', f'{self.persona_name}>' ]
 
   def get_prompt_size(self):
@@ -228,7 +215,6 @@ class SynthChatMode(BaseMode):
     ])
 
   def parse_query(self, query=''):
-    # parts = query.split('::>')
     parts = query.split(':>')
     if len(parts) == 1:
       return (query, '')
@@ -238,7 +224,6 @@ class SynthChatMode(BaseMode):
     lines = [
       self.format_persona_bio(),
       self.summary_header(),
-      # f'- {self.pinned_summary()}',
       *self.format_summaries(),
       self.conversation_header(),
       self.format_messages(messages),
@@ -290,6 +275,7 @@ class SynthChatMode(BaseMode):
       'persona',
       'seed',
       'temperature',
+      'max_response_tokens',
     ]
 
   @property
