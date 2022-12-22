@@ -8,7 +8,8 @@ class SynthChatMode(BaseMode):
 
   title = 'ChattyGPT'
 
-  line_sep = '-----'
+  line_sep = '---------'
+  line_sep_token = '45537'
 
   def __init__(self, state={}):
     self.model = 'text-davinci-003'
@@ -187,7 +188,8 @@ class SynthChatMode(BaseMode):
       model=self.model,
       temperature=float(self.temperature),
       max_length=max_length or self.max_response_tokens or 1000,
-      stop=self.get_stops(),
+      stops=self.get_stops(),
+      soft_stops=[ self.line_sep_token ],
       stream=stream,
     )
 

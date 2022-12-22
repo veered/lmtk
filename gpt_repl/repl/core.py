@@ -88,7 +88,7 @@ class REPL:
       answer = self.ask(text)
     except (KeyboardInterrupt, EOFError):
       self.mode.rollback()
-      pretty.request_canceled()
+      self.pretty.request_canceled()
       return
 
     self.pretty.print(answer, newline=True)

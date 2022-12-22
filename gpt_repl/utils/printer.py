@@ -1,5 +1,4 @@
 import traceback
-from colorama import Fore, Back, Style
 
 # Rich Colors:
 #  some= https://rich.readthedocs.io/en/stable/appendix/colors.html
@@ -125,7 +124,7 @@ class Printer:
     return TempLog(text)
 
   def exception(self, e):
-    print('\n' + Fore.RED + ''.join(traceback.TracebackException.from_exception(e).format()) + Fore.RESET)
+    self.print(f'\n[red]{"".join(traceback.TracebackException.from_exception(e).format())}[/red]')
 
   def pad_down(self, n=1):
     with printer.live(transient=True) as screen:

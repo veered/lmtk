@@ -1,4 +1,3 @@
-from colorama import Style
 from ..utils import printer
 
 class PrettyPrintREPL:
@@ -40,10 +39,10 @@ class PrettyPrintREPL:
     return markdown.to_text() + '\n\n\n'
 
   def loading_thread(self):
-    return printer.temp_log(f"Loading \x1b[1m@{self.repl.thread.name}{Style.RESET_ALL}...")
+    return printer.temp_log(f'Loading \x1b[1m@{self.repl.thread.name}\x1b[0m...')
 
   def leaving_thread(self):
-    print(f"\nLeaving \x1b[1m@{self.repl.thread.name}{Style.RESET_ALL}")
+    print(f'\nLeaving \x1b[1m@{self.repl.thread.name}\x1b[0m')
 
   def request_canceled(self):
     printer.print('Request canceled\n')

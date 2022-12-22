@@ -11,7 +11,6 @@ classifiers = ["License :: OSI Approved :: MIT License"]
 dynamic = ["version", "description"]
 dependencies = [
   "click >=8.0",
-  "colorama >=0.1.0",
   "guesslang-experimental >=2.2.3",
   "openai >=0.25",
   "prompt_toolkit >=3.0",

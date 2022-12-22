@@ -34,9 +34,15 @@ class GPT3:
       max_length=1000,
       temperature=0.7,
       model="text-davinci-003",
-      stop=None,
+      stops=None,
+      soft_stops=[],
       stream=False,
     ):
+
+    logit_bias = {}
+    for s in soft_stops:
+      logit_bias[s] = -100
+
     return openai.Completion.create(
       engine=model,
       prompt=prompt,
@@ -45,7 +51,8 @@ class GPT3:
       top_p=1,
       frequency_penalty=0,
       presence_penalty=0,
-      stop=stop,
+      stop=stops,
+      logit_bias=logit_bias,
       stream=stream,
       # logit_bias={
       #   '2949': 1, # Make "No" a more common token
