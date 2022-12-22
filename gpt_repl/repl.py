@@ -16,26 +16,25 @@ class REPL:
 
   def __init__(
       self,
-      config_path="~/.config/gpt_repl",
       thread_name=None,
       mode_name = None,
-      autofills=[],
+      auto_fills=[],
     ):
 
-    self.config = Config(config_path)
+    self.config = Config()
     self.config.load_plugins()
 
     self.thread = self.config.threads().load(thread_name)
     self.thread.set_mode(self.thread.mode.name or mode_name or 'synth-chat')
 
     self.mode_name = self.thread.mode.name
-    self.autofills = autofills
+    self.auto_fills = auto_fills
     self.first_run = True
 
   def get_user_input(self):
     default = ''
-    if len(self.autofills) > 0:
-      default = self.autofills.pop(0)
+    if len(self.auto_fills) > 0:
+      default = self.auto_fills.pop(0)
     text = self.prompt(default=default)
 
     (action, new_text) = Commands.exec(
@@ -186,7 +185,7 @@ class REPL:
       print()
 
   def warmup(self):
-    messages = [ entry.text for entry in self.thread.messages ] + self.autofills
+    messages = [ entry.text for entry in self.thread.messages ] + self.auto_fills
     if any([ '```' in m for m in messages ]):
       with printer.print_thread_loading(self.thread.name):
         printer.preload()

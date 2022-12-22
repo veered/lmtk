@@ -1,4 +1,4 @@
-from .mode import BaseMode, register_mode, get_mode, list_modes
+from .base_mode import BaseMode, register_mode, get_mode, list_modes
 from .synth_chat import SynthChatMode
 from .echo import EchoMode
 from .cowsay import CowsayMode

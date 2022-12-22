@@ -34,13 +34,14 @@ class CommandManager:
       shortcut = Command.shortcut
       if not shortcut or len(shortcut) == 0:
         continue
+      shortcut = [ s.lower() for s in shortcut ]
       self.bind_key(kb, Command.name, shortcut)
 
   def bind_key(self, kb, cmd_name, shortcut):
     @kb.add(*shortcut)
     def _(event):
-      breakpoint
-      event.current_buffer.text = cmd_name
-      event.current_buffer.validate_and_handle()
+      buffer = event.current_buffer
+      buffer.text = cmd_name
+      buffer.validate_and_handle()
 
 Commands = CommandManager()

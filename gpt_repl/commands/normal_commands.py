@@ -11,7 +11,7 @@ class ClearCommand(BaseCommand):
 
   aliases = [ '.cl' ]
   help = 'Clears the terminal screen.'
-  shortcut = [ 'c-x', 'c-c' ]
+  shortcut = [ 'C-x', 'C-c' ]
   erase_input = True
 
   def run(self):
@@ -67,11 +67,13 @@ class EditCommand(BaseCommand):
 
   aliases = [ '.e' ]
   help = 'Opens the current message in the text editor specified by $EDITOR.'
+  # We will use the built-in C-x+C-e keybinding
+  # shortcut = [ 'C-x', 'C-e' ]
   erase_input = True
 
   def run(self):
     text = open_in_editor(self.repl.session, extension='.md')
-    self.repl.autofills += [ text ]
+    self.repl.auto_fills += [ text ]
     self.action('prompt')
 
 @Commands.register('.exit')
@@ -88,7 +90,7 @@ class PrintCommand(BaseCommand):
 
   aliases = [ '.pp' ]
   help = 'Prints the internal prompt representation'
-  shortcut = [ 'c-x', 'c-p' ]
+  shortcut = [ 'C-x', 'C-p' ]
 
   def run(self):
     self.banner()
@@ -111,7 +113,7 @@ class RedoCommand(BaseCommand):
 
   aliases = [ '.r' ]
   help = 'Resubmits the most recent successful response.'
-  shortcut = [ 'c-x', 'c-r' ]
+  shortcut = [ 'C-x', 'C-r' ]
 
   def run(self):
     self.banner()
@@ -133,7 +135,7 @@ class UndoCommand(BaseCommand):
 
   aliases = [ '.u' ]
   help = 'Rolls back the most recent question and answer'
-  shortcut = [ 'c-x', 'c-u' ]
+  shortcut = [ 'C-x', 'C-u' ]
 
   def run(self):
     self.banner()
@@ -147,7 +149,7 @@ class UndoCommand(BaseCommand):
     last_message = history[-2].text
     self.repl.thread.rollback(2)
 
-    self.repl.autofills += [ last_message ]
+    self.repl.auto_fills += [ last_message ]
     self.action('break')
 
 @Commands.register('.rename')
@@ -169,7 +171,7 @@ class ResetCommand(BaseCommand):
 
   aliases = [ '.rs' ]
   help = 'Resets the history of the thread.'
-  shortcut = [ 'c-x', 'c-n' ]
+  shortcut = [ 'C-x', 'C-n' ]
 
   def run(self):
     self.banner()

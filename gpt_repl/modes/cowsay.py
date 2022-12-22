@@ -1,4 +1,4 @@
-from .mode import BaseMode, register_mode
+from .base_mode import BaseMode, register_mode
 
 @register_mode('cowsay')
 class CowsayMode(BaseMode):

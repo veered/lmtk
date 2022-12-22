@@ -1,4 +1,4 @@
-from .mode import BaseMode, register_mode
+from .base_mode import BaseMode, register_mode
 from ..llms.chat_gpt import ChatGPT
 
 @register_mode('chat-gpt')

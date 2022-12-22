@@ -5,26 +5,26 @@ from .threads import ThreadManager
 
 class Config:
 
-  def __init__(self, config_dir_path):
-    self.config_dir_path = path.abspath(path.expanduser(config_dir_path))
-    self.config_file_path = path.join(self.config_dir_path, "config.json")
-    self.prompt_history_path = path.join(self.config_dir_path, "prompt_history")
-    self.threads_dir_path = path.join(self.config_dir_path, "threads")
-    self.plugins_dir_path = path.join(self.config_dir_path, "plugins")
+  default_config_path = '~/.config/gpt_repl'
 
-    if not path.exists(self.config_dir_path):
-      os.makedirs(self.config_dir_path)
+  def __init__(self, config_path=None):
+    config_path = config_path or os.getenv('GPT_REPL_CONFIG_PATH', self.default_config_path)
 
-    if not path.exists(self.threads_dir_path):
-      os.mkdir(self.threads_dir_path)
+    self.config_dir_path = path.abspath(path.expanduser(config_path))
+    self.config_file_path = path.join(self.config_dir_path, 'config.json')
+    self.prompt_history_path = path.join(self.config_dir_path, 'prompt_history')
+    self.threads_dir_path = path.join(self.config_dir_path, 'threads')
+    self.plugins_dir_path = path.join(self.config_dir_path, 'plugins')
 
-    if not path.exists(self.plugins_dir_path):
-      os.mkdir(self.plugins_dir_path)
+    dirs = [ self.config_dir_path, self.threads_dir_path, self.plugins_dir_path]
+    for dir in dirs:
+      if not path.exists(dir):
+        os.makedirs(dir)
 
     self.reload()
 
   def save(self):
-      with open(self.config_file_path, "w") as config_file:
+      with open(self.config_file_path, 'w') as config_file:
         json.dump(self.config or {}, config_file, indent=2)
 
   def reload(self):
@@ -33,7 +33,7 @@ class Config:
     if not path.exists(self.config_file_path):
       self.save()
 
-    with open(self.config_file_path, "r") as config_file:
+    with open(self.config_file_path, 'r') as config_file:
       self.config = json.load(config_file)
 
     return self.config

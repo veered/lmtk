@@ -1,6 +1,6 @@
 import math, uuid, re
 
-from .mode import BaseMode, register_mode
+from .base_mode import BaseMode, register_mode
 from ..llms.gpt3 import GPT3
 
 @register_mode('synth-chat')
@@ -226,6 +226,7 @@ class SynthChatMode(BaseMode):
     ])
 
   def parse_query(self, query=''):
+    # parts = query.split('::>')
     parts = query.split(':>')
     if len(parts) == 1:
       return (query, '')

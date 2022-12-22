@@ -24,3 +24,12 @@ class ThreadManager:
     threads.sort(reverse=True)
 
     return [name for _, name in threads]
+
+  def make_name(self):
+    threads = self.list()
+    i = len(threads) + 1
+    while True:
+      thread = f'thread-{i}'
+      i += 1
+      if thread not in threads:
+        return thread
