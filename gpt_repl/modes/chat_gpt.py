@@ -2,7 +2,7 @@ from .base_mode import BaseMode, register_mode
 from ..llms.chat_gpt import ChatGPT
 
 @register_mode('chat-gpt')
-class RawGPTMode(BaseMode):
+class ChatGPTMode(BaseMode):
 
   title = 'ChatGPT'
   loader_latency=.25

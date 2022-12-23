@@ -4,4 +4,5 @@ from .echo import EchoMode
 from .cowsay import CowsayMode
 from .raw_gpt import RawGPTMode
 from .raw_codex import RawCodexMode
-from .chat_gpt import ChatGPT
+from .chat_gpt import ChatGPTMode
+from .js_sandbox import JSSandboxMode
