@@ -25,6 +25,7 @@ class BaseMode:
   loader_latency=1.5
 
   seed = ''
+  buffers = {}
 
   def __init__(self, state={}):
     pass
@@ -60,3 +61,9 @@ class BaseMode:
 
   def variables(self):
     return []
+
+  def get_buffer(self, name):
+    return self.buffers.get(name, '')
+
+  def set_buffer(self, name, value):
+    self.buffers[name] = value

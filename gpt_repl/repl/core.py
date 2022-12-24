@@ -52,7 +52,7 @@ class REPL:
 
   def run(self):
     if len(self.thread.messages) == 0:
-      printer.clear(1)
+      printer.clear(2)
     else:
       self.warmup_thread()
 
@@ -161,6 +161,6 @@ class REPL:
     if not should_warmup:
       return
 
-    printer.clear(1)
+    printer.clear(2)
     with self.pretty.loading_thread():
       printer.warmup()

@@ -38,7 +38,7 @@ class RichLive:
     self.transient = transient
 
   def update(self, content):
-    max_height = self.console.height - 1
+    max_height = self.console.height
     raw_text = '\n'.join(content.split('\n')[-max_height:])
     text = Text.from_ansi(raw_text)
 

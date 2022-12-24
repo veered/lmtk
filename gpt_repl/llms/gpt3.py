@@ -59,3 +59,12 @@ class GPT3:
       #   '44651': 1, # Make "Invalid" a more common token
       # },
     )
+
+
+  def get_model_max_tokens(self, model):
+    if model == 'text-davinci-003':
+      return 4000
+    elif model == 'code-davinci-002':
+      return 8000
+    else:
+      return 2000

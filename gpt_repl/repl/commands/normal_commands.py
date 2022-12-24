@@ -6,6 +6,27 @@ from ...publish import PublishGPT
 from .command_manager import Commands
 from .base_command import BaseCommand
 
+@Commands.register('.buffer')
+class BufferCommand(BaseCommand):
+
+  aliases = [ '.b' ]
+  # help = 'Opens the current message in the text editor specified by $EDITOR.'
+  shortcut = [ 'C-x', 'C-b' ]
+  erase_input = True
+
+  def run(self):
+    self.banner()
+
+    name = self.cmd_args[0] if len(self.cmd_args) > 0 else ''
+    buffer = self.repl.mode.get_buffer(name)
+    value = open_in_editor(self.repl.prompt.session, content=buffer, extension='.txt')
+    self.repl.mode.set_buffer(name, value)
+
+    printer.clear(0)
+    printer.print(value)
+
+    return ''
+
 @Commands.register('.clear')
 class ClearCommand(BaseCommand):
 
@@ -231,3 +252,13 @@ class SetCommand(BaseCommand):
       setattr(self.repl.mode, key, val)
       printer.print_markdown(f'**{key}** updated')
     return ''
+
+
+@Commands.register('.stats')
+class SetCommand(BaseCommand):
+
+  aliases = [ '.st' ]
+
+  def run(self):
+    self.banner()
+    return self.repl.mode.stats()
