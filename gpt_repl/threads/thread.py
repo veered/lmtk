@@ -92,7 +92,7 @@ class Thread:
     self.messages += [ message ]
     return message
 
-  def rollback(self, n=1):
+  def rollback_n(self, n=1):
     self.messages = self.messages[:-n]
 
   @classmethod

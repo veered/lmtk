@@ -11,7 +11,7 @@ class SynthChatMode(BaseMode):
   line_sep = '---------'
   line_sep_token = '45537'
 
-  def __init__(self, state={}):
+  def load(self, state):
     self.model = 'text-davinci-003'
     self.temperature = 0.7
     self.llm = GPT3()
@@ -51,31 +51,25 @@ class SynthChatMode(BaseMode):
     # self.max_prompt_tokens = 1500
     # self.soft_max_prompt_tokens = 1000
 
-    self.summaries = []
+    self.summaries = state.get('summaries', [])
     self.recent_conversation = self.build_messages(self.prologue)
 
-    if state.get('initialized'):
-      self.load(state)
+    # Load saved state, if present
+    self.summaries = state.get('summaries', self.summaries)
+    self.recent_conversation = state.get('recent_conversation', self.recent_conversation)
+    self.persona_name = state.get('persona_name', self.persona_name)
+
+  def save(self):
+    return {
+      'summaries': self.summaries,
+      'recent_conversation': self.recent_conversation,
+      'persona_name': self.persona_name,
+    }
 
   def get_title(self):
     return self.persona_name
 
-  def save(self):
-    return {
-      'initialized': True,
-      'summaries': self.summaries,
-      'recent_conversation': self.recent_conversation,
-      'seed': self.seed,
-      'persona_name': self.persona_name,
-    }
-
-  def load(self, state):
-    self.summaries = state['summaries']
-    self.recent_conversation = state['recent_conversation']
-    self.seed = state.get('seed', self.seed)
-    self.persona_name = state.get('persona_name', self.persona_name)
-
-  def ask(self, raw_query):
+  def respond(self, raw_query):
     (query, self.response_prefix) = self.parse_query(raw_query)
 
     client_message = self.add_message(text=query, source='client')

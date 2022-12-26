@@ -10,11 +10,11 @@ class BruhMode(BaseMode):
 
   title = 'Bruh'
 
-  def __init__(self, state={}):
+  def load(self, state={}):
     self.llm = GPT3()
 
-  def ask(self, text):
-    prompt = f'Rephrase the following text to bruh-speak:\n{text}\n\nBruh:\n'
+  def respond(self, query):
+    prompt = f'Rephrase the following text to bruh-speak:\n{query}\n\nBruh:\n'
     return self.llm.complete(
       prompt,
       stream=True

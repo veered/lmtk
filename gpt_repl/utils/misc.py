@@ -1,9 +1,16 @@
 import os, re, pyperclip
 from itertools import chain
+from collections.abc import Iterable
 
 def peek(gen):
   first = next(gen)
   return ( chain([ first ], gen), first )
+
+def make_iter(x):
+  if isinstance(x, str) or not isinstance(x, Iterable):
+    return iter([ x ])
+  else:
+    return x
 
 class set_env:
 

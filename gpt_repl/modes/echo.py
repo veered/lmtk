@@ -6,8 +6,8 @@ class EchoMode(BaseMode):
   title = 'Bat'
   visible = False
 
-  def ask(self, text):
-    yield f'# {text}'
+  def respond(self, query):
+    yield f'# {query}'
 
   def stats(self):
     return '( location="chamber" )'

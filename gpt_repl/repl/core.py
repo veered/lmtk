@@ -87,7 +87,7 @@ class REPL:
     try:
       answer = self.ask(text)
     except (KeyboardInterrupt, EOFError):
-      self.mode.rollback()
+      self.mode.rollback_n(1)
       self.pretty.request_canceled()
       return
 
@@ -113,7 +113,7 @@ class REPL:
     return self.prompt.input(default=default, toolbar=toolbar)
 
   def save_thread(self):
-    self.thread.set_mode(self.mode_name, self.mode.save())
+    self.thread.set_mode(self.mode_name, self.mode.save_state())
     self.thread.seed = self.mode.get_seed()
     self.thread.save()
 

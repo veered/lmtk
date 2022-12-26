@@ -6,32 +6,23 @@ class RawGPTMode(BaseMode):
 
   title = 'RawGPT'
 
-  def __init__(self, state={}):
+  def load(self, state={}):
     self.llm = GPT3()
     self.model = 'text-davinci-003'
     self.temperature = .7
-    self.prompt = state.get('prompt', '')
 
-  def ask(self, text):
-    results = self.llm.complete(
-      text,
+  def respond(self, query):
+    return self.llm.complete(
+      query,
       model=self.model,
       temperature=float(self.temperature),
       stream=True,
     )
 
-    self.prompt = text
-    for data in results:
-      self.prompt += data
-      yield data
-
-  def save(self):
-    return {
-      'prompt': self.prompt,
-    }
-
   def inspect(self):
-    return self.prompt
+    return ''.join(
+      [ m['text'] for m in self.conversation[-2:] ]
+    )
 
   def variables(self):
     return [

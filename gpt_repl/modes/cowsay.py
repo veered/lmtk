@@ -5,9 +5,8 @@ class CowsayMode(BaseMode):
 
   title = 'Cow'
 
-  def ask(self, text):
-    cow = f'```text\n{self.build_cow(text)}\n```'
-    yield cow
+  def respond(self, query):
+    return f'```text\n{self.build_cow(query)}\n```'
 
   def stats(self):
     return '( mood=moootastic )'

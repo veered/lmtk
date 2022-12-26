@@ -7,14 +7,14 @@ class ChatGPTMode(BaseMode):
   title = 'ChatGPT'
   loader_latency=.25
 
-  def __init__(self, state={}):
+  def load(self, state={}):
     self.chat_gpt = ChatGPT(
       conversation_id=state.get('conversation_id', ''),
       parent_message_id=state.get('parent_message_id', ''),
     )
 
-  def ask(self, text):
-    return self.chat_gpt.ask(text)
+  def respond(self, query):
+    return self.chat_gpt.ask(query)
 
   def save(self):
     return {

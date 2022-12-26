@@ -22,7 +22,7 @@ class BufferCommand(BaseCommand):
     value = open_in_editor(self.repl.prompt.session, content=buffer, extension='.txt')
     self.repl.mode.set_buffer(name, value)
 
-    printer.clear(0)
+    printer.clear(2)
     printer.print(value)
 
     return ''
@@ -36,7 +36,7 @@ class ClearCommand(BaseCommand):
   erase_input = True
 
   def run(self):
-    printer.clear(1)
+    printer.clear(2)
     self.action('prompt')
 
 @Commands.register('.copy')
@@ -143,10 +143,9 @@ class RedoCommand(BaseCommand):
     if len(history) < 2:
       return 'No message to redo'
 
-    self.repl.mode.rollback()
-    self.repl.mode.rollback()
+    self.repl.mode.rollback_n(2)
     last_message = history[-2].text
-    self.repl.thread.rollback(2)
+    self.repl.thread.rollback_n(2)
 
     self.set_text(last_message)
     self.action('continue')
@@ -165,10 +164,9 @@ class UndoCommand(BaseCommand):
     if len(history) < 2:
       return 'No message to undo'
 
-    self.repl.mode.rollback()
-    self.repl.mode.rollback()
+    self.repl.mode.rollback_n(2)
     last_message = history[-2].text
-    self.repl.thread.rollback(2)
+    self.repl.thread.rollback_n(2)
 
     self.repl.auto_fills += [ last_message ]
     self.action('break')

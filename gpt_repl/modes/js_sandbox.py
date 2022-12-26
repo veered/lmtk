@@ -9,7 +9,7 @@ class JSSandboxMode(BaseMode):
 
   title = 'JS Sandbox'
 
-  def __init__(self, state={}):
+  def load(self, state={}):
     self.state = state
     self.output_path = '/Users/lucas/junk/sandbox.html'
     # self.model = 'code-davinci-002'
@@ -27,19 +27,18 @@ class JSSandboxMode(BaseMode):
     else:
       self.file_name = 'index.js';
       self.code_prefix = 'onLoad = () => {\n'
-      self.starter_code = f"""{self.code_prefix}let ctx = document.querySelector("canvas").getContext("2d");\n}}"""
+      self.starter_code = f"""{self.code_prefix}  let ctx = document.querySelector("canvas").getContext("2d");\n}}"""
 
     self.code = state.get('code', self.starter_code)
     self.history = state.get('history', [])
 
     self.save_html()
 
-  def ask(self, text):
+  def respond(self, text):
     self.history += [
       { 'text': text, 'type': 'client' },
     ]
 
-    # breakpoint();
     prompt = self.create_prompt(text)
     results = self.llm.complete(
       prompt,

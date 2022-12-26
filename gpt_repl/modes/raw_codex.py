@@ -6,13 +6,14 @@ class RawCodexMode(BaseMode):
 
   title = 'Codex'
 
-  def __init__(self, state={}):
+  def load(self, state):
     self.llm = GPT3()
 
-  def ask(self, text):
+  def respond(self, query):
     yield '```\n'
     for data in self.llm.complete(
-        text, stream=True,
+        text,
+        stream=True,
         model='code-davinci-002',
         temperature=0.1,
     ):

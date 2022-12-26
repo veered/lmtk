@@ -1,3 +1,6 @@
+import uuid
+from ..utils import make_iter
+
 mode_registry = {}
 
 def register_mode(name):
@@ -27,14 +30,68 @@ class BaseMode:
   seed = ''
   buffers = {}
 
+  conversation = []
+
   def __init__(self, state={}):
+    self.state = state
+    self.conversation = self.state.get('conversation', [])
+    self.seed = self.state.get('seed', '')
+    self.load(self.state)
+
+  def ask(self, query):
+    client_message = self.__add_message(text=query, source='client')
+    server_message = self.__build_message(source='server')
+
+    response = make_iter(self.respond(query))
+    for data in response:
+      server_message['text'] += data
+      yield data
+
+    self.__add_message(message=server_message)
+
+  def save_state(self):
+    state = {
+      'conversation': self.conversation,
+      'seed': self.seed
+    }
+    sub_state = self.save() or {}
+    state.update(sub_state)
+    return state
+
+  def rollback_n(self, n=1):
+    for i in range(n):
+      self.rollback()
+      self.conversation.pop()
+
+  def __build_message(self, text='', source=''):
+    message = {
+      'id': str(uuid.uuid4()),
+      'text': text,
+      'source': source,
+    }
+    return message
+
+  def __add_message(self, message=None, text='', source=''):
+    if not message:
+      message = self.__build_message(text=text, source=source)
+    self.conversation += [ message ]
+    return message
+
+  ##############################
+  # Can override starting here #
+  ##############################
+
+  def respond(self, query):
+    yield ''
+
+  def load(self, state):
     pass
+
+  def save(self):
+    return {}
 
   def get_title(self):
     return self.title
-
-  def ask(self, text):
-    yield ''
 
   def get_seed(self):
     return self.seed
@@ -42,11 +99,8 @@ class BaseMode:
   def set_seed(self, seed):
     self.seed = seed
 
-  def rollback(self, message_id=''):
+  def rollback(self):
     pass
-
-  def save(self):
-    return {}
 
   def stats(self):
     return ''
