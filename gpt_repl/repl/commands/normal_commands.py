@@ -15,15 +15,15 @@ class BufferCommand(BaseCommand):
   erase_input = True
 
   def run(self):
-    self.banner()
-
     name = self.cmd_args[0] if len(self.cmd_args) > 0 else ''
-    buffer = self.repl.mode.get_buffer(name)
-    value = open_in_editor(self.repl.prompt.session, content=buffer, extension='.txt')
+    (title, buffer, file_type) = self.repl.mode.get_buffer(name)
+    self.banner(name=title)
+
+    value = open_in_editor(self.repl.prompt.session, content=buffer, extension=file_type)
     self.repl.mode.set_buffer(name, value)
 
     printer.clear(2)
-    printer.print(value)
+    printer.print(self.repl.mode.get_buffer(name)[1])
 
     return ''
 

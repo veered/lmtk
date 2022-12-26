@@ -127,8 +127,9 @@ class SynthChatMode(BaseMode):
 
   def rollback(self):
     # TODO : do more stuff
-    message_id = self.recent_conversation[-1]['id']
-    self.delete_message(message_id=message_id)
+    if len(self.recent_conversation) > 0:
+      message_id = self.recent_conversation[-1]['id']
+      self.delete_message(message_id=message_id)
 
   def shrink_messages(self):
     for (i, message) in enumerate(self.recent_conversation[:-8]):

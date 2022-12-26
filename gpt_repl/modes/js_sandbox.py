@@ -1,87 +1,164 @@
-from .base_mode import BaseMode, register_mode
-from ..llms.gpt3 import GPT3
+import html
+from itertools import chain
 
 from jsmin import jsmin
-import jsbeautifier
+from jsbeautifier import beautify
+
+from .base_mode import BaseMode, register_mode
+from ..llms.gpt3 import GPT3
+from ..utils import expand_path
+
 
 @register_mode('js-sandbox')
 class JSSandboxMode(BaseMode):
 
   title = 'JS Sandbox'
+  minify = False
+
+  prompt_prefix = '```javascript\n'
+  stops = [  '/*END*/', '```', '// END', '//END' ]
+
+  sandboxes = {
+
+    'blank': {},
+
+    'ui': {
+      'starter_code': 'document.body.innerHTML = ``;',
+      'min_starter_code': 'document.body.innerHTML=``;',
+      'inner_html': '',
+    },
+
+    'canvas': {
+      'starter_code': 'let ctx = document.querySelector("canvas").getContext("2d");',
+      'min_starter_code': 'c=document.querySelector("canvas").getContext("2d")}',
+      'inner_html': '<canvas width="700" height="700"></canvas>',
+    },
+
+    'svg': {
+      'starter_code': 'let svg = document.querySelector("svg");\nsvg.innerHTML=``;',
+      'inner_html': '<svg></svg>',
+    },
+
+  }
 
   def load(self, state={}):
-    self.state = state
-    self.output_path = '/Users/lucas/junk/sandbox.html'
-    # self.model = 'code-davinci-002'
+    self.output_directory = '/Users/lucas/junk'
     self.model = 'text-davinci-003'
     self.llm = GPT3()
 
-    self.prompt_prefix = '```javascript\n'
-    self.prompt_suffix = '```'
+    self.history = state.get('history', [])
+    # self.sandbox = self.sandboxes[state.get('profile', 'canvas')]
+    self.sandbox = self.sandboxes[state.get('profile', 'ui')]
+    self.inner_html = self.sandbox.get('inner_html', '')
 
-    self.minify = False
+    sandbox_starter = self.sandbox.get('starter_code', '')
+    min_sandbox_starter = self.sandbox.get('min_starter_code', sandbox_starter)
     if self.minify:
       self.file_name = 'index.min.js';
       self.code_prefix = 'onLoad=()=>{'
-      self.starter_code = f"""{self.code_prefix}c=document.querySelector("canvas").getContext("2d")}}"""
+      self.starter_code = f"""{self.code_prefix}{min_sandbox_starter}}}"""
     else:
       self.file_name = 'index.js';
       self.code_prefix = 'onLoad = () => {\n'
-      self.starter_code = f"""{self.code_prefix}  let ctx = document.querySelector("canvas").getContext("2d");\n}}"""
+      self.starter_code = f"""{self.code_prefix}  {sandbox_starter}\n}}"""
 
     self.code = state.get('code', self.starter_code)
-    self.history = state.get('history', [])
-
     self.save_html()
 
-  def respond(self, text):
-    self.history += [
-      { 'text': text, 'type': 'client' },
-    ]
+  def save(self):
+    return {
+      'code': self.code,
+      'history': self.history,
+    }
 
-    prompt = self.create_prompt(text)
-    results = self.llm.complete(
-      prompt,
-      stream=True,
-      max_length=self.llm.get_model_max_tokens(self.model) - self.llm.count_tokens(prompt),
-      model=self.model,
-      stops= [ '/*END*/', '```', '// END', '//END' ],
-    )
+  def respond(self, query):
+    self.history += [ { 'text': query, 'type': 'client' } ]
+    code = ''
 
-    self.history += [
-      { 'text': self.code, 'type': 'server' },
-    ]
-
-    self.code = self.code_prefix
+    prompt = self.get_prompt(query)
+    results = chain(self.code_prefix, self.complete(prompt))
 
     if self.minify:
-      all_data = ''
-      for data in results:
-        self.code += data
-        all_data += data
-      yield self.prompt_prefix + jsbeautifier.beautify(self.code_prefix + all_data) + '\n```'
+      code = ''.join(list(results))
+      yield self.prompt_prefix
+      yield self.beautify_code(code)
     else:
-      yield self.prompt_prefix + self.code_prefix
+      yield self.prompt_prefix
       for data in results:
-        self.code += data
+        code += data
         yield data
-      yield '\n```'
 
-    self.code = self.code.rstrip()
+    yield '\n```'
+
+    self.history += [ { 'text': self.code, 'type': 'server' } ]
+    self.code = code
     self.save_html()
 
-  def create_prompt(self, instruction):
+  def complete(self, text):
+    return self.llm.complete(
+      text,
+      stream=True,
+      max_length=self.llm.get_model_max_tokens(self.model) - self.llm.count_tokens(text),
+      model=self.model,
+      stops=self.stops,
+    )
+
+  def inspect(self):
+    return self.code
+
+  def rollback(self):
+    if len(self.history) > 0:
+      msg = self.history.pop()
+      if msg['type'] == 'server':
+        self.code = msg['text']
+    else:
+      self.code = self.starter_code
+    self.save_html()
+
+  def get_buffer(self, name):
+    return ('code', self.code, '.js')
+
+  def set_buffer(self, name, value):
+    self.code = value
+    self.save_html()
+
+  def stats(self):
+    return f'( tokens={len(self.get_prompt(""))}, minify={str(self.minify)} )'
+
+  @property
+  def loader_latency(self):
+    return .1 if self.minify else 1.5
+
+  def save_html(self):
+    sandbox_path = expand_path(self.output_directory, 'js_sandbox.html')
+    with open(sandbox_path, 'w') as f:
+      html = self.render_html(
+        code=self.code,
+        inner_html=self.inner_html,
+        style='body { margin: 0px; }',
+      )
+      f.write(html)
+
+    sandbox_display_path = expand_path(self.output_directory, 'js_sandbox_display.html')
+    with open(sandbox_display_path, 'w') as f:
+      html = self.render_display_html(self.code)
+      f.write(html)
+
+  def minify_code(self, code):
+    return jsmin(code) if self.minify else code
+
+  def beautify_code(self, code):
+    return beautify(code) if self.minify else code
+
+  def get_prompt(self, instruction):
     return f"""
 web/client/index.html
 ```html
-<html>
-  <head><script src='./index.js'></head>
-  <body onload="onLoad()"><canvas width="700" height="700" /></body>
-</html>
+{self.render_html(inner_html=self.inner_html)}
 ```
 web/client/index.js
 ```javascript
-{self.get_formatted_code()}/*END*/
+{self.minify_code(self.code)}/*END*/
 ```
 
 Make the following modifications to `index.js`:
@@ -90,7 +167,26 @@ Make the following modifications to `index.js`:
 web/client/{self.file_name}
 { self.prompt_prefix }{ self.code_prefix }"""
 
-  def render_html(self, code):
+  def render_html(self, code=None, inner_html='', style=None):
+    if code == None:
+      script_tag = '<script src="index.js"></script>'
+    else:
+      script_tag = f'<script>{code}</script>'
+
+    if style == None:
+      style_tag = ''
+    else:
+      style_tag = f'<style>{style}</style>';
+
+    return f"""
+<html>
+  <head>{style_tag}{script_tag}</head>
+  <body onload="onLoad()">{inner_html}</body>
+</html>
+""".strip()
+
+  def render_display_html(self, code=''):
+    formatted_code = html.escape(self.beautify_code(code))
     return f"""
 <html style="height: 100%">
   <head>
@@ -105,84 +201,34 @@ web/client/{self.file_name}
       .row {{
         flex: 1;
       }}
-      canvas {{
+      iframe {{
         border: 1px solid black;
-        // margin-right: 5px;
       }}
       pre {{
         display: inline-block;
         margin-top: 0px;
         margin-left: 5px;
         text-align: left;
-        /* width: 100%; */
-        /* height: 100%; */
       }}
       code {{
-        /* margin-right: 6px; */
-        height: 675px;
+        height: 676px;
         width: 700px;
       }}
     </style>
-    <script>
-      {code}
-    </script>
-
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/monokai.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
 
   </head>
-  <body onload="onLoad()">
+  <body>
     <div class="row" style="text-align: right">
-      <canvas width="700" height="700"></canvas>
+      <iframe width="700" height="700" src="js_sandbox.html"></iframe>
     </div>
     <div class="row" style="text-align: left">
-      <pre><code class="language-javascript">{code}</code></pre>
-      <script>hljs.highlightAll();</script>
+      <pre><code class="language-javascript" id="code">{formatted_code}</code></pre>
+      <script>
+        hljs.highlightAll();
+      </script>
     </div>
-
   </body>
 </html>
 """
-
-  def save_html(self):
-    with open(self.output_path, 'w') as f:
-      html = self.render_html(self.code)
-      f.write(html)
-
-  def get_formatted_code(self):
-    if self.minify:
-      return jsmin(self.code)
-    else:
-      return self.code
-
-  def save(self):
-    return {
-      'code': self.code,
-      'history': self.history,
-    }
-
-  def inspect(self):
-    return self.code
-
-  def rollback(self):
-    if len(self.history) > 0:
-      if self.history[-1]['type'] == 'server':
-        self.code = self.history[-1]['text']
-      self.history = self.history[:-1]
-    else:
-      self.code = self.starter_code
-    self.save_html()
-
-  def get_buffer(self, name):
-    return self.code
-
-  def set_buffer(self, name, value):
-    self.code = value
-    self.save_html()
-
-  def stats(self):
-    return f'( tokens={len(self.create_prompt(""))}, minify={str(self.minify)} )'
-
-  @property
-  def loader_latency(self):
-    return .1 if self.minify else 1.5

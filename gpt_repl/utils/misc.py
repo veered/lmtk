@@ -12,6 +12,9 @@ def make_iter(x):
   else:
     return x
 
+def expand_path(*args):
+  return os.path.abspath(os.path.expanduser(os.path.join(*args)))
+
 class set_env:
 
   def __init__(self, name, value):

@@ -61,7 +61,8 @@ class BaseMode:
   def rollback_n(self, n=1):
     for i in range(n):
       self.rollback()
-      self.conversation.pop()
+      if len(self.conversation) > 0:
+        self.conversation.pop()
 
   def __build_message(self, text='', source=''):
     message = {
@@ -116,8 +117,8 @@ class BaseMode:
   def variables(self):
     return []
 
-  def get_buffer(self, name):
-    return self.buffers.get(name, '')
+  def get_buffer(self, name=''):
+    return (name or '.buffer', self.buffers.get(name, ''), '.md')
 
   def set_buffer(self, name, value):
     self.buffers[name] = value
