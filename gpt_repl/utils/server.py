@@ -7,7 +7,7 @@ class RequestHandler(BaseHTTPRequestHandler):
     """Handle a GET request by calling the handler function and returning the response."""
     self.send_response(200)
     self.end_headers()
-    result = self.server.handler(self.path, self.request) or ''
+    result = self.server.handler(self.request, self.path) or ''
     self.wfile.write(result.encode())
 
   def log_request(self, *args, **kwargs):

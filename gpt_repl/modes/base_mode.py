@@ -1,5 +1,5 @@
 import uuid
-from ..utils import make_iter
+from ..utils import make_iter, SimpleServer, printer
 
 mode_registry = {}
 
@@ -33,6 +33,10 @@ class BaseMode:
   seed = ''
   profile = ''
 
+  web_server_config = None
+  web_server = None
+  __has_logged = False
+
   def __init__(self, state={}):
     self.state = state
     self.conversation = self.state.get('conversation', [])
@@ -40,6 +44,9 @@ class BaseMode:
     self.profile = self.state.get('profile', '')
     self.active = True
     self.load(self.state)
+
+    if self.web_server_config != None:
+      self.__serve()
 
   def ask(self, query):
     client_message = self.__add_message(text=query, source='client')
@@ -65,6 +72,8 @@ class BaseMode:
   def stop(self):
     if self.active:
       self.unload()
+    if self.web_server != None:
+      self.web_server.stop()
     self.active = False
 
   def rollback_n(self, n=1):
@@ -86,6 +95,28 @@ class BaseMode:
       message = self.__build_message(text=text, source=source)
     self.conversation += [ message ]
     return message
+
+  def __serve(self):
+    self.web_server = SimpleServer(
+      lambda request, path: self.request_handler(request, path),
+      host=self.web_server_config.get('host', 'localhost'),
+      port=self.web_server_config.get('port', 8081),
+    )
+    success = self.web_server.start()
+
+    if BaseMode.__has_logged:
+      return
+    BaseMode.__has_logged = True
+
+    if success:
+      printer.print(f'[bold]Notice:[/bold] Sandbox available at [bold]{self.web_server.host}:{self.web_server.port}[/bold] \n')
+    else:
+      printer.print(f'[bold]Warning:[/bold] Failed to start sandbox web server. Port {self.web_server.port} is in use.\n')
+
+  # To use ipdb set:
+  #   export PYTHONBREAKPOINT=IPython.terminal.debugger.set_trace
+  def debug(self):
+    breakpoint()
 
   ##############################
   # Can override starting here #
@@ -121,11 +152,6 @@ class BaseMode:
   def inspect(self):
     return ''
 
-  # To use ipdb set:
-  #   export PYTHONBREAKPOINT=IPython.terminal.debugger.set_trace
-  def debug(self):
-    breakpoint()
-
   def variables(self):
     return []
 
@@ -134,3 +160,6 @@ class BaseMode:
 
   def set_buffer(self, name, value):
     self.buffers[name] = value
+
+  def request_handler(self, request, path):
+    return ''

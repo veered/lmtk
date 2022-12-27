@@ -7,13 +7,18 @@ from itertools import chain
 
 from .base_mode import BaseMode, register_mode
 from ..llms.gpt3 import GPT3
-from ..utils import SimpleServer, printer, render_code_display
+from ..utils import printer, render_code_display
 
 @register_mode('js-sandbox')
 class JSSandboxMode(BaseMode):
 
   title = 'JS Sandbox'
   minify = False
+
+  web_server_config = {
+    'host': 'localhost',
+    'port': 8081,
+  }
 
   prompt_prefix = '```javascript\n'
   stops = [  '/*END*/', '```', '// END', '//END' ]
@@ -53,10 +58,12 @@ class JSSandboxMode(BaseMode):
     },
 
     'game': {
+      'bio': 'You are an experienced video game developer. Avoid code duplication, write self-contained code, and group similar objects into arrays.',
       'starter_code': 'let canvas = document.querySelector("canvas");\n  let ctx = canvas.getContext("2d");',
       'min_starter_code': 'c=document.querySelector("canvas").getContext("2d")}',
-      'inner_html': '<canvas width="700" height="700"></canvas>',
-      'bio': 'You are an experienced video game developer. Avoid code duplication, write self-contained code, and group similar objects into arrays.',
+      # 'inner_html': '<canvas width="700" height="700"></canvas><ui style="position: absolute; top: 20px; left: 20px"></ui>',
+      'inner_html': '<canvas width="700" height="700"></canvas><ui></ui>',
+      'style': 'ui { position: absolute; top: 20px; left: 20px; }',
     },
 
     'svg': {
@@ -74,7 +81,6 @@ class JSSandboxMode(BaseMode):
     self.history = state.get('history', [])
     self.sandbox_name = state.get('profile') or 'game'
     self.sandbox = self.sandboxes[self.sandbox_name]
-    # self.sandbox = self.sandboxes[state.get('profile') or 'ui']
     self.inner_html = self.sandbox.get('inner_html', '')
     self.bio = self.sandbox.get('bio', '')
 
@@ -84,11 +90,6 @@ class JSSandboxMode(BaseMode):
     self.file_name = 'index.min.js' if self.minify else 'index.js'
     self.starter_code = min_sandbox_starter if self.minify else sandbox_starter
     self.code = state.get('code', self.starter_code)
-
-    self.serve()
-
-  def unload(self):
-    self.server.stop()
 
   def save(self):
     return {
@@ -125,24 +126,7 @@ class JSSandboxMode(BaseMode):
       stops=self.stops,
     )
 
-  def serve(self):
-    self.server = SimpleServer(
-      lambda path, request: self.handle(path),
-      host='localhost',
-      port=8081,
-    )
-    success = self.server.start()
-
-    if JSSandboxMode.has_logged:
-      return
-    JSSandboxMode.has_logged = True
-
-    if success:
-      printer.print(f'[bold]Notice[/bold]: Sandbox UI available at [bold]{self.server.host}:{self.server.port}[/bold] \n')
-    else:
-      printer.print(f'[bold]Warning:[/bold] Failed to start sandbox web server. Port {self.server.port} is in use.\n')
-
-  def handle(self, path):
+  def request_handler(self, request, path):
     if path == '/':
       return render_code_display(
         code=self.beautify_code(self.code),
