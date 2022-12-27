@@ -4,6 +4,7 @@
     <br />
     <br />
     <a href="https://pypi.python.org/pypi/gpt-repl/"><img alt="PyPi" src="https://img.shields.io/pypi/v/gpt-repl.svg?style=flat-square"></a>
+    <a href="https://pypi.python.org/pypi/gpt-repl/"><img alt="Downloads" src="https://img.shields.io/pypi/dm/gpt-repl.svg"></a>
     <a href="https://github.com/veered/gpt-repl/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/github/license/veered/gpt-repl.svg?style=flat-square"></a>
 </p>
 
