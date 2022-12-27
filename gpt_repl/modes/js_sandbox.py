@@ -76,34 +76,6 @@ class JSSandboxMode(BaseMode):
   def unload(self):
     self.server.stop()
 
-  def serve(self):
-    self.server = SimpleServer(
-      lambda path, request: self.handle(path),
-      host='localhost',
-      port=8080,
-    )
-    success = self.server.start()
-
-    if JSSandboxMode.has_logged:
-      return
-    JSSandboxMode.has_logged = True
-
-    if success:
-      printer.print(f'[bold]Notice[/bold]: Sandbox UI available at [bold]{self.server.host}:{self.server.port}[/bold] \n')
-    else:
-      printer.print(f'[bold]Warning:[/bold] Failed to start sandbox web server. Port {self.server.port} is in use.\n')
-
-  def handle(self, path):
-    if path == '/':
-      return self.render_display_html(self.code)
-    elif path == '/sandbox':
-      return self.render_html(
-        code=self.code,
-        inner_html=self.inner_html,
-        style='body { margin: 0px; }',
-      )
-    return ''
-
   def save(self):
     return {
       'code': self.code,
@@ -140,6 +112,33 @@ class JSSandboxMode(BaseMode):
       model=self.model,
       stops=self.stops,
     )
+
+  def serve(self):
+    self.server = SimpleServer(
+      lambda path, request: self.handle(path),
+      host='localhost',
+      port=8080,
+    )
+    success = self.server.start()
+
+    if JSSandboxMode.has_logged:
+      return
+    JSSandboxMode.has_logged = True
+
+    if success:
+      printer.print(f'[bold]Notice[/bold]: Sandbox UI available at [bold]{self.server.host}:{self.server.port}[/bold] \n')
+    else:
+      printer.print(f'[bold]Warning:[/bold] Failed to start sandbox web server. Port {self.server.port} is in use.\n')
+
+  def handle(self, path):
+    if path == '/':
+      return self.render_display_html(self.code)
+    elif path == '/sandbox':
+      return self.render_html(
+        code=self.code,
+        inner_html=self.inner_html,
+        style='body { margin: 0px; }',
+      )
 
   def inspect(self):
     return self.code
