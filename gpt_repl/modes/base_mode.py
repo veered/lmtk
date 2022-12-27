@@ -27,15 +27,18 @@ class BaseMode:
   visible = True
   loader_latency=1.5
 
-  seed = ''
   buffers = {}
 
   conversation = []
+  seed = ''
+  profile = ''
 
   def __init__(self, state={}):
     self.state = state
     self.conversation = self.state.get('conversation', [])
     self.seed = self.state.get('seed', '')
+    self.profile = self.state.get('profile', '')
+    self.active = True
     self.load(self.state)
 
   def ask(self, query):
@@ -52,11 +55,17 @@ class BaseMode:
   def save_state(self):
     state = {
       'conversation': self.conversation,
-      'seed': self.seed
+      'seed': self.seed,
+      'profile': self.profile,
     }
     sub_state = self.save() or {}
     state.update(sub_state)
     return state
+
+  def stop(self):
+    if self.active:
+      self.unload()
+    self.active = False
 
   def rollback_n(self, n=1):
     for i in range(n):
@@ -86,6 +95,9 @@ class BaseMode:
     yield ''
 
   def load(self, state):
+    pass
+
+  def unload(self):
     pass
 
   def save(self):
@@ -118,7 +130,7 @@ class BaseMode:
     return []
 
   def get_buffer(self, name=''):
-    return (name or '.buffer', self.buffers.get(name, ''), '.md')
+    return (name or 'default', self.buffers.get(name, ''), '.md')
 
   def set_buffer(self, name, value):
     self.buffers[name] = value

@@ -26,6 +26,7 @@ class REPL:
     self.thread.set_mode(self.thread.mode.name or mode_name or 'synth-chat')
 
     self.mode_name = self.thread.mode.name
+    self.mode = None
     self.auto_fills = auto_fills
     self.first_run = True
 
@@ -69,6 +70,7 @@ class REPL:
       self.pretty.leaving_thread()
       if isinstance(error, KeyboardInterrupt) or isinstance(error, EOFError):
         self.save_thread()
+        self.mode.stop()
         sys.exit(0) # breaking might be better, but sys.exit is a lot faster
       else:
         printer.exception(error)
@@ -118,13 +120,13 @@ class REPL:
     self.thread.save()
 
   def load_mode(self, mode_name, state={}, seed=''):
+    if self.mode:
+      self.mode.stop()
     self.mode = get_mode(mode_name)(state=state)
     self.mode.set_seed(seed)
 
   def reset(self):
-    old_mode = self.mode
-
-    self.load_mode(self.mode_name, seed=old_mode.get_seed())
+    self.load_mode(self.mode_name, seed=self.mode.get_seed())
     self.thread.reset()
     self.save_thread()
 
