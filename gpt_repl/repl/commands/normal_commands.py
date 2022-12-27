@@ -115,7 +115,7 @@ class PrintCommand(BaseCommand):
 
   def run(self):
     self.banner()
-    printer.print(self.repl.mode.inspect())
+    printer.print(self.repl.mode.inspect(), markup=False)
     return ''
 
 @Commands.register('.publish')

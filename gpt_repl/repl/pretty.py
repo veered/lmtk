@@ -39,10 +39,13 @@ class PrettyPrintREPL:
     if space > 0:
       printer.pad_down(space)
 
-  def partial_response(self, text):
-    # It would be great to use the monokai theme but it causes too much flashing
-    markdown = printer.to_markdown(text.lstrip() + '█', code_theme='default')
-    return markdown.to_text() + '\n\n\n'
+  def partial_response(self, text, render=False):
+    if render:
+      # It would be great to use the monokai theme but it causes too much flashing
+      markdown = printer.to_markdown(text.lstrip() + '█', code_theme='default')
+      return markdown.to_text() + '\n\n\n'
+    else:
+      return f'{text.lstrip()}█\n\n\n'
 
   def loading_thread(self):
     return printer.temp_log(f'Loading \x1b[1m@{self.repl.thread.name}\x1b[0m...')

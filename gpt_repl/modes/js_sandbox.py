@@ -80,15 +80,9 @@ class JSSandboxMode(BaseMode):
 
     sandbox_starter = self.sandbox.get('starter_code', '')
     min_sandbox_starter = self.sandbox.get('min_starter_code', sandbox_starter)
-    if self.minify:
-      self.file_name = 'index.min.js';
-      self.code_prefix = 'onLoad=()=>{'
-      self.starter_code = f"""{self.code_prefix}{min_sandbox_starter}}}"""
-    else:
-      self.file_name = 'index.js';
-      self.code_prefix = 'onLoad = () => {\n'
-      self.starter_code = f"""{self.code_prefix}  {sandbox_starter}\n}}"""
 
+    self.file_name = 'index.min.js' if self.minify else 'index.js'
+    self.starter_code = min_sandbox_starter if self.minify else sandbox_starter
     self.code = state.get('code', self.starter_code)
 
     self.serve()
@@ -105,9 +99,7 @@ class JSSandboxMode(BaseMode):
   def respond(self, query):
     self.history += [ { 'text': query, 'type': 'client' } ]
     code = ''
-
-    prompt = self.get_prompt(query)
-    results = chain(self.code_prefix, self.complete(prompt))
+    results = self.complete(self.get_prompt(query))
 
     if self.minify:
       code = ''.join(list(results))
@@ -164,7 +156,7 @@ class JSSandboxMode(BaseMode):
       )
 
   def inspect(self):
-    return self.code
+    return self.get_prompt('{ instruction }')
 
   def rollback(self):
     if len(self.history) > 0:
@@ -208,7 +200,7 @@ web/client/index.js
 {instruction}
 
 web/client/{self.file_name}
-{ self.prompt_prefix }{ self.code_prefix }"""
+{ self.prompt_prefix }"""
 
   def render_html(self, code=None, inner_html='', style=None):
     if code == None:
@@ -223,7 +215,7 @@ web/client/{self.file_name}
 
     return f"""
 <html>
-  <head>{style_tag}{script_tag}</head>
-  <body onload="onLoad()">{inner_html}</body>
+  <head>{style_tag}</head>
+  <body>{inner_html}{script_tag}</body>
 </html>
 """.strip()

@@ -33,14 +33,23 @@ class TempLog:
 
 class RichLive:
 
-  def __init__(self, console, transient=False):
+  def __init__(self, console, transient=False, offset=0):
     self.console = console
     self.transient = transient
+    self.offset = offset
 
   def update(self, content):
-    max_height = self.console.height
-    raw_text = '\n'.join(content.split('\n')[-max_height:])
-    text = Text.from_ansi(raw_text)
+    max_height = self.console.height - self.offset
+
+    # raw_text = Text.from_ansi(content, end='')
+    raw_text = Text(content, end='')
+    all_lines = raw_text.wrap(
+      console=self.console,
+      width=self.console.width,
+      tab_size=4,
+    )
+    lines = all_lines[-max_height:]
+    text = Text('\n', end='').join(lines)
 
     self.live_enter.update(text, refresh=True)
 
@@ -62,14 +71,20 @@ class RichLive:
 class Printer:
 
   def __init__(self):
-    self.console = Console(color_system="truecolor")
+    self.console = self.build_console()
+
+  def build_console(self, markup=True):
+    return Console(
+      color_system="truecolor",
+      markup=markup,
+    )
 
   def warmup(self):
     GuessLexer.warmup()
     # GuessLexer.load()
 
-  def print(self, text):
-    self.console.print(text)
+  def print(self, text, markup=True):
+    self.console.print(text, markup=markup)
 
   def to_markdown(self, text, preserve_softbreak=True, code_theme='monokai'):
     if preserve_softbreak:
@@ -117,8 +132,8 @@ class Printer:
 
     self.console.print(table)
 
-  def live(self, transient=False):
-    return RichLive(self.console, transient=transient)
+  def live(self, transient=False, offset=0):
+    return RichLive(console=self.console, transient=transient, offset=offset)
 
   def temp_log(self, text):
     return TempLog(text)
