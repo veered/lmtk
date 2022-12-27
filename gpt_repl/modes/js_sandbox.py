@@ -7,7 +7,7 @@ from itertools import chain
 
 from .base_mode import BaseMode, register_mode
 from ..llms.gpt3 import GPT3
-from ..utils import expand_path, SimpleServer, printer
+from ..utils import SimpleServer, printer, render_code_display
 
 @register_mode('js-sandbox')
 class JSSandboxMode(BaseMode):
@@ -25,6 +25,26 @@ class JSSandboxMode(BaseMode):
       'bio': 'You are an experienced software engineer',
     },
 
+    'console': {
+      'starter_code': 'let outputDisplay = document.querySelector("pre");',
+      'inner_html': '<pre></pre>',
+      'bio': 'You are an experienced software engineer',
+      'style': """
+        body {
+          background-color: #000;
+        }
+        pre {
+          color: #fff;
+          font-family: monospace;
+          font-size: 18px;
+          padding: 1em;
+          overflow: auto;
+          white-space: pre-wrap;
+          word-break: keep-all;
+        }
+      """
+    },
+
     'web': {
       'starter_code': 'document.body.innerHTML = ``;',
       'min_starter_code': 'document.body.innerHTML=``;',
@@ -36,7 +56,7 @@ class JSSandboxMode(BaseMode):
       'starter_code': 'let canvas = document.querySelector("canvas");\n  let ctx = canvas.getContext("2d");',
       'min_starter_code': 'c=document.querySelector("canvas").getContext("2d")}',
       'inner_html': '<canvas width="700" height="700"></canvas>',
-      'bio': 'You are an experienced video game developer. Avoid code duplication and put similar objects in an array.',
+      'bio': 'You are an experienced video game developer. Avoid code duplication, write self-contained code, and group similar objects into arrays.',
     },
 
     'svg': {
@@ -117,7 +137,7 @@ class JSSandboxMode(BaseMode):
     self.server = SimpleServer(
       lambda path, request: self.handle(path),
       host='localhost',
-      port=8080,
+      port=8081,
     )
     success = self.server.start()
 
@@ -132,12 +152,15 @@ class JSSandboxMode(BaseMode):
 
   def handle(self, path):
     if path == '/':
-      return self.render_display_html(self.code)
+      return render_code_display(
+        code=self.beautify_code(self.code),
+        frame='/sandbox',
+      )
     elif path == '/sandbox':
       return self.render_html(
         code=self.code,
         inner_html=self.inner_html,
-        style='body { margin: 0px; }',
+        style=f'body {{ margin: 0px; }}\n{self.sandbox.get("style", "")}',
       )
 
   def inspect(self):
@@ -204,68 +227,3 @@ web/client/{self.file_name}
   <body onload="onLoad()">{inner_html}</body>
 </html>
 """.strip()
-
-  def render_display_html(self, code=''):
-    formatted_code = html.escape(self.beautify_code(code))
-    return f"""
-<html style="height: 100%">
-  <head>
-    <style>
-      html {{
-        height: 100%;
-      }}
-      body {{
-        display: flex;
-        flex-direction: row;
-        background: #444654;
-      }}
-      .row {{
-        flex: 1;
-        margin: 10px;
-      }}
-      iframe {{
-        border: 0px;
-        background: #ededed;
-        box-shadow: 0px 0px 20px #000;
-      }}
-      pre {{
-        display: inline-block;
-        margin-top: 0px;
-        text-align: left;
-      }}
-      code {{
-        height: 674px;
-        width: 700px;
-        box-shadow: 0px 0px 20px #000;
-      }}
-      #fullscreen {{
-        position: fixed;
-        bottom: 1rem;
-        right: 1rem;
-        color: rgb(217,217,227);
-        background-color: rgba(52,53,65);
-        border-color: rgba(86,88,105);
-        font-family: Helvetica;
-        padding: 10px;
-        box-shadow: 0px 0px 3px #000;
-        text-decoration: none;
-      }}
-    </style>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/monokai.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
-
-  </head>
-  <body>
-    <div class="row" style="text-align: right">
-      <iframe width="700" height="700" src="sandbox"></iframe>
-    </div>
-    <div class="row" style="text-align: left">
-      <pre><code class="language-javascript" id="code">{formatted_code}</code></pre>
-      <script>
-        hljs.highlightAll();
-      </script>
-    </div>
-    <a href="sandbox" target="_blank" id="fullscreen">Fullscreen</a>
-  </body>
-</html>
-"""

@@ -59,7 +59,7 @@ class REPL:
     else:
       self.warmup_thread()
 
-    self.load_mode(self.mode_name, state=self.thread.mode.state, seed=self.thread.seed)
+    self.load_mode(self.mode_name, state=self.thread.mode.state)
     self.create_prompt()
 
     self.pretty.intro()
@@ -121,14 +121,18 @@ class REPL:
     self.thread.seed = self.mode.get_seed()
     self.thread.save()
 
-  def load_mode(self, mode_name, state={}, seed=''):
+  def load_mode(self, mode_name, state={}):
+    state = state.copy()
+
     if self.mode:
       self.mode.stop()
+      state['seed'] = state.get('seed', self.mode.seed)
+      state['profile'] = state.get('profile', self.mode.profile)
+
     self.mode = get_mode(mode_name)(state=state)
-    self.mode.set_seed(seed)
 
   def reset(self):
-    self.load_mode(self.mode_name, seed=self.mode.get_seed())
+    self.load_mode(self.mode_name)
     self.thread.reset()
     self.save_thread()
 
