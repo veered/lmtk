@@ -14,11 +14,17 @@ class PrettyPrintREPL:
     printer.print('Type "help" for a list of commands. Use "Enter" to submit and "Tab" to start a new line.\n')
 
   def your_banner(self, count, space=0):
+    profile = self.repl.mode.state.get('profile')
+    if profile:
+      mode_text = f'#{self.repl.mode_name} | {profile}'
+    else:
+      mode_text = f'#{self.repl.mode_name}'
+
     printer.print_banner(
       bg_color='rgb(0,95,135)',
       text=' You:',
       prefix=f' {count} ',
-      suffix=f' @{self.repl.thread.name} [ {self.repl.mode_name} ]'
+      suffix=f' @{self.repl.thread.name} [ {mode_text} ]'
     )
     if space > 0:
       printer.pad_down(space)

@@ -9,10 +9,11 @@ from .modes import list_modes
 @click.command(help='Usually just `gpt-repl @thread-name [-m MODE]`')
 @click.argument("cmd", type=str, required=False)
 @click.option('-m', '--mode', default='synth-chat', help="REPL mode to load")
+@click.option('-p', '--profile', default='', help="Mode profile to use")
 @click.option('-t', '--thread', default=None, help="Thread name to open")
 # @click.option('-f', '--file', type=click.Path(exists=True), help="Path to text file to preload")
 # @click.option('-l', '--list', is_flag=True, help="List all threads")
-def run(cmd, mode, thread):
+def run(cmd, mode, profile, thread):
   config = Config()
 
   if str(cmd) == 'help':
@@ -43,6 +44,7 @@ def run(cmd, mode, thread):
 
   repl = REPL(
     mode_name=mode,
+    profile_name=profile,
     thread_name=thread,
   )
 

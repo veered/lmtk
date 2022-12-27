@@ -14,7 +14,8 @@ class REPL:
   def __init__(
       self,
       thread_name=None,
-      mode_name = None,
+      mode_name=None,
+      profile_name=None,
       auto_fills=[],
     ):
     self.pretty = PrettyPrintREPL(self)
@@ -24,6 +25,7 @@ class REPL:
 
     self.thread = self.config.threads().load(thread_name)
     self.thread.set_mode(self.thread.mode.name or mode_name or 'synth-chat')
+    self.thread.mode.state['profile'] = profile_name or self.thread.mode.state.get('profile', '')
 
     self.mode_name = self.thread.mode.name
     self.mode = None

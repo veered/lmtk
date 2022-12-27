@@ -17,6 +17,7 @@ class JSSandboxMode(BaseMode):
 
   prompt_prefix = '```javascript\n'
   stops = [  '/*END*/', '```', '// END', '//END' ]
+  has_logged = False
 
   sandboxes = {
 
@@ -24,18 +25,18 @@ class JSSandboxMode(BaseMode):
       'bio': 'You are an experienced software engineer',
     },
 
-    'ui': {
+    'web': {
       'starter_code': 'document.body.innerHTML = ``;',
       'min_starter_code': 'document.body.innerHTML=``;',
       'inner_html': '',
       'bio': 'You are an experienced web developer and UI/UX designer. Always use lots of CSS to style the page, use a consistent color palette, use flexbox for layout, and set a custom font. Prefer innerHTML over element insertion, use <style> and prefer complete solutions over minimal solutions',
     },
 
-    'canvas': {
+    'game': {
       'starter_code': 'let canvas = document.querySelector("canvas");\n  let ctx = canvas.getContext("2d");',
       'min_starter_code': 'c=document.querySelector("canvas").getContext("2d")}',
       'inner_html': '<canvas width="700" height="700"></canvas>',
-      'bio': 'You are an experienced video game developer. Avoid code duplication and prefer complete solutions over minimal solutions',
+      'bio': 'You are an experienced video game developer. Avoid code duplication and put similar objects in an array.',
     },
 
     'svg': {
@@ -51,7 +52,8 @@ class JSSandboxMode(BaseMode):
     self.llm = GPT3()
 
     self.history = state.get('history', [])
-    self.sandbox = self.sandboxes[state.get('profile') or 'canvas']
+    self.sandbox_name = state.get('profile') or 'game'
+    self.sandbox = self.sandboxes[self.sandbox_name]
     # self.sandbox = self.sandboxes[state.get('profile') or 'ui']
     self.inner_html = self.sandbox.get('inner_html', '')
     self.bio = self.sandbox.get('bio', '')
@@ -81,6 +83,11 @@ class JSSandboxMode(BaseMode):
       port=8080,
     )
     success = self.server.start()
+
+    if JSSandboxMode.has_logged:
+      return
+    JSSandboxMode.has_logged = True
+
     if success:
       printer.print(f'[bold]Notice[/bold]: Sandbox UI available at [bold]{self.server.host}:{self.server.port}[/bold] \n')
     else:
@@ -152,7 +159,7 @@ class JSSandboxMode(BaseMode):
     self.code = value
 
   def stats(self):
-    return f'( tokens={len(self.get_prompt(""))}, minify={str(self.minify)} )'
+    return f'( tokens={len(self.get_prompt(""))}, sandbox={self.sandbox_name} )'
 
   @property
   def loader_latency(self):
