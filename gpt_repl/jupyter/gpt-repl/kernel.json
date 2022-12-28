@@ -1,0 +1,4 @@
+{
+  "argv":["python","-m","gpt_repl.jupyter.kernel", "-f", "{connection_file}"],
+  "display_name":"gpt-repl"
+}
