@@ -61,8 +61,8 @@ class JSSandboxMode(BaseMode):
       'bio': 'You are an experienced video game developer. Avoid code duplication, write self-contained code, and group similar objects into arrays.',
       'starter_code': 'let canvas = document.querySelector("canvas");\n  let ctx = canvas.getContext("2d");',
       'min_starter_code': 'c=document.querySelector("canvas").getContext("2d")}',
-      # 'inner_html': '<canvas width="700" height="700"></canvas><ui style="position: absolute; top: 20px; left: 20px"></ui>',
-      'inner_html': '<canvas width="700" height="700"></canvas><ui></ui>',
+      # 'inner_html': '<canvas width="700" height="800"></canvas><ui style="position: absolute; top: 20px; left: 20px"></ui>',
+      'inner_html': '<canvas width="700" height="800"></canvas><ui></ui>',
       'style': 'ui { position: absolute; top: 20px; left: 20px; }',
     },
 

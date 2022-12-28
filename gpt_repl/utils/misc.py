@@ -72,7 +72,7 @@ def render_code_display(code='', frame='', language='javascript'):
         text-align: left;
       }}
       code {{
-        height: 674px;
+        height: 774px;
         width: 700px;
         box-shadow: 0px 0px 20px #000;
       }}
@@ -95,7 +95,7 @@ def render_code_display(code='', frame='', language='javascript'):
   </head>
   <body>
     <div class="row" style="text-align: right">
-      <iframe width="700" height="700" src="{frame}"></iframe>
+      <iframe width="700" height="800" src="{frame}"></iframe>
     </div>
     <div class="row" style="text-align: left">
       <pre><code class="language-{language}" id="code">{formatted_code}</code></pre>

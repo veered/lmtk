@@ -100,7 +100,7 @@ class BaseMode:
     self.web_server = SimpleServer(
       lambda request, path: self.request_handler(request, path),
       host=self.web_server_config.get('host', 'localhost'),
-      port=self.web_server_config.get('port', 8081),
+      port=self.web_server_config.get('port', 8080),
     )
     success = self.web_server.start()
 
