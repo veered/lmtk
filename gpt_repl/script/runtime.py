@@ -1,6 +1,5 @@
 import re, sys
 
-from mdformat.renderer import MDRenderer
 from markdown_it import MarkdownIt
 from markdown_it.token import Token
 
@@ -12,33 +11,69 @@ from .helpers import get_web, get_file, shell, code_block
 
 class ScriptSection:
 
-  def __init__(self, md):
+  tag_regex = re.compile(r'{{(.*?)}}')
+
+  def __init__(self, md, text):
     self.md = md
-    self.raw_tokens = []
-    self.new_tokens = []
+    self.source_text = text
+    self.expanded_text = None
 
-  def add_token(self, token):
-    self.raw_tokens += [ token ]
+  def bind(self, mode, context):
+    self.mode = mode
+    self.context = context
 
-  def get_tokens(self):
-    return self.raw_tokens
+  def expand(self):
+    self.expanded_text = self.source_text
 
-  def is_empty(self):
-    return len(self.raw_tokens) == 0
+    tokens = self.md.parse(self.source_text)
+    changes = []
+    for token in tokens:
+      changes += self.expand_token(token)
 
-  def build(self, tokens):
-    self.new_tokens += tokens
+    if len(changes) == 0:
+      return self.display()
+    changes.sort(key=lambda x: x[0][0])
 
-  def render(self):
-    self.body = self.md.renderer.render(
-      self.new_tokens,
-      self.md.options,
-      {}
-    )
-    return self.body
+    spans = [ v[0] for v in changes ]
+    lines = self.source_text.split('\n')
+    new_lines = []
+
+    new_lines += lines[:spans[0][0]]
+    for (i, change) in enumerate(changes):
+      if i != 0:
+        new_lines += lines[spans[i-1][1] + 1 : spans[i][0]]
+      new_lines += [ change[1] ]
+    new_lines += lines[spans[-1][1]+1:]
+
+    self.expanded_text = '\n'.join(new_lines)
+    return self.display()
+
+  def expand_token(self, token):
+    if token.map == None or not token.content:
+      return []
+
+    text = '\n'.join(self.source_text.split('\n')[token.map[0]:token.map[1]])
+
+    if token.type == 'fence' and text.split('\n')[1] == '#eval':
+      result = self.eval(token.content)
+      return [ (token.map, result) ]
+    elif re.search(self.tag_regex, text):
+      result = re.sub(self.tag_regex, lambda m: self.eval(m.group(1), True), text)
+      return [ (token.map, result) ]
+    else:
+      return []
+
+  def eval(self, code, inline=False):
+    self.context.prepare()
+    if inline:
+      result = eval(code, globals(), self.context.get_vars())
+    else:
+      exec(code, globals(), self.context.get_vars())
+      result = self.context.get_output()
+    return str(result)
 
   def display(self):
-    return self.body
+    return self.expanded_text
 
 class ScriptContext:
 
@@ -84,17 +119,17 @@ class ScriptContext:
 
 class ScriptRuntime:
 
-  tag_regex = re.compile(r'{{(.*?)}}')
-
   def __init__(self, mode=None, data='', params={}):
     self.mode = mode
-    self.md = MarkdownIt('commonmark', renderer_cls=MDRenderer)
+    self.md = MarkdownIt('commonmark')
     self.context = ScriptContext(mode, data=data, params=params)
 
   def run(self, text):
-    sections = self.extract_sections(self.parse(text))
+    sections = self.extract_sections(text)
     for (i, section) in enumerate(sections):
-      output = self.run_section(section)
+      section.bind(self.mode, self.context)
+      output = section.expand()
+
       printer.print_markdown(f'## [{i}] Input')
       printer.print_markdown(output)
       printer.print_markdown(f'## [{i}] Output')
@@ -107,59 +142,16 @@ class ScriptRuntime:
       printer.print_markdown('-------------------------------')
     return self.mode.conversation[-1]['text']
 
-  def run_section(self, section):
-    for token in section.get_tokens():
-        section.build(self.expand_token(token))
-    return section.render()
+  def extract_sections(self, text):
+    chunks = re.split(r'^\*{3,}\s*$', text, flags=re.MULTILINE)
+    return [
+      self.create_section(chunk)
+      for chunk in chunks
+      if chunk.strip() != ''
+    ]
 
-  def extract_sections(self, tokens):
-    sections = [ ScriptSection(self.md) ]
-    for token in tokens:
-      if token.type == 'hr':
-        sections += [ ScriptSection(self.md) ]
-      else:
-        sections[-1].add_token(token)
-    return [ s for s in sections if not s.is_empty() ]
-
-  def eval(self, code, inline=False):
-    self.context.prepare()
-    if inline:
-      result = eval(code, globals(), self.context.get_vars())
-    else:
-      exec(code, globals(), self.context.get_vars())
-      result = self.context.get_output()
-    return str(result)
-
-  def expand_token(self, token):
-    content = token.content
-    if token.type == 'fence' and content[0:6] == '#eval\n':
-      result = self.eval(content)
-      return self.parse(result)
-    if re.search(self.tag_regex, content):
-      if token.type == 'inline':
-        result = re.sub(self.tag_regex, lambda m: self.eval(m.group(1), True), content)
-        if len(result.strip().split('\n')) < 2:
-          return self.build_inline_token(result)
-        else:
-          return self.parse(result)
-      if token.type == 'fence':
-        result = re.sub(self.tag_regex, lambda m: self.eval(m.group(1), True), content)
-        token.content = result
-        return [ token ]
-    return [ token ]
-
-  def build_inline_token(self, text):
-    return self.parse(text)[1:-1]
-
-  def parse(self, text):
-    return self.md.parse(text)
-
-  def render(self, tokens):
-    return self.md.renderer.render(
-      tokens,
-      self.md.options,
-      {}
-    )
+  def create_section(self, text):
+    return ScriptSection(self.md, text)
 
 def run_script(name='', path='', code='', data='', params={}):
   if name:

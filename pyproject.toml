@@ -12,6 +12,7 @@ dynamic = ["version", "description"]
 dependencies = [
   "click >=8.0",
   "guesslang-experimental >=2.2.3",
+  "markdown-it-py >=2.0",
   "openai >=0.25",
   "prompt_toolkit >=3.0",
   "pyperclip >=1.0",
@@ -26,6 +27,7 @@ Home = "https://github.com/veered/gpt-repl"
 
 [project.scripts]
 gpt-repl = "gpt_repl.cli:run"
+lmtk = "gpt_repl.cli:run"
 
 [tool.flit.module]
 name = "gpt_repl"

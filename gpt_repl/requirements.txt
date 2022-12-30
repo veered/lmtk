@@ -1,5 +1,6 @@
 click >=8.0
 guesslang-experimental >=2.2.3
+markdown-it-py >=2.0
 openai >=0.25
 prompt_toolkit >=3.0
 pyperclip >=1.0
