@@ -8,10 +8,13 @@ from rich.syntax import Syntax
 # The guesslang library loads quite slowly because of its dependency on TensorFlow,
 # so we load it lazily using `importlib`
 class GuessLexer:
+  enabled = True
   guess = None
 
   @classmethod
   def parse(cls, code):
+    if not cls.enabled:
+      return 'text'
     if code.strip() == '':
       return 'text'
     try:
@@ -23,11 +26,15 @@ class GuessLexer:
 
   @classmethod
   def load(cls):
+    if not cls.enabled:
+      return
     if GuessLexer.guess == None:
       GuessLexer.guess = importlib.import_module('guesslang').Guess()
 
   @classmethod
   def warmup(cls):
+    if not cls.enabled:
+      return
     cls.load()
     GuessLexer.guess.language_name('_')
 

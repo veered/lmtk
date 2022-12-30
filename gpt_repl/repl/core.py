@@ -91,6 +91,7 @@ class REPL:
     try:
       answer = self.ask(text)
     except (KeyboardInterrupt, EOFError):
+      self.auto_fills += [ text ]
       self.mode.rollback_n(1)
       self.pretty.request_canceled()
       return

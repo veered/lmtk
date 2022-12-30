@@ -15,6 +15,15 @@ def make_iter(x):
 def expand_path(*args):
   return os.path.abspath(os.path.expanduser(os.path.join(*args)))
 
+class DotDict(dict):
+  __getattr__ = dict.__getitem__
+  __setattr__ = dict.__setitem__
+  __delattr__ = dict.__delitem__
+
+  def __init__(self, source={}):
+    for key, value in source.items():
+      self[key] = value
+
 class set_env:
 
   def __init__(self, name, value):

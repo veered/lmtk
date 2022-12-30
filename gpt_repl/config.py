@@ -1,6 +1,6 @@
 import os, json, re, pdb, importlib.util
 from os import path, listdir
-from .utils import printer
+from .utils import printer, expand_path
 from .threads import ThreadManager
 
 class Config:
@@ -15,8 +15,14 @@ class Config:
     self.prompt_history_path = path.join(self.config_dir_path, 'prompt_history')
     self.threads_dir_path = path.join(self.config_dir_path, 'threads')
     self.plugins_dir_path = path.join(self.config_dir_path, 'plugins')
+    self.scripts_dir_path = path.join(self.config_dir_path, 'scripts')
 
-    dirs = [ self.config_dir_path, self.threads_dir_path, self.plugins_dir_path]
+    dirs = [
+      self.config_dir_path,
+      self.threads_dir_path,
+      self.plugins_dir_path,
+      self.scripts_dir_path
+    ]
     for dir in dirs:
       if not path.exists(dir):
         os.makedirs(dir)
@@ -54,3 +60,15 @@ class Config:
       except Exception as e:
         printer.exception(e)
         continue
+
+  def get_script(self, name):
+    file_names = [
+      f for f in os.listdir(self.scripts_dir_path)
+      if name == f or name + '.md' == f
+    ]
+    if len(file_names) == 0:
+      return None
+
+    file_path = expand_path(self.scripts_dir_path, file_names[0])
+    with open(file_path, 'r') as file:
+      return file.read()

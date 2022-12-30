@@ -86,7 +86,10 @@ class SynthChatMode(BaseMode):
     self.response_prefix = ''
 
   def continue_conversation(self):
-    self.compress_conversation(self.max_response_tokens)
+    success = self.compress_conversation(self.max_response_tokens)
+    if not success:
+      pass
+      # breakpoint()
 
     conversation_prompt = self.format_conversation_prompt(self.recent_conversation)
     results = self.complete(
@@ -156,7 +159,6 @@ class SynthChatMode(BaseMode):
         chunk_text = '\n'.join([ m['text'] for m in chunk ])
 
       if len(chunk) == 0:
-        breakpoint()
         break
 
       summary_prompt = self.format_summary_prompt(chunk)
@@ -164,6 +166,8 @@ class SynthChatMode(BaseMode):
       summary = f'{self.human_name} ' + response.strip()
 
       self.summaries = self.summaries[-(self.max_summaries - 1):] + [ summary ]
+
+    return self.get_conversation_space() <= space_required
 
   def complete(self, prompt, max_length=None, stream=False):
     return self.llm.complete(
@@ -187,7 +191,7 @@ class SynthChatMode(BaseMode):
     return self.max_prompt_tokens - self.get_prompt_size() - self.max_response_tokens
 
   def has_prompt_token_pressure(self):
-    return self.count_tokens(self.format_conversation_prompt(self.recent_conversation)) > self.soft_max_prompt_tokens;
+    return self.count_tokens(self.format_conversation_prompt(self.recent_conversation)) > self.soft_max_prompt_tokens
 
   def format_summaries(self, include_pinned=True):
     pinned = [ self.pinned_summary() ] if include_pinned else []
@@ -222,7 +226,7 @@ class SynthChatMode(BaseMode):
       *self.format_summaries(),
       self.conversation_header(),
       self.format_messages(messages),
-      f'{self.format_seed()}{self.persona_name}>{self.response_prefix}'
+      f'{self.format_seed()}{self.persona_name}> {self.response_prefix}'
     ]
     return whitespace.join(lines).strip()
 
