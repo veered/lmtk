@@ -32,7 +32,7 @@ export OPENAI_API_KEY="<your api key>"
 
 ## Usage
 ```bash
-lmtk @my-thread [-m mode-name]
+lmtk @thread-name [-m mode-name]
 ```
 
 Use `lmtk modes` to list available REPL modes and `lmtk threads` to list open threads.
