@@ -7,7 +7,7 @@ from ..config import Config
 from ..modes import get_mode
 from ..utils import printer, DotDict, expand_path
 
-from .helpers import get_web, get_file, shell, code_block
+from .helpers import get_web, get_file, shell, code_block, ask
 
 class ScriptSection:
 
@@ -52,9 +52,10 @@ class ScriptSection:
     if token.map == None or not token.content:
       return []
 
-    text = '\n'.join(self.source_text.split('\n')[token.map[0]:token.map[1]])
+    text_lines = self.source_text.split('\n')[token.map[0]:token.map[1]]
+    text = '\n'.join(text_lines)
 
-    if token.type == 'fence' and text.split('\n')[1] == '#eval':
+    if token.type == 'fence' and (text_lines[0] == '```eval' or text_lines[1] == '#eval'):
       result = self.eval(token.content)
       return [ (token.map, result) ]
     elif re.search(self.tag_regex, text):
@@ -94,6 +95,7 @@ class ScriptContext:
       'get_path': expand_path,
       'shell': shell,
       'code_block': code_block,
+      'ask': ask,
     }
 
   def set_var(self, key, val):
@@ -164,6 +166,10 @@ def run_script(name='', path='', code='', data='', params={}):
     pass
 
   mode = get_mode('synth-chat')()
+  # mode.persona_name = 'NatLang'
+  mode.seed = 'Eden will ask you to do something, and you must always respond with the result and only the result. Respond with *only* the result.'
+  # mode.seed = 'You must act like a programming language interpreter based on natural English (called NatLang). Eden will ask you for something, and you must always respond with the result and only the result.'
+
   mode.max_response_tokens = 750
   script = ScriptRuntime(mode, data=data, params=params)
 

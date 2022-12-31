@@ -1,5 +1,6 @@
 import requests, subprocess, os
 from bs4 import BeautifulSoup
+from prompt_toolkit.shortcuts import prompt
 from ..utils import expand_path
 
 def get_web(url):
@@ -16,7 +17,7 @@ def get_file(file_path):
 def code_block(file_name):
   file_path = expand_path(file_name)
   if not os.path.exists(file_path):
-    return ''
+    raise FileNotFoundError(f'File "{file_name}" does not exist')
 
   file_content = get_file(file_path)
   if not file_content:
@@ -32,3 +33,9 @@ def code_block(file_name):
 
 def shell(cmd):
   return subprocess.getoutput(cmd)
+
+def ask(question=''):
+  if question:
+    return prompt(question + '\n')
+  else:
+    return prompt()
