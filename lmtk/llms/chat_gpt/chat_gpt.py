@@ -1,6 +1,6 @@
 # npm install chatgpt puppeteer
 
-import os, subprocess, base64, json
+import os, subprocess, base64, json, signal
 from ...utils import expand_path
 
 class ChatGPT:
@@ -24,12 +24,12 @@ class ChatGPT:
     (self.read_pipe, self.write_pipe) = os.pipe()
     self.node_process = subprocess.Popen(
       [
-        "node",
+        'node',
         expand_path(os.path.dirname(__file__), './api.mjs'),
       ],
       stdin=self.read_pipe,
       stdout=subprocess.PIPE,
-      preexec_fn=os.setsid,
+      # preexec_fn=os.setsid,
     )
 
   def send_message(self, msg):
@@ -40,5 +40,6 @@ class ChatGPT:
 
     return json.loads(base64.b64decode(response).decode('utf-8'))
 
-def set_subprocess_group():
-    os.setpgid(0, 0)
+  def exit(self):
+    self.node_process.terminate()
+    # os.killpg(os.getpgid(self.node_process.pid), signal.SIGTERM)

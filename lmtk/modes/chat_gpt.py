@@ -13,6 +13,9 @@ class ChatGPTMode(BaseMode):
       parent_message_id=state.get('parent_message_id', ''),
     )
 
+  def unload(self):
+    self.chat_gpt.exit()
+
   def respond(self, query):
     return self.chat_gpt.ask(query)
 
