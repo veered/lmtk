@@ -52,9 +52,16 @@ def script(
     if len(parts) == 2:
       params_dict[parts[0]] = parts[1]
 
+  if name.endswith('.md'):
+    path = name
+    name = None
+  else:
+    path = None
+
   printer.toggle_syntax_guessing(False)
   result = run_script(
     name=name,
+    path=path,
     data=sys.stdin.read() if not sys.stdin.isatty() else '',
     params=params_dict,
   )

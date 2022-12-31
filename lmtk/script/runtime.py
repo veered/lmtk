@@ -161,7 +161,7 @@ def run_script(name='', path='', code='', data='', params={}):
     config = Config()
     code = config.get_script(name)
   elif path:
-    with open(path, 'r') as file:
+    with open(expand_path(path), 'r') as file:
       code = file.read()
   elif code:
     pass
