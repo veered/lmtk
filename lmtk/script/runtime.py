@@ -7,7 +7,7 @@ from ..config import Config
 from ..modes import get_mode
 from ..utils import printer, DotDict, expand_path
 
-from .helpers import get_web, get_file, shell, code_block, ask
+from .helpers import get_web, get_file, shell, ask, show_web, show_code
 
 class ScriptSection:
 
@@ -94,8 +94,9 @@ class ScriptContext:
       'get_file': get_file,
       'get_path': expand_path,
       'shell': shell,
-      'code_block': code_block,
       'ask': ask,
+      'show_web': show_web,
+      'show_code': show_code
     }
 
   def set_var(self, key, val):

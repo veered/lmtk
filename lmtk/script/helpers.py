@@ -31,6 +31,14 @@ def show_code(file_name):
 ```
 """.strip()
 
+def show_web(url):
+  return f"""
+`{ url }`
+```
+{ get_web(url) }
+```
+""".strip()
+
 def shell(cmd):
   return subprocess.getoutput(cmd)
 
