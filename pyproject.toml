@@ -10,6 +10,7 @@ license = {file = "LICENSE"}
 classifiers = ["License :: OSI Approved :: MIT License"]
 dynamic = ["version", "description"]
 dependencies = [
+  "beautifulsoup4 >=4.0",
   "guesslang-experimental >=2.2.3",
   "markdown-it-py >=2.0",
   "openai >=0.25",
