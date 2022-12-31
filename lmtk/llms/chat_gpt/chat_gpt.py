@@ -1,6 +1,7 @@
 # npm install chatgpt puppeteer
 
 import os, subprocess, base64, json
+from ...utils import expand_path
 
 class ChatGPT:
 
@@ -24,7 +25,7 @@ class ChatGPT:
     self.node_process = subprocess.Popen(
       [
         "node",
-        "api.mjs"
+        expand_path(os.path.dirname(__file__), './api.mjs'),
       ],
       stdin=self.read_pipe,
       stdout=subprocess.PIPE,
