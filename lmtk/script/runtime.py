@@ -168,7 +168,8 @@ def run_script(name='', path='', code='', data='', params={}):
 
   mode = get_mode('synth-chat')()
   # mode.persona_name = 'NatLang'
-  mode.seed = 'Eden will ask you to do something, and you must always respond with the result and only the result. Respond with *only* the result.'
+  # mode.seed = 'Eden will ask you to do something, and you must always respond with the result and only the result. Respond with *only* the result and no additional comments.'
+  mode.seed = 'You must only respond with exactly what was requested. Don\'t start your response with text like "Here is..."'
   # mode.seed = 'You must act like a programming language interpreter based on natural English (called NatLang). Eden will ask you for something, and you must always respond with the result and only the result.'
 
   mode.max_response_tokens = 750
