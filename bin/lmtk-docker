@@ -1,0 +1,9 @@
+#!/bin/sh
+
+docker volume create lmtk-data > /dev/null
+docker run \
+  -it \
+  --rm \
+  -v lmtk-data:/root/.config \
+  veered/lmtk:latest \
+  $@

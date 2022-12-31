@@ -4,8 +4,8 @@ from ipykernel.kernelbase import Kernel
 from ..modes import get_mode
 Mode = get_mode('synth-chat')
 
-class GptReplKernel(Kernel):
-    implementation = 'gpt-repl'
+class LmtkKernel(Kernel):
+    implementation = 'lmtk'
     implementation_version = '1.0'
     language = 'no-op'
     language_version = '0.1'
@@ -14,7 +14,7 @@ class GptReplKernel(Kernel):
         'mimetype': 'text/markdown',
         'file_extension': '.md',
     }
-    banner = 'gpt-repl - Kernel for attaching to gpt-repl'
+    banner = 'lmtk - Kernel for attaching to lmtk'
 
     def __init__(self, *args, **kwargs):
         self.my_log('\n---- START ----')
@@ -79,4 +79,4 @@ class GptReplKernel(Kernel):
 
 if __name__ == '__main__':
     from ipykernel.kernelapp import IPKernelApp
-    IPKernelApp.launch_instance(kernel_class=GptReplKernel)
+    IPKernelApp.launch_instance(kernel_class=LmtkKernel)

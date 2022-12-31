@@ -6,7 +6,7 @@ from .repl.search import fuzzy_search_input
 from .config import Config
 from .modes import list_modes
 
-@click.command(help='Usually just `gpt-repl @thread-name [-m MODE]`')
+@click.command(help='Usually just `lmtk @thread-name [-m MODE]`')
 @click.argument("cmd", type=str, required=False)
 @click.option('-m', '--mode', default='synth-chat', help="REPL mode to load")
 @click.option('-p', '--profile', default='', help="Mode profile to use")

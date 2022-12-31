@@ -1,15 +1,15 @@
-<h1 align="center">gpt-repl</h1>
+<h1 align="center">lmtk</h1>
 <p align="center">
     Interactively play with GPT-based tools from the terminal
     <br />
     <br />
-    <a href="https://pypi.python.org/pypi/gpt-repl/"><img alt="PyPi" src="https://img.shields.io/pypi/v/gpt-repl.svg?style=flat-square"></a>
-    <a href="https://pypi.python.org/pypi/gpt-repl/"><img alt="Downloads" src="https://img.shields.io/pypi/dm/gpt-repl.svg"></a>
-    <a href="https://github.com/veered/gpt-repl/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/github/license/veered/gpt-repl.svg?style=flat-square"></a>
+    <a href="https://pypi.python.org/pypi/lmtk/"><img alt="PyPi" src="https://img.shields.io/pypi/v/lmtk.svg?style=flat-square"></a>
+    <a href="https://pypi.python.org/pypi/lmtk/"><img alt="Downloads" src="https://img.shields.io/pypi/dm/lmtk.svg"></a>
+    <a href="https://github.com/veered/lmtk/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/github/license/veered/lmtk.svg?style=flat-square"></a>
 </p>
 
 ## Description
-ChatGPT needs a power-user mode. `gpt-repl` gives you a terminal UI for interacting with ChatGPT and other GPT-based tools.
+ChatGPT needs a power-user mode. `lmtk` gives you a terminal UI for interacting with ChatGPT and other GPT-based tools.
 
 The default mode, `synth-chat`, uses a ChatGPT-like chatbot built directly from GPT-3. It supports features not possible with ChatGPT, including:
 - Write the prefix of the next response
@@ -22,7 +22,7 @@ This project is still in the **early stages** of development. It will have bugs 
 For now, Python >=3.9 is required. Use `pip3` instead of `pip` if necessary.
 
 ```bash
-pip install -U gpt-repl
+pip install -U lmtk
 ```
 
 If you don't have an OpenAI API key [create one here](https://beta.openai.com/account/api-keys) and set it:
@@ -32,10 +32,10 @@ export OPENAI_API_KEY="<your api key>"
 
 ## Usage
 ```bash
-gpt-repl @my-thread [-m mode-name]
+lmtk @my-thread [-m mode-name]
 ```
 
-Use `gpt-repl modes` to list available REPL modes and `gpt-repl threads` to list open threads.
+Use `lmtk modes` to list available REPL modes and `lmtk threads` to list open threads.
 
 Inside the REPL, type `.help` for a list of commands and keyboard shortcuts.
 
@@ -63,15 +63,15 @@ See `.help` for a full list, but these are some particularly important commands:
 - `.undo`  or `C-x + C-u` to rewrite your most recent message
 
 ## Custom Modes
-Add a Python file that [looks like this](https://github.com/veered/gpt-repl/blob/main/examples/bruh_mode.py) to `$GPT_REPL_CONFIG_PATH/plugins/`. By default this will be `~/.config/gpt_repl/plugins/`.
+Add a Python file that [looks like this](https://github.com/veered/lmtk/blob/main/examples/bruh_mode.py) to `$LMTK_CONFIG_PATH/plugins/`. By default this will be `~/.config/lmtk/plugins/`.
 
-See [gpt_repl/modes](https://github.com/veered/gpt-repl/tree/main/gpt_repl/modes) for more complete examples.
+See [lmtk/modes](https://github.com/veered/lmtk/tree/main/lmtk/modes) for more complete examples.
 
 ## Development
-To install `gpt-repl` from source:
+To install `lmtk` from source:
 ```bash
-git clone git@github.com:veered/gpt-repl.git
-cd gpt-repl
+git clone git@github.com:veered/lmtk.git
+cd lmtk
 pip install -U flit
 flit install -s
 ```

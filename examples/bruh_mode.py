@@ -1,9 +1,9 @@
 # INSTALLATION:
-#   Copy or symlink this file into `$GPT_REPL_CONFIG_PATH/plugins/`
-#   By default, this will be `~/.config/gpt_repl/plugins/`
+#   Copy or symlink this file into `$LMTK_CONFIG_PATH/plugins/`
+#   By default, this will be `~/.config/lmtk/plugins/`
 
-from gpt_repl.modes import BaseMode, register_mode
-from gpt_repl.llms.gpt3 import GPT3
+from lmtk.modes import BaseMode, register_mode
+from lmtk.llms.gpt3 import GPT3
 
 @register_mode('bruh')
 class BruhMode(BaseMode):

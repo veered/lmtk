@@ -1,9 +1,0 @@
-#!/bin/sh
-
-docker volume create gpt-repl-data > /dev/null
-docker run \
-  -it \
-  --rm \
-  -v gpt-repl-data:/root/.config \
-  veered/gpt-repl:latest \
-  $@

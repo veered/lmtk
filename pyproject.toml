@@ -3,7 +3,7 @@ requires = ["flit_core >=3.2,<4"]
 build-backend = "flit_core.buildapi"
 
 [project]
-name = "gpt-repl"
+name = "lmtk"
 authors = [{name = "Lucas Hansen", email = "lucashansen@gmail.com"}]
 readme = "README.md"
 license = {file = "LICENSE"}
@@ -23,11 +23,10 @@ dependencies = [
 requires-python = ">=3.9"
 
 [project.urls]
-Home = "https://github.com/veered/gpt-repl"
+Home = "https://github.com/veered/lmtk"
 
 [project.scripts]
-gpt-repl = "gpt_repl.cli:run"
-lmtk = "gpt_repl.cli:run"
+lmtk = "lmtk.cli:run"
 
 [tool.flit.module]
-name = "gpt_repl"
+name = "lmtk"

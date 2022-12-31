@@ -5,10 +5,10 @@ from .threads import ThreadManager
 
 class Config:
 
-  default_config_path = '~/.config/gpt_repl'
+  default_config_path = '~/.config/lmtk'
 
   def __init__(self, config_path=None):
-    config_path = config_path or os.getenv('GPT_REPL_CONFIG_PATH', self.default_config_path)
+    config_path = config_path or os.getenv('LMTK_CONFIG_PATH', self.default_config_path)
 
     self.config_dir_path = path.abspath(path.expanduser(config_path))
     self.config_file_path = path.join(self.config_dir_path, 'config.json')
