@@ -1,4 +1,3 @@
-click >=8.0
 guesslang-experimental >=2.2.3
 markdown-it-py >=2.0
 openai >=0.25
@@ -7,3 +6,4 @@ pyperclip >=1.0
 requests >=2.0
 rich >=12.0
 tiktoken >=0.1
+typer >=0.7

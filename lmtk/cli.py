@@ -1,59 +1,92 @@
-import click, os, datetime
-from os.path import abspath
+import typer, sys
+from typing import Optional
 
+from .config import Config
 from .repl import REPL
 from .repl.search import fuzzy_search_input
-from .config import Config
 from .modes import list_modes
+from .utils import printer
+from .script import run_script
 
-@click.command(help='Usually just `lmtk @thread-name [-m MODE]`')
-@click.argument("cmd", type=str, required=False)
-@click.option('-m', '--mode', default='synth-chat', help="REPL mode to load")
-@click.option('-p', '--profile', default='', help="Mode profile to use")
-@click.option('-t', '--thread', default=None, help="Thread name to open")
-# @click.option('-f', '--file', type=click.Path(exists=True), help="Path to text file to preload")
-# @click.option('-l', '--list', is_flag=True, help="List all threads")
-def run(cmd, mode, profile, thread):
-  config = Config()
+config = Config()
 
-  if str(cmd) == 'help':
-    ctx = click.get_current_context()
-    click.echo(ctx.get_help())
-    return
+# I'd like to have completion but I find the completion flags in --help distracting
+app = typer.Typer(add_completion=False)
 
-  if cmd == 'threads':
-    for thread in config.threads().list():
-      print(thread)
-    return
-
-  if str(cmd)[0] == '@':
-    thread = cmd[1:]
-
-  if str(cmd) == '-':
+@app.command()
+def repl(
+    thread: Optional[str] = typer.Argument(None),
+    mode: str = 'synth-chat',
+    profile: str = None
+):
+  """
+  """
+  if thread == '@':
+    thread = fuzzy_search_input('thread = @', config.threads().list()) or None
+  elif thread == '-':
     thread = config.threads().list()[0]
-
-  if cmd == '@':
-    thread = fuzzy_search_input('thread = @', config.threads().list())
-
-  if cmd == 'i':
-    thread = fuzzy_search_input('thread = @', config.threads().list())
-    mode = fuzzy_search_input('mode = ', list_modes())
-
-  if thread == None:
+  elif thread == 'i':
+    thread = fuzzy_search_input('thread = @', config.threads().list()) or None
+    mode = fuzzy_search_input('mode = ', list_modes()) or None
+  if not thread:
     thread = config.threads().make_name()
 
-  repl = REPL(
+  REPL(
+    thread_name=thread,
     mode_name=mode,
     profile_name=profile,
-    thread_name=thread,
+  ).run()
+
+@app.command()
+def script(
+  name: str
+):
+  printer.toggle_syntax_guessing(False)
+  result = run_script(
+    name=name,
+    data=sys.stdin.read() if not sys.stdin.isatty() else '',
   )
+  if result:
+    printer.print_markdown(f'# Result\n{result}')
 
-  if cmd == 'modes':
-    for mode in list_modes():
-      print(mode)
+@app.command()
+def notebook():
+  print('notebook')
+
+@app.command()
+def modes():
+  for mode in list_modes():
+    print(mode)
+
+@app.command()
+def threads():
+  for thread in config.threads().list():
+    print(thread)
+
+def apply_aliases():
+  if len(sys.argv) < 2:
+    sys.argv += [ '--help' ]
     return
+  cmd = sys.argv[1]
 
-  repl.run()
+  if cmd[0] == '@':
+    sys.argv[1] = 'repl'
+    sys.argv.insert(2, cmd)
+  elif cmd == '-':
+    sys.argv[1] = 'repl'
+    sys.argv.insert(2, cmd)
+  elif cmd[0] == '.':
+    sys.argv[1] = 'script'
+    sys.argv.insert(2, cmd[1:])
+  elif cmd[0] == '_':
+    sys.argv[1] = 'notebook'
+    sys.argv.insert(2, cmd[1:])
+  elif cmd == 'help':
+    sys.argv[1] = '--help'
+
+def run():
+  apply_aliases()
+  app()
 
 if __name__ == '__main__':
   run()
