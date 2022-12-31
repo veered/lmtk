@@ -1,5 +1,5 @@
 import typer, sys
-from typing import Optional
+from typing import Optional, List
 
 from .config import Config
 from .repl import REPL
@@ -11,13 +11,17 @@ from .script import run_script
 config = Config()
 
 # I'd like to have completion but I find the completion flags in --help distracting
-app = typer.Typer(add_completion=False)
+app = typer.Typer(
+  add_completion=False,
+  pretty_exceptions_enable=True,
+  pretty_exceptions_short=True,
+)
 
 @app.command()
 def repl(
     thread: Optional[str] = typer.Argument(None),
-    mode: str = 'synth-chat',
-    profile: str = None
+    mode: str = typer.Option('synth-chat', '--mode', '-m'),
+    profile: str =typer.Option(None, '--profile', '-p'),
 ):
   """
   """
@@ -39,12 +43,20 @@ def repl(
 
 @app.command()
 def script(
-  name: str
+    name: str,
+    params: Optional[List[str]] = typer.Argument(None)
 ):
+  params_dict = {}
+  for p in params:
+    parts = p.split('=')
+    if len(parts) == 2:
+      params_dict[parts[0]] = parts[1]
+
   printer.toggle_syntax_guessing(False)
   result = run_script(
     name=name,
     data=sys.stdin.read() if not sys.stdin.isatty() else '',
+    params=params_dict,
   )
   if result:
     printer.print_markdown(f'# Result\n{result}')
@@ -82,7 +94,8 @@ def apply_aliases():
     sys.argv[1] = 'notebook'
     sys.argv.insert(2, cmd[1:])
   elif cmd == 'help':
-    sys.argv[1] = '--help'
+    sys.argv.pop(1)
+    sys.argv += [ '--help' ]
 
 def run():
   apply_aliases()
