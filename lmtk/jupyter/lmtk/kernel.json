@@ -1,4 +1,4 @@
 {
-  "argv":["python","-m","lmtk.jupyter.kernel", "-f", "{connection_file}"],
+  "argv":["python3","-m","lmtk.jupyter.kernel", "-f", "{connection_file}"],
   "display_name":"lmtk"
 }

@@ -33,28 +33,30 @@ class LmtkKernel(Kernel):
         allow_stdin=False,
     ):
         if not silent:
-            self.my_log(f'Input: {code}\nOutput:\n')
+            self.my_log(f'\nInput: {code}\nOutput:\n')
             self.mode = Mode()
             text = ''
 
             display_id = str(time.time())
             self.send_response(self.iopub_socket, 'display_data', {
-                'source': 'kernel',
+                'metadata': {},
                 'data': {
-                    'text/markdown': 'Loading...',
+                    'text/plain': 'Loading...',
                 },
                 'transient': {
                     'display_id': display_id,
                 },
             })
 
-            for data in self.mode.ask(code):
+            for (i, data) in enumerate(self.mode.ask(code)):
+                if i == 0:
+                    data = data.lstrip()
                 self.my_log(data)
                 text += data
                 self.send_response(self.iopub_socket, 'update_display_data', {
-                    'source': 'kernel',
+                    'metadata': {},
                     'data': {
-                        'text/plain': text.lstrip() + '█',
+                        'text/plain': text + '█',
                     },
                     'transient': {
                         'display_id': display_id,
@@ -62,20 +64,20 @@ class LmtkKernel(Kernel):
                 })
 
             self.send_response(self.iopub_socket, 'update_display_data', {
-                'source': 'kernel',
+                'metadata': {},
                 'data': {
-                    'text/markdown': text.lstrip(),
+                    'text/markdown': text,
                 },
                 'transient': {
                     'display_id': display_id,
                 },
             })
-        return {'status': 'ok',
-                # The base class increments the execution count
-                'execution_count': self.execution_count,
-                'payload': [],
-                'user_expressions': {},
-               }
+        return {
+          'status': 'ok',
+          'execution_count': self.execution_count,
+          'payload': [],
+          'user_expressions': {},
+        }
 
 if __name__ == '__main__':
     from ipykernel.kernelapp import IPKernelApp
