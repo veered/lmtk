@@ -26,17 +26,20 @@ class GuessLexer:
 
   @classmethod
   def load(cls):
-    if not cls.enabled:
+    if not cls.enabled or GuessLexer.guess:
       return
-    if GuessLexer.guess == None:
-      GuessLexer.guess = importlib.import_module('guesslang').Guess()
+
+    if not importlib.util.find_spec('guesslang'):
+      cls.enabled = False
+      return
+
+    GuessLexer.guess = importlib.import_module('guesslang').Guess()
 
   @classmethod
   def warmup(cls):
-    if not cls.enabled:
-      return
     cls.load()
-    GuessLexer.guess.language_name('_')
+    if GuessLexer.guess:
+      GuessLexer.guess.language_name('_')
 
 
 class SmartCodeBlock(CodeBlock):

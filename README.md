@@ -22,8 +22,16 @@ This project is still in the **early stages** of development. It will have bugs 
 For now, Python >=3.9 is required. Use `pip3` instead of `pip` if necessary.
 
 ```bash
+pip install -U lmtk[extras]
+```
+
+If you are having trouble with the TensorFlow dependency, you can exclude it:
+
+```bash
 pip install -U lmtk
 ```
+
+This will disable automatic code syntax detection, but most `lmtk` modes are good about manual syntax annotation.
 
 If you don't have an OpenAI API key [create one here](https://beta.openai.com/account/api-keys) and set it:
 ```bash
