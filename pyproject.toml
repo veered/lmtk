@@ -26,6 +26,9 @@ requires-python = ">=3.9"
 extras = [
   "guesslang-experimental >=2.2.3"
 ]
+notebook = [
+  "ipykernel >=6.0",
+]
 
 [project.urls]
 Home = "https://github.com/veered/lmtk"
