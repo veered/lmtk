@@ -15,6 +15,7 @@ app = typer.Typer(
   add_completion=False,
   pretty_exceptions_enable=True,
   pretty_exceptions_short=True,
+  help="Try 'lmtk repl'",
 )
 
 @app.command()
