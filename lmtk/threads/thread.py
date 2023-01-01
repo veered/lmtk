@@ -6,7 +6,6 @@ class Thread:
 
   id = ''
   name = ''
-  messages = []
   mode_name = ''
   mode_state = {}
   profile = ''
@@ -35,8 +34,9 @@ class Thread:
   def to_data(self):
     return {
       'id': self.id,
+      'head_id': self.head_id,
       'name': self.name,
-      'messages': [ msg.to_data() for msg in self.messages ],
+      'all_messages': { msg_id: msg.to_data() for (msg_id, msg) in self.all_messages.items() },
       'mode_name': self.mode_name,
       'mode_state': self.mode_state,
       'profile': self.profile,
@@ -46,11 +46,12 @@ class Thread:
 
   def load_data(self, data):
     self.id = data.get('id')
+    self.head_id = data.get('head_id')
     self.name = data.get('name')
-    self.messages = [
-      Message().load_data(msg_data)
-      for msg_data in data.get('messages', [])
-    ]
+    self.all_messages = {
+      msg_id: Message().load_data(msg_data)
+      for (msg_id, msg_data) in data.get('all_messages', {}).items()
+    }
     self.mode_name = data.get('mode_name')
     self.mode_state = data.get('mode_state')
     self.profile = data.get('profile')
@@ -77,23 +78,37 @@ class Thread:
 
   def reset(self, preserve_profile=False, preserve_seed=False):
     self.id = self.id or str(uuid.uuid4())
-    self.messages = []
+    self.head_id = None
+    self.all_messages = {}
     self.mode_name = self.mode_name or ''
     self.mode_state = {}
     self.profile = self.profile if preserve_profile else ''
     self.seed = self.seed if preserve_seed else ''
     # self.timestamp = datetime.now()
 
-  def get_messages(self):
-    return self.messages
+  def get_messages(self, head_id=None):
+    head_id = head_id or self.head_id
+    messages = []
+    while head_id:
+      msg = self.all_messages[head_id]
+      messages.insert(0, msg)
+      head_id = msg.parent_id
+    return messages
 
   def add_message(self, source, text, stats=''):
-    message = Message(source, text, stats=stats)
-    self.messages += [ message ]
+    message = Message(source, text, stats=stats, parent_id=self.head_id)
+    self.all_messages[message.id] = message
+    self.head_id = message.id
     return message
 
   def rollback_n(self, n=1):
-    self.messages = self.messages[:-n]
+    new_head_id = self.head_id
+    for i in range(n):
+      msg = self.all_messages.get(new_head_id)
+      if not msg:
+        break
+      new_head_id = msg.parent_id
+    self.head_id = new_head_id
 
   @classmethod
   def normalize_name(cls, thread_name):

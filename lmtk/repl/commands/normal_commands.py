@@ -48,7 +48,7 @@ class CopyCommand(BaseCommand):
   def run(self):
     self.banner()
 
-    code_block = self.extract_code_block(self.repl.thread.messages)
+    code_block = self.extract_code_block(self.repl.thread.get_messages())
     if code_block == None:
       return 'No code block found'
 
@@ -139,7 +139,7 @@ class RedoCommand(BaseCommand):
   def run(self):
     self.banner()
 
-    history = self.repl.thread.messages
+    history = self.repl.thread.get_messages()
     if len(history) < 2:
       return 'No message to redo'
 
@@ -160,7 +160,7 @@ class UndoCommand(BaseCommand):
   def run(self):
     self.banner()
 
-    history = self.repl.thread.messages
+    history = self.repl.thread.get_messages()
     if len(history) < 2:
       return 'No message to undo'
 

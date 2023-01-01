@@ -54,7 +54,7 @@ class REPL:
       return new_text
 
   def run(self):
-    if len(self.thread.messages) == 0:
+    if len(self.thread.get_messages()) == 0:
       printer.clear(2)
     else:
       self.warmup_thread()
@@ -79,14 +79,14 @@ class REPL:
         sys.exit(1)
 
   def core_loop(self):
-    self.pretty.your_banner(len(self.thread.messages) + 1, space=3)
+    self.pretty.your_banner(len(self.thread.get_messages()) + 1, space=3)
 
     text = self.get_user_input()
     if text == None:
       return
 
     stats = self.mode.stats()
-    self.pretty.their_banner(len(self.thread.messages) + 2, stats=stats, space=3)
+    self.pretty.their_banner(len(self.thread.get_messages()) + 2, stats=stats, space=3)
 
     try:
       answer = self.ask(text)
@@ -159,7 +159,7 @@ class REPL:
   # labeling code blocks. Kinda jank since it's not actually
   # parsing the Markdown.
   def warmup_thread(self):
-    messages = [ entry.text for entry in self.thread.messages ] + self.auto_fills
+    messages = [ entry.text for entry in self.thread.get_messages() ] + self.auto_fills
     pattern1 = re.compile(r'^```.+$', re.MULTILINE)
     pattern2 = re.compile(r'^```$', re.MULTILINE)
 

@@ -57,7 +57,7 @@ class PrettyPrintREPL:
     printer.print('Request canceled\n')
 
   def replay_thread(self):
-    for i, msg in enumerate(self.repl.thread.messages):
+    for i, msg in enumerate(self.repl.thread.get_messages()):
       if msg.source == 'you':
         self.your_banner(i + 1)
       elif msg.source == 'them':
