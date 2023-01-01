@@ -1,1 +1,1 @@
-from .runtime import run_script
+from .runtime import ScriptRuntime

@@ -6,7 +6,7 @@ from .repl import REPL
 from .repl.search import fuzzy_search_input
 from .modes import list_modes
 from .utils import printer
-from .script import run_script
+from .script import ScriptRuntime
 
 config = Config()
 
@@ -59,7 +59,7 @@ def script(
     path = None
 
   printer.toggle_syntax_guessing(False)
-  result = run_script(
+  result = ScriptRuntime.exec(
     name=name,
     path=path,
     data=sys.stdin.read() if not sys.stdin.isatty() else '',

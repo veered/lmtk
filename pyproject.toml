@@ -11,14 +11,15 @@ classifiers = ["License :: OSI Approved :: MIT License"]
 dynamic = ["version", "description"]
 dependencies = [
   "beautifulsoup4 >=4.0",
-  "markdown-it-py >=2.0",
+  "markdown-it-py[plugins] >=2.0",
   "openai >=0.25",
   "prompt_toolkit >=3.0",
   "pyperclip >=1.0",
   "requests >=2.0",
   "rich >=12.0",
   "tiktoken >=0.1",
-  "typer >=0.7"
+  "typer >=0.7",
+  "pyyaml >=6.0"
 ]
 requires-python = ">=3.9"
 

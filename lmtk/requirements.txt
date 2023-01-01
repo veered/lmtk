@@ -8,3 +8,4 @@ requests >=2.0
 rich >=12.0
 tiktoken >=0.1
 typer >=0.7
+pyyaml >=6.0
