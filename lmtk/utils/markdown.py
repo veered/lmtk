@@ -19,6 +19,9 @@ class GuessLexer:
       return 'text'
     try:
       GuessLexer.load()
+      if not GuessLexer.guess:
+        return 'text'
+
       return GuessLexer.guess._language_map[GuessLexer.guess.language_name(code.strip())]
     except Exception as e:
       print(e)
