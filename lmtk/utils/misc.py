@@ -20,8 +20,8 @@ class DotDict(dict):
   __setattr__ = dict.__setitem__
   __delattr__ = dict.__delitem__
 
-  def __init__(self, source={}):
-    for key, value in source.items():
+  def __init__(self, source: dict = None):
+    for key, value in (source or {}).items():
       self[key] = value
 
 class set_env:

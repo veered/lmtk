@@ -122,8 +122,8 @@ class REPL:
     self.thread.seed = self.mode.get_seed()
     self.thread.save()
 
-  def load_mode(self, mode_name, state={}):
-    state = state.copy()
+  def load_mode(self, mode_name, state: dict = None):
+    state = (state or {}).copy()
 
     if self.mode:
       self.mode.stop()

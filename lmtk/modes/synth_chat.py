@@ -123,7 +123,8 @@ class SynthChatMode(BaseMode):
     self.recent_conversation += [ message ]
     return message
 
-  def delete_message(self, message={}, message_id=None):
+  def delete_message(self, message: dict = None, message_id=None):
+    message = message or {}
     if not message_id:
       message_id = message['id']
     self.recent_conversation = [ m for m in self.recent_conversation if m['id'] != message_id ]

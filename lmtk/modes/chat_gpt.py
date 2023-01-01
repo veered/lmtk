@@ -7,7 +7,7 @@ class ChatGPTMode(BaseMode):
   title = 'ChatGPT'
   loader_latency=.25
 
-  def load(self, state={}):
+  def load(self, state):
     self.chat_gpt = ChatGPT(
       conversation_id=state.get('conversation_id', ''),
       parent_message_id=state.get('parent_message_id', ''),

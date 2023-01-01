@@ -27,9 +27,6 @@ class BaseMode:
   visible = True
   loader_latency=1.5
 
-  buffers = {}
-
-  conversation = []
   seed = ''
   profile = ''
 
@@ -37,11 +34,12 @@ class BaseMode:
   web_server = None
   __has_logged = False
 
-  def __init__(self, state={}):
-    self.state = state
+  def __init__(self, state: dict = None):
+    self.state = state or {}
     self.conversation = self.state.get('conversation', [])
     self.seed = self.state.get('seed', '')
     self.profile = self.state.get('profile', '')
+    self.buffers = {}
     self.active = True
     self.load(self.state)
 

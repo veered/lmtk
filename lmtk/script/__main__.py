@@ -2,7 +2,7 @@ import sys, getopt
 from ..utils import printer
 from .runtime import run_script
 
-def get_params(args=[]):
+def get_params(args):
   params = {}
   for arg in args:
     parts = arg.split('=')

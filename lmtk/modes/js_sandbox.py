@@ -74,7 +74,7 @@ class JSSandboxMode(BaseMode):
 
   }
 
-  def load(self, state={}):
+  def load(self, state):
     self.model = 'text-davinci-003'
     self.llm = GPT3()
 

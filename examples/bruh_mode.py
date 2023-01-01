@@ -10,7 +10,7 @@ class BruhMode(BaseMode):
 
   title = 'Bruh'
 
-  def load(self, state={}):
+  def load(self, state):
     self.llm = GPT3()
 
   def respond(self, query):

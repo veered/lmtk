@@ -6,7 +6,7 @@ class RawGPTMode(BaseMode):
 
   title = 'RawGPT'
 
-  def load(self, state={}):
+  def load(self, state):
     self.llm = GPT3()
     self.model = 'text-davinci-003'
     self.temperature = .7
