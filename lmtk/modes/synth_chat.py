@@ -2,6 +2,7 @@ import math, uuid, re
 
 from .base_mode import BaseMode, register_mode
 from ..llms.gpt3 import GPT3
+from ..utils import default
 
 @register_mode('synth-chat')
 class SynthChatMode(BaseMode):
@@ -124,7 +125,7 @@ class SynthChatMode(BaseMode):
     return message
 
   def delete_message(self, message: dict = None, message_id=None):
-    message = message or {}
+    message = default(message, {})
     if not message_id:
       message_id = message['id']
     self.recent_conversation = [ m for m in self.recent_conversation if m['id'] != message_id ]

@@ -15,13 +15,30 @@ def make_iter(x):
 def expand_path(*args):
   return os.path.abspath(os.path.expanduser(os.path.join(*args)))
 
+# Yeah, sorry not sorry. This is needed because of a
+# confluence of my 3 least favorite parts of Python:
+#   1. Shared mutable default parameters
+#   2. Falsey {}, [], etc. For some random class `C`, is
+#      `C()` falsey? Who knows... it is user defined.
+#   3. Ugly and non-linear "ternary" statements
+# I mean... wtf. Aside from some arguably wacky variable
+# scoping and the mess that is package management, that's
+# pretty much the complete list of things I strongly
+# dislike about Python.
+#
+# I know Python doesn't support macros so this can't
+# short-circuit, but whatever. At least `default` isn't
+# a reserved parameter. So rejoice, dear reader.
+def default(val, fallback):
+  return val if val != None else fallback
+
 class DotDict(dict):
   __getattr__ = dict.__getitem__
   __setattr__ = dict.__setitem__
   __delattr__ = dict.__delitem__
 
   def __init__(self, source: dict = None):
-    for key, value in (source or {}).items():
+    for key, value in default(source, {}).items():
       self[key] = value
 
 class set_env:

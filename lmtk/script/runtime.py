@@ -5,7 +5,7 @@ from markdown_it.token import Token
 
 from ..config import Config
 from ..modes import get_mode
-from ..utils import printer, DotDict, expand_path
+from ..utils import printer, DotDict, expand_path, default
 
 from .helpers import get_web, get_file, shell, ask, show_web, show_code
 
@@ -79,7 +79,7 @@ class ScriptSection:
 class ScriptContext:
 
   def __init__(self, mode, data='', params: dict = None):
-    params = params or {}
+    params = default(params, {})
 
     self.mode = mode
     self.output_buffer = ''
@@ -87,7 +87,7 @@ class ScriptContext:
     self.build_vars(data, params)
 
   def build_vars(self, data='', params: dict = None):
-    params = params or {}
+    params = default(params, {})
     self.live_vars = {
       'data': data,
       'params': DotDict(params),
@@ -126,7 +126,7 @@ class ScriptContext:
 class ScriptRuntime:
 
   def __init__(self, mode=None, data='', params: dict = None):
-    params = params or {}
+    params = default(params, {})
     self.mode = mode
     self.md = MarkdownIt('commonmark')
     self.context = ScriptContext(mode, data=data, params=params)
@@ -161,7 +161,7 @@ class ScriptRuntime:
     return ScriptSection(self.md, text)
 
 def run_script(name='', path='', code='', data='', params: dict = None):
-  params = params or {}
+  params = default(params, {})
   if name:
     config = Config()
     code = config.get_script(name)

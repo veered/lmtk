@@ -1,5 +1,5 @@
 import uuid
-from ..utils import make_iter, SimpleServer, printer
+from ..utils import make_iter, SimpleServer, printer, default
 
 mode_registry = {}
 
@@ -35,7 +35,7 @@ class BaseMode:
   __has_logged = False
 
   def __init__(self, state: dict = None):
-    self.state = state or {}
+    self.state = default(state, {})
     self.conversation = self.state.get('conversation', [])
     self.seed = self.state.get('seed', '')
     self.profile = self.state.get('profile', '')

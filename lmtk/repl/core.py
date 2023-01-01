@@ -3,7 +3,7 @@ import sys, re
 from .pretty import PrettyPrintREPL
 from .prompt import Prompt
 
-from ..utils import peek, printer, Loader
+from ..utils import peek, printer, Loader, default
 from ..config import Config
 
 from ..modes import get_mode
@@ -123,7 +123,7 @@ class REPL:
     self.thread.save()
 
   def load_mode(self, mode_name, state: dict = None):
-    state = (state or {}).copy()
+    state = default(state, {}).copy()
 
     if self.mode:
       self.mode.stop()
