@@ -8,39 +8,20 @@ from ..utils import default
 class SynthChatMode(BaseMode):
 
   title = 'ChattyGPT'
+  default_profile_name = 'chat-delphi'
 
   line_sep = '---------'
   line_sep_token = '45537'
 
   def load(self, state):
+    self.load_profile()
+
     self.model = 'text-davinci-003'
     self.temperature = 0.7
     self.llm = GPT3()
 
-    if self.profile.empty:
-      self.profile_name = 'assistant'
-    else:
-      self.profile_name = self.profile.name
-
     self.seed = ''
     self.response_prefix = ''
-
-    self.human_name = 'Eden'
-    self.authority_name = 'Boss'
-    self.persona_name = 'Delphi'
-    self.persona_bio = ''
-
-    self.pinned_summary = lambda: f'{self.human_name} demanded I give comprehensive answers, including detailed code, writing, guides, and more. I should use Markdown formatting (lists like "1.", headers like "# title", code blocks like ```js etc). When asked a question that is nonsense, trickery, or has no clear answer, I must respond explaining what\'s wrong with the question. '
-    self.prologue = [
-      # {
-      #   'source': 'server',
-      #   # 'text': f"Hello! How can I help? I'm going to write some awesome code for you!",
-      #   # 'text': f"Hello! How can I help? I'll tell you if I don't know something.",
-      # },
-    ]
-
-    self.summary_header = lambda: f'!! {self.persona_name}\'s Old Live Chat Notes:'
-    self.conversation_header = lambda: f'!! Recent Live Chat Between {self.human_name} and {self.persona_name}:'
 
     self.max_summaries = 8
     self.soft_max_depth = 18
@@ -70,6 +51,35 @@ class SynthChatMode(BaseMode):
       'recent_conversation': self.recent_conversation,
       'persona_name': self.persona_name,
     }
+
+  def load_profile(self):
+    if self.profile.empty:
+      self.profile_name = 'assistant'
+    else:
+      self.profile_name = self.profile.name
+
+    config = self.profile.config
+
+    self.human_name = config.get('human_name', 'Eden')
+    self.authority_name = config.get('authority_name', 'Boss')
+    self.persona_name = config.get('persona_name', 'Delphi')
+    self.persona_bio = config.get('persona_bio', '')
+    self.prologue = config.get('prologue', [])
+
+    if config.get('pinned_summary') == None:
+      self.pinned_summary = lambda: f'{self.human_name} demanded I give comprehensive answers, including detailed code, writing, guides, and more. I should use Markdown formatting (lists like "1.", headers like "# title", code blocks like ```js etc). When asked a question that is nonsense, trickery, or has no clear answer, I must respond explaining what\'s wrong with the question. '
+    else:
+      self.pinned_summary = lambda: config.get('pinned_summary')
+
+    if config.get('summary_header') == None:
+      self.summary_header = lambda: f'!! {self.persona_name}\'s Old Live Chat Notes:'
+    else:
+      self.summary_header = lambda: config.get('summary_header')
+
+    if config.get('conversation_header') == None:
+      self.conversation_header = lambda: f'!! Recent Live Chat Between {self.human_name} and {self.persona_name}:'
+    else:
+      self.conversation_header = lambda: config.get('conversation_header')
 
   def get_title(self):
     return self.persona_name
