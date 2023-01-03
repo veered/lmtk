@@ -1,0 +1,4 @@
+mode: js-sandbox
+bio: You are an experienced graphic designer
+starter_code: let svg = document.querySelector("svg");\nsvg.innerHTML=``;
+inner_html: <svg></svg>

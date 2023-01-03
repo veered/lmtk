@@ -6,18 +6,20 @@ class ThreadManager:
   def __init__(self, config):
     self.config = config
 
-  def load(self, thread_name):
+  def load(self, thread_name=None):
+    if not thread_name:
+      thread_name = ThreadManager.make_name()
     thread = Thread(thread_name, self.config)
     thread.save()
     return thread
 
   def list(self):
     threads = []
-    for file_name in os.listdir(self.config.threads_dir_path):
+    for file_name in self.config.folders.get_files('threads'):
       if not file_name.endswith('.json'):
         continue
       thread_name = Thread.normalize_name(file_name[:-5])
-      file_path = os.path.join(self.config.threads_dir_path, file_name)
+      file_path = self.config.folders.get_file_path('threads', file_name)
       mod_time = os.path.getmtime(file_path)
       threads += [ (mod_time, thread_name) ]
 
@@ -26,10 +28,7 @@ class ThreadManager:
     return [name for _, name in threads]
 
   def make_name(self):
-    threads = self.list()
-    i = len(threads) + 1
-    while True:
-      thread = f'thread-{i}'
+    i = len(self.config.folders.get_files('threads'))
+    while os.path.isfile(f'thread-{i}.json'):
       i += 1
-      if thread not in threads:
-        return thread
+    return f'thread-{i}'

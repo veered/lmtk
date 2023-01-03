@@ -7,7 +7,7 @@ from itertools import chain
 
 from .base_mode import BaseMode, register_mode
 from ..llms.gpt3 import GPT3
-from ..utils import printer, render_code_display
+from ..utils import printer, render_code_display, DotDict
 
 @register_mode('js-sandbox')
 class JSSandboxMode(BaseMode):
@@ -24,65 +24,17 @@ class JSSandboxMode(BaseMode):
   stops = [  '/*END*/', '```', '// END', '//END' ]
   has_logged = False
 
-  sandboxes = {
-
-    'blank': {
-      'bio': 'You are an experienced software engineer',
-    },
-
-    'console': {
-      'starter_code': 'let outputDisplay = document.querySelector("pre");',
-      'inner_html': '<pre></pre>',
-      'bio': 'You are an experienced software engineer',
-      'style': """
-        body {
-          background-color: #000;
-        }
-        pre {
-          color: #fff;
-          font-family: monospace;
-          font-size: 18px;
-          padding: 1em;
-          overflow: auto;
-          white-space: pre-wrap;
-          word-break: keep-all;
-        }
-      """
-    },
-
-    'web': {
-      'starter_code': 'document.body.innerHTML = ``;',
-      'min_starter_code': 'document.body.innerHTML=``;',
-      'inner_html': '',
-      'bio': 'You are an experienced web developer and UI/UX designer. Always use lots of CSS to style the page, use a consistent color palette, use flexbox for layout, and set a custom font. Prefer innerHTML over element insertion, use <style> and prefer complete solutions over minimal solutions',
-    },
-
-    'game': {
-      'bio': 'You are an experienced video game developer. Avoid code duplication, write self-contained code, and group similar objects into arrays.',
-      'starter_code': 'let canvas = document.querySelector("canvas");\n  let ctx = canvas.getContext("2d");',
-      'min_starter_code': 'c=document.querySelector("canvas").getContext("2d")}',
-      # 'inner_html': '<canvas width="700" height="800"></canvas><ui style="position: absolute; top: 20px; left: 20px"></ui>',
-      'inner_html': '<canvas width="700" height="800"></canvas><ui></ui>',
-      'style': 'ui { position: absolute; top: 20px; left: 20px; }',
-    },
-
-    'svg': {
-      'starter_code': 'let svg = document.querySelector("svg");\nsvg.innerHTML=``;',
-      'inner_html': '<svg></svg>',
-      'bio': 'You are an experienced graphic designer',
-    },
-
-  }
+  default_profile_name = 'js-blank'
 
   def load(self, state):
     self.model = 'text-davinci-003'
     self.llm = GPT3()
 
     self.history = state.get('history', [])
-    self.sandbox_name = state.get('profile') or 'game'
-    self.sandbox = self.sandboxes[self.sandbox_name]
+
+    self.sandbox = self.profile.config
     self.inner_html = self.sandbox.get('inner_html', '')
-    self.bio = self.sandbox.get('bio', '')
+    self.bio = self.sandbox.get('bio', 'You are an experienced software engineer')
 
     sandbox_starter = self.sandbox.get('starter_code', '')
     min_sandbox_starter = self.sandbox.get('min_starter_code', sandbox_starter)
@@ -157,14 +109,14 @@ class JSSandboxMode(BaseMode):
     self.code = value
 
   def stats(self):
-    return f'( tokens={len(self.get_prompt(""))}, sandbox={self.sandbox_name} )'
+    return f'( tokens={len(self.get_prompt(""))} )'
 
   @property
   def loader_latency(self):
     return .1 if self.minify else 1.5
 
   def minify_code(self, code):
-    return jsmin(code) if self.minify else code
+    return jsmin(code) if self.minify else code.rstrip()
 
   def beautify_code(self, code):
     return beautify(code) if self.minify else code
@@ -177,7 +129,8 @@ web/client/index.html
 ```
 web/client/index.js
 ```javascript
-{self.minify_code(self.code)}/*END*/
+{self.minify_code(self.code)}
+/*END*/
 ```
 
 {self.bio}. Make the following modifications to `index.js`:

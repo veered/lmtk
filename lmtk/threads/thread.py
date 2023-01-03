@@ -1,6 +1,7 @@
 import uuid, re, os, json
 from datetime import datetime
 from .message import Message
+from ..modes import get_mode
 
 class Thread:
 
@@ -8,7 +9,7 @@ class Thread:
   name = ''
   mode_name = ''
   mode_state = {}
-  profile = ''
+  profile_name = ''
   seed = ''
   # timestamp = None
 
@@ -27,9 +28,16 @@ class Thread:
     self.mode_name = mode_name
     self.mode_state = state or self.mode_state
 
+  def get_profile(self):
+    profile_name = self.profile_name or get_mode(self.mode_name).default_profile_name
+    return self.config.load_profile(profile_name)
+
+  def set_profile(self, profile_name):
+    self.profile_name = profile_name
+
   def get_file_path(self):
     file_name = f'{self.escape_name(self.name)}.json'
-    return os.path.join(self.config.threads_dir_path, file_name)
+    return self.config.folders.get_file_path('threads', file_name)
 
   def to_data(self):
     return {
@@ -39,7 +47,7 @@ class Thread:
       'all_messages': { msg_id: msg.to_data() for (msg_id, msg) in self.all_messages.items() },
       'mode_name': self.mode_name,
       'mode_state': self.mode_state,
-      'profile': self.profile,
+      'profile_name': self.profile_name,
       'seed': self.seed,
       # 'timestamp': self.timestamp,
     }
@@ -54,7 +62,7 @@ class Thread:
     }
     self.mode_name = data.get('mode_name')
     self.mode_state = data.get('mode_state')
-    self.profile = data.get('profile')
+    self.profile_name = data.get('profile_name')
     self.seed = data.get('seed')
     # self.timestamp = data.get('timestamp')
     return self
@@ -82,7 +90,7 @@ class Thread:
     self.all_messages = {}
     self.mode_name = self.mode_name or ''
     self.mode_state = {}
-    self.profile = self.profile if preserve_profile else ''
+    self.profile_name = self.profile_name if preserve_profile else ''
     self.seed = self.seed if preserve_seed else ''
     # self.timestamp = datetime.now()
 

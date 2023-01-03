@@ -2,6 +2,7 @@ import time
 from ipykernel.kernelbase import Kernel
 
 from ..modes import get_mode
+from ..config import Config
 Mode = get_mode('synth-chat')
 
 class LmtkKernel(Kernel):
@@ -18,6 +19,7 @@ class LmtkKernel(Kernel):
 
     def __init__(self, *args, **kwargs):
         self.my_log('\n---- START ----')
+        self.lmtk_config = Config()
         super().__init__(*args, **kwargs)
 
     def my_log(self, txt):
@@ -34,7 +36,7 @@ class LmtkKernel(Kernel):
     ):
         if not silent:
             self.my_log(f'\nInput: {code}\nOutput:\n')
-            self.mode = Mode()
+            self.mode = Mode(profile=self.lmtk_config.load_profile(Mode.default_profile_name))
             text = ''
 
             display_id = str(time.time())

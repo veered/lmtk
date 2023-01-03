@@ -1,6 +1,8 @@
 import uuid
 from ..utils import make_iter, SimpleServer, printer, default
 
+from ..config.profile import Profile
+
 mode_registry = {}
 
 def register_mode(name):
@@ -26,19 +28,20 @@ class BaseMode:
   title = ''
   visible = True
   loader_latency=1.5
+  default_profile_name = None
 
   seed = ''
-  profile = ''
 
   web_server_config = None
   web_server = None
   __has_logged = False
 
-  def __init__(self, state: dict = None):
+  def __init__(self, state: dict = None, profile=None):
     self.state = default(state, {})
+    self.profile = profile if profile != None else Profile()
+
     self.conversation = self.state.get('conversation', [])
     self.seed = self.state.get('seed', '')
-    self.profile = self.state.get('profile', '')
     self.buffers = {}
     self.active = True
     self.load(self.state)
@@ -61,7 +64,6 @@ class BaseMode:
     state = {
       'conversation': self.conversation,
       'seed': self.seed,
-      'profile': self.profile,
     }
     sub_state = self.save() or {}
     state.update(sub_state)

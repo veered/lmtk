@@ -17,7 +17,11 @@ class SynthChatMode(BaseMode):
     self.temperature = 0.7
     self.llm = GPT3()
 
-    self.profile = 'assistant'
+    if self.profile.empty:
+      self.profile_name = 'assistant'
+    else:
+      self.profile_name = self.profile.name
+
     self.seed = ''
     self.response_prefix = ''
 
@@ -265,7 +269,7 @@ class SynthChatMode(BaseMode):
   def stats(self):
     history_size = len(self.recent_conversation)
     headroom = 100 - round(100 * self.get_prompt_size() / self.max_prompt_tokens)
-    return f'( depth={history_size}, free={headroom}%, profile={self.profile} )'
+    return f'( depth={history_size}, free={headroom}%, profile={self.profile_name} )'
 
   def capacity(self):
     return round(100 * self.get_prompt_size() / self.max_prompt_tokens)

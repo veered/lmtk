@@ -12,6 +12,9 @@ def make_iter(x):
   else:
     return x
 
+def make_list(x):
+  return list(make_iter(x))
+
 def expand_path(*args):
   return os.path.abspath(os.path.expanduser(os.path.join(*args)))
 

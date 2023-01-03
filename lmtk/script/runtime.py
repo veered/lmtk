@@ -16,9 +16,10 @@ class ScriptRuntime:
     self.md = MarkdownIt().use(front_matter_plugin)
 
     (self.meta, self.sections) = self.parse(text)
+    config = Config()
 
     Mode = get_mode(self.meta.get('mode', 'synth-chat'))
-    self.mode = Mode()
+    self.mode = Mode(profile=config.load_profile(Mode.default_profile_name))
     self.context = ScriptContext(self.mode, data=data, params=params)
 
     # I'll remove this hard coding soon

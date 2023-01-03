@@ -25,7 +25,8 @@ class REPL:
 
     self.thread = self.config.threads().load(thread_name)
     self.thread.set_mode(self.thread.mode.name or mode_name or 'synth-chat')
-    self.thread.mode.state['profile'] = profile_name or self.thread.mode.state.get('profile', '')
+    if profile_name:
+      self.thread.set_profile(profile_name)
 
     self.mode_name = self.thread.mode.name
     self.mode = None
@@ -128,13 +129,15 @@ class REPL:
     if self.mode:
       self.mode.stop()
       state['seed'] = state.get('seed', self.mode.seed)
-      state['profile'] = state.get('profile', self.mode.profile)
 
-    self.mode = get_mode(mode_name)(state=state)
+    self.mode = get_mode(mode_name)(
+      state=state,
+      profile=self.thread.get_profile(),
+    )
 
   def reset(self):
+    self.thread.reset(preserve_profile=True)
     self.load_mode(self.mode_name)
-    self.thread.reset()
     self.save_thread()
 
   def ask(self, text):
