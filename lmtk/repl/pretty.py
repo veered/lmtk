@@ -54,7 +54,11 @@ class PrettyPrintREPL:
     print(f'\nLeaving \x1b[1m@{self.repl.thread.name}\x1b[0m')
 
   def request_canceled(self):
-    printer.print('Request canceled\n')
+    printer.print('[[cyan] Request Canceled [/cyan]]\n')
+
+  def api_error(self, error):
+    message = getattr(error, 'message', '')
+    printer.print(f'[bold red]API Error:[/bold red] {message}\n\n  {repr(error)}\n')
 
   def replay_thread(self):
     for i, msg in enumerate(self.repl.thread.get_messages()):

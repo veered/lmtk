@@ -13,8 +13,8 @@ config = Config()
 # I'd like to have completion but I find the completion flags in --help distracting
 app = typer.Typer(
   add_completion=False,
-  pretty_exceptions_enable=True,
-  pretty_exceptions_short=True,
+  pretty_exceptions_enable=False,
+  pretty_exceptions_short=False,
   help="Try 'lmtk repl'",
 )
 

@@ -5,6 +5,7 @@ from .prompt import Prompt
 
 from ..utils import peek, printer, Loader, default
 from ..config import Config
+from ..errors import LmtkApiError
 
 from ..modes import get_mode
 from .commands import Commands
@@ -77,16 +78,17 @@ class REPL:
       try:
           self.core_loop()
       except KeyboardInterrupt:
-        printer.print('(Ctrl+D to Exit)\n')
-      except (Exception, EOFError) as error:
+        printer.print('(Ctrl+D to exit)\n')
+      except EOFError:
         self.pretty.leaving_thread()
-        if isinstance(error, EOFError):
-          self.save_thread()
-          self.mode.stop()
-          sys.exit(0) # breaking might be better, but sys.exit is a lot faster
-        else:
-          printer.exception(error)
-          sys.exit(1)
+        self.save_thread()
+        self.mode.stop()
+        sys.exit(0) # breaking might be better, but sys.exit is a lot faster
+      except Exception as error:
+        breakpoint()
+        self.pretty.leaving_thread()
+        printer.exception(error)
+        sys.exit(1)
 
   def core_loop(self):
     self.pretty.your_banner(len(self.thread.get_messages()) + 1, space=3)
@@ -100,10 +102,13 @@ class REPL:
 
     try:
       answer = self.ask(text)
-    except (KeyboardInterrupt, EOFError):
+    except (KeyboardInterrupt, EOFError, LmtkApiError) as error:
+      if isinstance(error, LmtkApiError):
+        self.pretty.api_error(error)
+      self.pretty.request_canceled()
+
       self.auto_fills += [ text ]
       self.mode.rollback_n(1)
-      self.pretty.request_canceled()
       return
 
     self.pretty.print(answer, newline=True)

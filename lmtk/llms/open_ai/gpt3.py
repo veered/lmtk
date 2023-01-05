@@ -1,20 +1,36 @@
 import openai
-from .utils import check_api_key, count_tokens
+from ...errors import LmtkApiError
+from .utils import check_api_key, count_tokens, get_tokenizer
 
 class GPT3:
 
   def __init__(self):
     check_api_key()
+    get_tokenizer() # preload tokenizer
 
   def count_tokens(self, text):
     return count_tokens(text)
 
   def complete(self, *args, **kwargs):
-    response = self.get_response(*args, **kwargs)
     if kwargs.get('stream'):
-      return map(lambda data: data.choices[0].text, response)
+      return self.get_response_async(*args, **kwargs)
     else:
+      return self.get_response_sync(*args, **kwargs)
+
+  def get_response_async(self, *args, **kwargs):
+    try:
+      response = self.get_response(*args, **kwargs)
+      for data in response:
+        yield data.choices[0].text
+    except openai.OpenAIError as error:
+      raise LmtkApiError(error)
+
+  def get_response_sync(self, *args, **kwargs):
+    try:
+      response = self.get_response(*args, **kwargs)
       return response.choices[0].text
+    except openai.OpenAIError as error:
+      raise LmtkApiError(error)
 
   def get_response(self,
       prompt,
