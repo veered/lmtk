@@ -6,7 +6,7 @@ from itertools import chain
 # from jsbeautifier import beautify
 
 from .base_mode import BaseMode, register_mode
-from ..llms.gpt3 import GPT3
+from ..llms.open_ai import GPT3
 from ..utils import printer, render_code_display, DotDict
 
 @register_mode('js-sandbox')

@@ -1,7 +1,7 @@
 import math, uuid, re
 
 from .base_mode import BaseMode, register_mode
-from ..llms.gpt3 import GPT3
+from ..llms.open_ai import GPT3
 from ..utils import default
 
 @register_mode('synth-chat')
@@ -110,7 +110,7 @@ class SynthChatMode(BaseMode):
     results = self.complete(
       conversation_prompt,
       max_length=self.max_response_tokens,
-      stream=True
+      stream=True,
     )
 
     for i, data in enumerate(results):
@@ -193,6 +193,7 @@ class SynthChatMode(BaseMode):
       max_length=max_length or self.max_response_tokens or 1000,
       stops=self.get_stops(),
       soft_stops=[ self.line_sep_token ],
+      # soft_stops=[ self.line_sep_token, '1003', '3373', '15211', '11900' ],
       stream=stream,
     )
 

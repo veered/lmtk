@@ -3,7 +3,7 @@
 #   By default, this will be `~/.config/lmtk/plugins/`
 
 from lmtk.modes import BaseMode, register_mode
-from lmtk.llms.gpt3 import GPT3
+from lmtk.llms.open_ai import GPT3
 
 @register_mode('bruh')
 class BruhMode(BaseMode):

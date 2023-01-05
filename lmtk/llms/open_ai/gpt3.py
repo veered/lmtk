@@ -1,33 +1,20 @@
-import os, openai, re, sys, tiktoken
+import openai
+from .utils import check_api_key, count_tokens
 
 class GPT3:
 
   def __init__(self):
-    if not os.environ.get('OPENAI_API_KEY'):
-      print("Please set the OPENAI_API_KEY environment variable. If you don't have one you can generate one here https://beta.openai.com/account/api-keys")
-      sys.exit(0)
-
-    self.tokenizer = tiktoken.get_encoding("gpt2")
+    check_api_key()
 
   def count_tokens(self, text):
-    return len(self.tokenizer.encode(text))
+    return count_tokens(text)
 
   def complete(self, *args, **kwargs):
-    if kwargs.get('stream', False):
-      return self.__complete_async(*args, **kwargs)
+    response = self.get_response(*args, **kwargs)
+    if kwargs.get('stream'):
+      return map(lambda data: data.choices[0].text, response)
     else:
-      return self.__complete_sync(*args, **kwargs)
-
-  def __complete_sync(self, *args, **kwargs):
-    kwargs['stream'] = False
-    response = self.get_response(*args, **kwargs)
-    return response.choices[0].text
-
-  def __complete_async(self, *args, **kwargs):
-    kwargs['stream'] = True
-    response = self.get_response(*args, **kwargs)
-    for data in response:
-      yield data.choices[0].text
+      return response.choices[0].text
 
   def get_response(self,
       prompt,

@@ -1,5 +1,5 @@
 from .base_mode import BaseMode, register_mode
-from ..llms.gpt3 import GPT3
+from ..llms.open_ai import GPT3
 
 @register_mode('raw-codex')
 class RawCodexMode(BaseMode):
