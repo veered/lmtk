@@ -77,7 +77,7 @@ class REPL:
       try:
           self.core_loop()
       except KeyboardInterrupt:
-        printer.print('[dim](Ctrl+D to Exit)[/dim]\n')
+        printer.print('(Ctrl+D to Exit)\n')
       except (Exception, EOFError) as error:
         self.pretty.leaving_thread()
         if isinstance(error, EOFError):

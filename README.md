@@ -65,6 +65,7 @@ Then the response will start with `Here is the code:`.
 ### Useful Commands
 See `.help` for a full list, but these are some particularly important commands:
 - `.clear` or `C-x + C-c` to clear the screen
+- `.exit` or `C-d` to exit the REPL
 - `.new` or `C-x + C-n` to reset the thread
 - `.redo`  or `C-x + C-r` to resample the response
 - `.undo`  or `C-x + C-u` to rewrite your most recent message
