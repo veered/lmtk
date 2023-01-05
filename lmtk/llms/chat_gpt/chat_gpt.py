@@ -11,14 +11,15 @@ class ChatGPT:
     self.spawn_node()
 
   def ask(self, prompt):
-    result = self.send_message({
+    response = self.send_message({
       'prompt': prompt,
       'conversation_id': self.conversation_id,
       'parent_message_id': self.parent_message_id,
     })
-    self.conversation_id = result['conversation_id'];
-    self.parent_message_id = result['message_id'];
-    return result['response']
+    for msg in response:
+      self.conversation_id = msg['conversation_id'];
+      self.parent_message_id = msg['message_id'];
+      yield msg['data']
 
   def spawn_node(self):
     (self.read_pipe, self.write_pipe) = os.pipe()
@@ -33,12 +34,16 @@ class ChatGPT:
     )
 
   def send_message(self, msg):
-    encoded_msg = base64.b64encode(json.dumps(msg).encode('utf-8'))
+    encoded_request = json.dumps(msg).encode() + b'\n'
+    os.write(self.write_pipe, encoded_request)
 
-    os.write(self.write_pipe, encoded_msg + b'\n')
-    response = self.node_process.stdout.readline()
-
-    return json.loads(base64.b64decode(response).decode('utf-8'))
+    while True:
+      encoded_response = self.node_process.stdout.readline()
+      msg = json.loads(encoded_response.decode())
+      if msg.get('end') == True:
+        break
+      else:
+        yield msg
 
   def exit(self):
     self.node_process.terminate()
