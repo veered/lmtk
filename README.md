@@ -11,8 +11,8 @@
 ChatGPT needs a power-user mode. `lmtk` gives you a terminal UI for interacting with ChatGPT and other GPT-based tools.
 
 The default mode, `synth-chat`, uses a ChatGPT-like chatbot built directly from GPT-3. It supports features not possible with ChatGPT, including:
-- Write the prefix of the next response
-- Give instructions that will always be followed and never forgetten
+- Writing the prefix of the next response
+- Giving instructions that will always be followed and never forgetten
 
 This project is still in the **early stages** of development. It will have bugs and frequent breaking changes.
 
