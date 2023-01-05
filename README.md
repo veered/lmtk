@@ -4,7 +4,6 @@
     <br />
     <br />
     <a href="https://pypi.python.org/pypi/lmtk/"><img alt="PyPi" src="https://img.shields.io/pypi/v/lmtk.svg?style=flat-square"></a>
-    <a href="https://pypi.python.org/pypi/lmtk/"><img alt="Downloads" src="https://img.shields.io/pypi/dm/lmtk.svg"></a>
     <a href="https://github.com/veered/lmtk/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/github/license/veered/lmtk.svg?style=flat-square"></a>
 </p>
 
