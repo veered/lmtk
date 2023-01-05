@@ -37,7 +37,14 @@ class REPL:
     default = ''
     if len(self.auto_fills) > 0:
       default = self.auto_fills.pop(0)
-    text = self.input(default=default)
+
+    try:
+      text = self.input(default=default)
+    except KeyboardInterrupt as error:
+      if len(self.prompt.text()) > 0:
+        return self.get_user_input()
+      else:
+        raise error
 
     (action, new_text) = Commands.exec(
       repl=self,
@@ -66,18 +73,20 @@ class REPL:
     self.pretty.intro()
     self.pretty.replay_thread()
 
-    try:
-      while True:
-        self.core_loop()
-    except (Exception, KeyboardInterrupt, EOFError) as error:
-      self.pretty.leaving_thread()
-      if isinstance(error, KeyboardInterrupt) or isinstance(error, EOFError):
-        self.save_thread()
-        self.mode.stop()
-        sys.exit(0) # breaking might be better, but sys.exit is a lot faster
-      else:
-        printer.exception(error)
-        sys.exit(1)
+    while True:
+      try:
+          self.core_loop()
+      except KeyboardInterrupt:
+        printer.print('[dim](Ctrl+D to Exit)[/dim]\n')
+      except (Exception, EOFError) as error:
+        self.pretty.leaving_thread()
+        if isinstance(error, EOFError):
+          self.save_thread()
+          self.mode.stop()
+          sys.exit(0) # breaking might be better, but sys.exit is a lot faster
+        else:
+          printer.exception(error)
+          sys.exit(1)
 
   def core_loop(self):
     self.pretty.your_banner(len(self.thread.get_messages()) + 1, space=3)

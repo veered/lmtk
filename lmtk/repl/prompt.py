@@ -42,6 +42,9 @@ class Prompt:
     )
     return text.strip()
 
+  def text(self):
+    return self.session.layout.current_buffer.text
+
 @Filters.Condition
 def is_not_searching():
   return not get_app().layout.is_searching

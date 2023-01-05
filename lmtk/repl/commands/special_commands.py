@@ -46,7 +46,7 @@ class HelpCommand(BaseCommand):
     ]
     formatted_lines = '\n'.join(sorted([
       *cmd_lines,
-      '**C-c**: Closes the REPL.',
+      '**C-c**: Clears current prompt or cancels in progress response.',
       '**C-d**: Closes the REPL.',
       '**C-r**: Search message history.',
       '**C-x + C-e**: Opens the current message in the text editor specified by $EDITOR.',

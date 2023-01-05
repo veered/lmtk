@@ -104,7 +104,7 @@ class ExitCommand(BaseCommand):
   help = 'Closes the REPL.'
 
   def run(self):
-    raise KeyboardInterrupt
+    raise EOFError
 
 @Commands.register('.print')
 class PrintCommand(BaseCommand):
