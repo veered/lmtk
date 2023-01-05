@@ -25,11 +25,11 @@ class REPL:
     self.config.load_plugins()
 
     self.thread = self.config.threads().load(thread_name)
-    self.thread.set_mode(self.thread.mode.name or mode_name or 'synth-chat')
+    self.thread.set_mode(self.thread.mode_name or mode_name or 'synth-chat')
     if profile_name:
       self.thread.set_profile(profile_name)
 
-    self.mode_name = self.thread.mode.name
+    self.mode_name = self.thread.mode_name
     self.mode = None
     self.auto_fills = auto_fills
     self.first_run = True
@@ -68,7 +68,7 @@ class REPL:
     else:
       self.warmup_thread()
 
-    self.load_mode(self.mode_name, state=self.thread.mode.state)
+    self.mode = self.thread.load_mode()
     self.create_prompt()
 
     self.pretty.intro()
@@ -81,8 +81,7 @@ class REPL:
         printer.print('(Ctrl+D to exit)\n')
       except EOFError:
         self.pretty.leaving_thread()
-        self.save_thread()
-        self.mode.stop()
+        self.thread.save(stop=True)
         sys.exit(0) # breaking might be better, but sys.exit is a lot faster
       except Exception as error:
         breakpoint()
@@ -115,8 +114,8 @@ class REPL:
 
     self.thread.add_message('you', text)
     self.thread.add_message('them', answer, stats=stats)
+    self.thread.save()
 
-    self.save_thread()
     self.first_run = False
 
   def create_prompt(self):
@@ -132,27 +131,10 @@ class REPL:
       toolbar = 'No conversation seed set'
     return self.prompt.input(default=default, toolbar=toolbar)
 
-  def save_thread(self):
-    self.thread.set_mode(self.mode_name, self.mode.save_state())
-    self.thread.seed = self.mode.get_seed()
-    self.thread.save()
-
-  def load_mode(self, mode_name, state: dict = None):
-    state = default(state, {}).copy()
-
-    if self.mode:
-      self.mode.stop()
-      state['seed'] = state.get('seed', self.mode.seed)
-
-    self.mode = get_mode(mode_name)(
-      state=state,
-      profile=self.thread.get_profile(),
-    )
-
   def reset(self):
     self.thread.reset(preserve_profile=True)
-    self.load_mode(self.mode_name)
-    self.save_thread()
+    self.mode = self.thread.load_mode()
+    self.thread.save()
 
   def ask(self, text):
     delay = 0.25 if self.first_run else self.mode.loader_latency

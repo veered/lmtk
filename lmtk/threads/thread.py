@@ -16,13 +16,25 @@ class Thread:
   def __init__(self, name, config):
     self.set_name(name)
     self.config = config
+    self.mode = None
 
     if not self.load():
       self.reset()
 
-  @property
-  def mode(self):
-    return Mode(self.mode_name, self.mode_state)
+  def load_mode(self):
+    if self.mode:
+      self.mode.stop()
+    self.mode = get_mode(self.mode_name)(
+      state=self.mode_state,
+      profile=self.get_profile(),
+    )
+    self.mode.set_seed(self.seed)
+    return self.mode
+
+  def stop_mode(self):
+    if self.mode:
+      self.mode.stop()
+      self.mode = None
 
   def set_mode(self, mode_name, state=None):
     self.mode_name = mode_name
@@ -67,10 +79,17 @@ class Thread:
     # self.timestamp = data.get('timestamp')
     return self
 
-  def save(self):
+  def save(self, stop=False):
+    if self.mode:
+      self.mode_state = self.mode.save_state()
+      self.seed = self.mode.get_seed()
+
     file_path = self.get_file_path()
     with open(file_path, 'w') as thread_file:
       json.dump(self.to_data(), thread_file, indent=2)
+
+    if stop:
+      self.stop_mode()
 
   def load(self):
     file_path = self.get_file_path()
@@ -126,9 +145,3 @@ class Thread:
   @classmethod
   def escape_name(cls, thread_name):
     return cls.normalize_name(thread_name).replace('-', '_')
-
-# Just for dottable access
-class Mode:
-  def __init__(self, name, state):
-    self.name = name
-    self.state = state
