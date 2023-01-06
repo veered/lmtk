@@ -75,7 +75,6 @@ class Printer:
 
   def build_console(self, markup=True):
     return Console(
-      color_system="truecolor",
       markup=markup,
     )
 
