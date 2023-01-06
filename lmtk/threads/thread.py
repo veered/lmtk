@@ -36,9 +36,12 @@ class Thread:
       self.mode.stop()
       self.mode = None
 
-  def set_mode(self, mode_name, state=None):
+  def set_mode(self, mode_name, state=None, set_default_profile=True):
     self.mode_name = mode_name
     self.mode_state = state or self.mode_state
+
+    if set_default_profile and not self.profile_name:
+      self.profile_name = get_mode(self.mode_name).default_profile_name
 
   def get_profile(self):
     profile_name = self.profile_name or get_mode(self.mode_name).default_profile_name

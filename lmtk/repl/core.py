@@ -20,19 +20,29 @@ class REPL:
       auto_fills=[],
     ):
     self.pretty = PrettyPrintREPL(self)
+    self.auto_fills = auto_fills
 
     self.config = Config()
     self.config.load_plugins()
 
+    self.load_thread(thread_name, mode_name, profile_name)
+    self.mode_name = self.thread.mode_name
+
+    self.mode = None
+    self.first_run = True
+
+  def load_thread(self, thread_name, mode_name=None, profile_name=None):
     self.thread = self.config.threads().load(thread_name)
-    self.thread.set_mode(self.thread.mode_name or mode_name or 'synth-chat')
+
+    # If this thread already has a mode, it's too late to change anything
+    if self.thread.mode_name:
+      return
+
     if profile_name:
       self.thread.set_profile(profile_name)
+      mode_name = self.thread.get_profile().mode or mode_name
 
-    self.mode_name = self.thread.mode_name
-    self.mode = None
-    self.auto_fills = auto_fills
-    self.first_run = True
+    self.thread.set_mode(mode_name or 'synth-chat')
 
   def get_user_input(self):
     default = ''
