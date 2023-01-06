@@ -51,7 +51,7 @@ class ScriptRuntime:
       meta = yaml.safe_load(tokens[0].content)
       text = '\n'.join(text.split('\n')[tokens[0].map[1]:])
 
-    chunks = re.split(r'^\*{3,}\s*$', text, flags=re.MULTILINE)
+    chunks = re.split(r'^[*-]{3,}\s*$', text, flags=re.MULTILINE)
     sections = [
       self.create_section(chunk)
       for chunk in chunks
