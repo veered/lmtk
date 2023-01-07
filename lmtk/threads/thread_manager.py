@@ -8,7 +8,7 @@ class ThreadManager:
 
   def load(self, thread_name=None):
     if not thread_name:
-      thread_name = ThreadManager.make_name()
+      thread_name = self.make_name()
     thread = Thread(thread_name, self.config)
     thread.save()
     return thread

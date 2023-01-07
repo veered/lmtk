@@ -18,8 +18,10 @@ class ScriptRuntime:
     (self.meta, self.sections) = self.parse(text)
     config = Config()
 
-    Mode = get_mode(self.meta.get('mode', 'synth-chat'))
-    self.mode = Mode(profile=config.load_profile(Mode.default_profile_name))
+    self.thread = config.threads().load()
+    self.thread.set_mode(self.meta.get('mode', 'synth-chat'))
+    self.mode = self.thread.load_mode()
+
     self.context = ScriptContext(self.mode, data=data, params=params)
 
     # I'll remove this hard coding soon
@@ -29,18 +31,23 @@ class ScriptRuntime:
   def run(self):
     for (i, section) in enumerate(self.sections):
       section.bind(self.mode, self.context)
-      output = section.expand()
 
-      printer.print_markdown(f'## [{i}] Input')
-      printer.print_markdown(output)
+      output = section.expand()
+      self.thread.add_message('you', output)
+      printer.print_markdown(f'## [{i}] Input\n{output}')
+
       printer.print_markdown(f'## [{i}] Output')
       for (i, data) in enumerate(self.mode.ask(output)):
         if i == 0:
           data = data.lstrip()
         print(data, end='')
         sys.stdout.flush()
-      print('\n')
-      printer.print_markdown('-------------------------------')
+
+      printer.print_markdown('\n-------------------------------')
+
+      self.thread.add_message('them', data)
+
+    self.thread.save()
     return self.mode.conversation[-1]['text']
 
   def parse(self, text):

@@ -34,7 +34,7 @@ class ScriptContext:
 
   def prepare(self):
     self.clear_output()
-    answers = [ m['text'] for m in self.mode.conversation if m['source'] == 'server']
+    answers = [ m['text'].strip() for m in self.mode.conversation if m['source'] == 'server']
     self.live_vars['answers'] = answers
     self.live_vars['__'] = answers if len(answers) > 0 else ''
 
