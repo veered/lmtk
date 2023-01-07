@@ -45,6 +45,7 @@ def repl(
 @app.command()
 def script(
     name: str,
+    repl: bool = typer.Option(False, '--repl', '-r'),
     params: Optional[List[str]] = typer.Argument(None)
 ):
   params_dict = {}
@@ -60,14 +61,18 @@ def script(
     path = None
 
   printer.toggle_syntax_guessing(False)
-  result = ScriptRuntime.exec(
+  thread = ScriptRuntime.exec(
     name=name,
     path=path,
     data=sys.stdin.read() if not sys.stdin.isatty() else '',
     params=params_dict,
   )
-  if result:
-    printer.print_markdown(f'# Result\n{result}')
+
+  if repl:
+    REPL(thread_name=thread.name).run()
+  else:
+    last_message = thread.get_messages()[-1].text
+    printer.print_markdown(f'# Result\n{last_message}')
 
 @app.command()
 def notebook():
@@ -101,6 +106,9 @@ def apply_aliases():
   elif cmd[0] == '_':
     sys.argv[1] = 'notebook'
     sys.argv.insert(2, cmd[1:])
+  elif cmd.endswith('.md'):
+    sys.argv[1] = 'script'
+    sys.argv.insert(2, cmd)
   elif cmd == 'help':
     sys.argv.pop(1)
     sys.argv += [ '--help' ]

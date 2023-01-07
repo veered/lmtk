@@ -34,19 +34,21 @@ class ScriptRuntime:
 
       output = section.expand()
       self.thread.add_message('you', output)
-      printer.print_markdown(f'## [{i}] Input\n{output}')
 
+      printer.print_markdown(f'## [{i}] Input\n{output}')
       printer.print_markdown(f'## [{i}] Output')
+
+      response = ''
       for (i, data) in enumerate(self.mode.ask(output)):
         if i == 0:
           data = data.lstrip()
+        response += data
         print(data, end='')
         sys.stdout.flush()
+      self.thread.add_message('them', response)
 
       print('\n')
       printer.print_markdown('---')
-
-      self.thread.add_message('them', data)
 
     self.thread.save()
     return self.mode.conversation[-1]['text']
@@ -84,5 +86,6 @@ class ScriptRuntime:
       pass
 
     script = cls(code, data=data, params=params)
+    script.run()
 
-    return script.run()
+    return script.thread

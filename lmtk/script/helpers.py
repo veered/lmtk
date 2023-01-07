@@ -1,7 +1,9 @@
 import requests, subprocess, os
 from bs4 import BeautifulSoup
-from prompt_toolkit.shortcuts import prompt
+
 from ..utils import expand_path
+from ..config import Config
+from ..repl.prompt import Prompt
 
 def get_web(url):
   if not url.startswith('http'):
@@ -43,7 +45,15 @@ def shell(cmd):
   return subprocess.getoutput(cmd)
 
 def ask(question=''):
+  config = Config()
+  prompt = Prompt(
+    config,
+    erase_when_done=False,
+    history_path=config.script_prompt_history_path,
+  )
+  prompt.bind_keys()
+
   if question:
-    return prompt(question + '\n')
+    return prompt.input(prefix=f'{question}\n')
   else:
-    return prompt()
+    return prompt.input()

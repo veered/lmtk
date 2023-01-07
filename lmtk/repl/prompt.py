@@ -6,14 +6,18 @@ from prompt_toolkit import filters as Filters
 
 class Prompt:
 
-  def __init__(self, config):
+  def __init__(self, config, erase_when_done=True, history_path=None):
     self.config = config
+
+    self.erase_when_done = erase_when_done
+    self.history_path = history_path or self.config.prompt_history_path
+
     self.start_session()
 
   def start_session(self):
     self.session = PromptSession(
-      erase_when_done=True,
-      history=FileHistory(self.config.prompt_history_path),
+      erase_when_done=self.erase_when_done,
+      history=FileHistory(self.history_path),
     )
     self.kb = KeyBindings()
 
@@ -30,10 +34,10 @@ class Prompt:
       else:
         event.current_buffer.insert_text('\n')
 
-  def input(self, default='', toolbar='', extension='.md'):
+  def input(self, default='', toolbar=None, extension='.md', prefix='', multiline=True):
     text = self.session.prompt(
-      '',
-      multiline=True,
+      prefix,
+      multiline=multiline,
       key_bindings=self.kb,
       enable_open_in_editor=True,
       tempfile_suffix=extension,

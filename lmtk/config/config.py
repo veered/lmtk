@@ -30,6 +30,11 @@ class Config:
       'prompt_history'
     )
 
+    self.script_prompt_history_path = self.folders.get_file_path(
+      'config',
+      'script_prompt_history'
+    )
+
     self.reload()
 
   def save(self):
