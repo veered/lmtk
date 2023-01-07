@@ -28,7 +28,7 @@ class RawGPTMode(BaseMode):
 
   def parse_prefix(self, query):
     parts = query.split(':>')
-    return parts[-1].strip() if len(parts) > 1 else ''
+    return parts[-1].lstrip().rstrip('\n') if len(parts) > 1 else ''
 
   def inspect(self):
     return ''.join(
