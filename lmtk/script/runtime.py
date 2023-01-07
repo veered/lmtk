@@ -43,7 +43,7 @@ class ScriptRuntime:
         print(data, end='')
         sys.stdout.flush()
 
-      printer.print_markdown('\n-------------------------------')
+      printer.print_markdown('\n------------------')
 
       self.thread.add_message('them', data)
 
