@@ -25,24 +25,15 @@ class REPL:
     self.config = Config()
     self.config.load_plugins()
 
-    self.load_thread(thread_name, mode_name, profile_name)
+    self.thread = self.config.threads().load(
+      thread_name,
+      mode_name=mode_name or 'synth-chat',
+      profile_name=profile_name
+    )
     self.mode_name = self.thread.mode_name
 
     self.mode = None
     self.first_run = True
-
-  def load_thread(self, thread_name, mode_name=None, profile_name=None):
-    self.thread = self.config.threads().load(thread_name)
-
-    # If this thread already has a mode, it's too late to change anything
-    if self.thread.mode_name:
-      return
-
-    if profile_name:
-      self.thread.set_profile(profile_name)
-      mode_name = self.thread.get_profile().mode or mode_name
-
-    self.thread.set_mode(mode_name or 'synth-chat')
 
   def get_user_input(self):
     default = ''

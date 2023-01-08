@@ -6,11 +6,20 @@ class ThreadManager:
   def __init__(self, config):
     self.config = config
 
-  def load(self, thread_name=None):
+  def load(self, thread_name=None, mode_name=None, profile_name=None, save=True):
     if not thread_name:
       thread_name = self.make_name()
     thread = Thread(thread_name, self.config)
-    thread.save()
+
+    if not thread.mode_name:
+      if profile_name:
+        thread.set_profile(profile_name)
+        mode_name = thread.get_profile().mode or mode_name
+      thread.set_mode(mode_name)
+
+    if save:
+      thread.save()
+
     return thread
 
   def list(self):

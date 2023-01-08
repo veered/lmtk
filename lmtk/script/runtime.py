@@ -18,17 +18,21 @@ class ScriptRuntime:
     (self.meta, self.sections) = self.parse(text)
     config = Config()
 
-    self.thread = config.threads().load()
-    self.thread.set_mode(self.meta.get('mode', 'synth-chat'))
+    self.thread = config.threads().load(
+      thread_name=None,
+      mode_name=self.meta.get('mode', 'synth-chat'),
+      profile_name=self.meta.get('profile_name')
+    )
+
     self.mode = self.thread.load_mode()
     if self.meta.get("temperature") is not None:
       self.mode.temperature = self.meta.get("temperature")
 
-    self.context = ScriptContext(self.mode, data=data, params=params)
-
     # I'll remove this hard coding soon
     self.mode.seed = 'You must only respond with exactly what was requested. Don\'t start your response with text like "Here is..."'
     self.mode.max_response_tokens = 750
+
+    self.context = ScriptContext(self.mode, data=data, params=params)
 
   def run(self):
     for (i, section) in enumerate(self.sections):

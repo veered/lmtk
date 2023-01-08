@@ -47,8 +47,10 @@ class Thread:
     profile_name = self.profile_name or get_mode(self.mode_name).default_profile_name
     return self.config.load_profile(profile_name)
 
-  def set_profile(self, profile_name):
+  def set_profile(self, profile_name, set_mode=False):
     self.profile_name = profile_name
+    if profile_name and set_mode:
+      self.mode_name = self.config.load_profile(profile_name).mode or self.mode_name
 
   def get_file_path(self):
     file_name = f'{self.escape_name(self.name)}.json'
