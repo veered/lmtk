@@ -33,23 +33,9 @@ The Pro has presented the argument
 The Con has presented the argument
 {{ answers[1] }}
 
-The Judge will now decide if the Pro or Con has made a stronger argument:
+The Liberal Judge will now decide if the Pro or Con has made a stronger argument:
 
-:> The Judge decides in favor of
-
----
-
-Topic: {{ topic }}
-
-The Pro has presented the argument
-{{ answers[0] }}
-
-The Con has presented the argument
-{{ answers[1] }}
-
-The Judge will now decide if the Pro or Con has made a stronger argument:
-
-:> The Judge decides in favor of
+:> The Liberal Judge decides in favor of
 
 ---
 
@@ -61,16 +47,30 @@ The Pro has presented the argument
 The Con has presented the argument
 {{ answers[1] }}
 
-The Judge will now decide if the Pro or Con has made a stronger argument:
+The Centrist Judge will now decide if the Pro or Con has made a stronger argument:
 
-:> The Judge decides in favor of
+:> The Centrist Judge decides in favor of
+
+---
+
+Topic: {{ topic }}
+
+The Pro has presented the argument
+{{ answers[0] }}
+
+The Con has presented the argument
+{{ answers[1] }}
+
+The Conservative Judge will now decide if the Pro or Con has made a stronger argument:
+
+:> The Conservative Judge decides in favor of
 
 ---
 
 Summary of the Three Judges
 
-Judge 1: {{ answers[2] }}
-Judge 2: {{ answers[3] }}
-Judge 3: {{ answers[4] }}
+Liberal Judge 1: {{ answers[2] }}
+Centrist Judge 2: {{ answers[3] }}
+Conservative Judge 3: {{ answers[4] }}
 
 Overall result:
