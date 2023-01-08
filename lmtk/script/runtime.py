@@ -34,7 +34,7 @@ class ScriptRuntime:
     for (i, section) in enumerate(self.sections):
       section.bind(self.mode, self.context)
 
-      output = section.expand()
+      output = section.expand().lstrip('\n')
       self.thread.add_message('you', output)
 
       printer.print_markdown(f'## [{i}] Input\n{output}')

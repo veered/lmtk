@@ -94,7 +94,6 @@ class REPL:
         self.thread.save(stop=True)
         sys.exit(0) # breaking might be better, but sys.exit is a lot faster
       except Exception as error:
-        breakpoint()
         self.pretty.leaving_thread()
         printer.exception(error)
         sys.exit(1)
