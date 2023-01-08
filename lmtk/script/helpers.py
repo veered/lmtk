@@ -73,7 +73,8 @@ def parse_code_block(text):
   return ''
 
 def run_code(text):
-  if not text.strip():
+  text = text.strip()
+  if not text:
     return ''
 
   output = ''
