@@ -10,6 +10,10 @@ from .script import ScriptRuntime
 
 config = Config()
 
+printer.set_syntax_detection(
+  not config.get_setting('disable_syntax_detection', False)
+)
+
 # I'd like to have completion but I find the completion flags in --help distracting
 app = typer.Typer(
   add_completion=False,
@@ -60,7 +64,7 @@ def script(
   else:
     path = None
 
-  printer.toggle_syntax_guessing(False)
+  printer.set_syntax_detection(False)
   thread = ScriptRuntime.exec(
     name=name,
     path=path,

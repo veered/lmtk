@@ -81,7 +81,7 @@ class Printer:
   def warmup(self):
     GuessLexer.warmup()
 
-  def toggle_syntax_guessing(self, enabled):
+  def set_syntax_detection(self, enabled):
     GuessLexer.enabled = enabled
 
   def print(self, text, markup=True):

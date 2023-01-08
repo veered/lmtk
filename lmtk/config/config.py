@@ -52,6 +52,9 @@ class Config:
 
     return self.config
 
+  def get_setting(self, field_name, default_value=None):
+    return self.config.get(field_name, default_value)
+
   def threads(self):
     return ThreadManager(self)
 
