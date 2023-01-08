@@ -17,18 +17,28 @@ class GPT3:
     else:
       return self.get_response_sync(*args, **kwargs)
 
-  def get_response_async(self, *args, **kwargs):
+  def get_response_async(self, prompt, *args, rstrip_prompt_spaces=True, **kwargs):
+    new_prompt = prompt.rstrip(' ') if rstrip_prompt_spaces else prompt
+
     try:
-      response = self.get_response(*args, **kwargs)
-      for data in response:
-        yield data.choices[0].text
+      response = self.get_response(new_prompt, *args, **kwargs)
+      for (i, data) in enumerate(response):
+        text = data.choices[0].text
+        if i == 0 and new_prompt is not prompt:
+          text = text.lstrip(' ')
+        yield text
     except openai.OpenAIError as error:
       raise LmtkApiError(error)
 
-  def get_response_sync(self, *args, **kwargs):
+  def get_response_sync(self, prompt, *args, rstrip_prompt_spaces=True, **kwargs):
+    new_prompt = prompt.rstrip(' ') if rstrip_prompt_spaces else prompt
+
     try:
-      response = self.get_response(*args, **kwargs)
-      return response.choices[0].text
+      response = self.get_response(new_prompt, *args, **kwargs)
+      text =  response.choices[0].text
+      if new_prompt is not prompt:
+        text = text.lstrip(' ')
+      return text
     except openai.OpenAIError as error:
       raise LmtkApiError(error)
 
