@@ -32,9 +32,9 @@ class ScriptSection:
     new_lines += lines[:spans[0][0]]
     for (i, change) in enumerate(changes):
       if i != 0:
-        new_lines += lines[spans[i-1][1] + 1 : spans[i][0]]
+        new_lines += lines[spans[i-1][1] : spans[i][0]]
       new_lines += [ change[1] ]
-    new_lines += lines[spans[-1][1]+1:]
+    new_lines += lines[spans[-1][1]:]
 
     self.expanded_text = '\n'.join(new_lines)
     return self.display()
