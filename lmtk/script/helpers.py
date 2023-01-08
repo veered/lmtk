@@ -1,4 +1,4 @@
-import requests, subprocess, os
+import requests, subprocess, os, traceback
 from bs4 import BeautifulSoup
 from markdown_it import MarkdownIt
 
@@ -84,5 +84,6 @@ def run_code(text):
     output = capture.value()
   except Exception as e:
     printer.exception(e)
+    output = ''.join(traceback.TracebackException.from_exception(e).format())
 
   return output.rstrip('\n')
