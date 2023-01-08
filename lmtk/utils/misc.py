@@ -1,4 +1,4 @@
-import os, re, pyperclip, html
+import os, re, pyperclip, html, sys, io
 from itertools import chain
 from collections.abc import Iterable
 
@@ -69,6 +69,21 @@ def copy_to_clipboard(text):
     return True
   except Exception as e:
     return False
+
+class CaptureStdout:
+
+  def __init__(self):
+    self.old_stdout = sys.stdout
+    self.buffer = io.StringIO()
+
+  def __enter__(self):
+    sys.stdout = self.buffer
+
+  def __exit__(self, *args):
+    sys.stdout = self.old_stdout
+
+  def value(self):
+    return self.buffer.getvalue()
 
 # This doesn't really belong here, but it's here for now
 def render_code_display(code='', frame='', language='javascript'):

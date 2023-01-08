@@ -140,7 +140,8 @@ class Printer:
     return TempLog(text)
 
   def exception(self, e):
-    self.print(f'\n[red]{"".join(traceback.TracebackException.from_exception(e).format())}[/red]')
+    msg = f'\n[red]{"".join(traceback.TracebackException.from_exception(e).format())}[/red]'
+    Console(markup=True, stderr=True).print(msg)
 
   def pad_down(self, n=1):
     with printer.live(transient=True) as screen:

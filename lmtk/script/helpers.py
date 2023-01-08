@@ -1,7 +1,8 @@
 import requests, subprocess, os
 from bs4 import BeautifulSoup
+from markdown_it import MarkdownIt
 
-from ..utils import expand_path
+from ..utils import expand_path, printer, CaptureStdout
 from ..config import Config
 from ..repl.prompt import Prompt
 
@@ -57,3 +58,31 @@ def ask(question=''):
     return prompt.input(prefix=f'{question}\n')
   else:
     return prompt.input()
+
+def parse_code_block(text):
+  md = MarkdownIt()
+
+  try:
+    tokens = md.parse(text)
+    for token in tokens:
+      if token.type == 'fence':
+        return token.content
+  except:
+    pass
+
+  return ''
+
+def run_code(text):
+  if not text.strip():
+    return ''
+
+  output = ''
+  try:
+    capture = CaptureStdout()
+    with capture:
+      exec(text)
+    output = capture.value()
+  except Exception as e:
+    printer.exception(e)
+
+  return output.rstrip('\n')
