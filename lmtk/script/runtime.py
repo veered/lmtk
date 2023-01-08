@@ -21,6 +21,8 @@ class ScriptRuntime:
     self.thread = config.threads().load()
     self.thread.set_mode(self.meta.get('mode', 'synth-chat'))
     self.mode = self.thread.load_mode()
+    if self.meta.get("temperature") is not None:
+      self.mode.temperature = self.meta.get("temperature")
 
     self.context = ScriptContext(self.mode, data=data, params=params)
 
