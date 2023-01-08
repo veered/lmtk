@@ -35,6 +35,11 @@ class ScriptRuntime:
       section.bind(self.mode, self.context)
 
       output = section.expand().lstrip('\n')
+
+      # Lame hack
+      if ':>' in output and '\n:>\n' not in output:
+        output = output.rstrip('\n')
+
       self.thread.add_message('you', output)
 
       printer.print_markdown(f'## [{i}] Input\n{output}')

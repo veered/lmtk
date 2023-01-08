@@ -234,7 +234,7 @@ class SynthChatMode(BaseMode):
     parts = query.split(':>')
     if len(parts) == 1:
       return (query, '')
-    return (' '.join(parts[:-1]), parts[-1].lstrip().rstrip('\n'))
+    return (' '.join(parts[:-1]), parts[-1].lstrip())
 
   def format_conversation_prompt(self, messages, whitespace='\n'):
     lines = [
