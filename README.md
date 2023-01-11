@@ -8,6 +8,8 @@
 </p>
 
 ## Description
+(TODO: Update README with information about other modes, config profiles, scripting, JS sandbox, and Jupyter integration)
+
 ChatGPT needs a power-user mode. `lmtk` gives you a terminal UI for interacting with ChatGPT and other GPT-based tools.
 
 The default mode, `synth-chat`, uses a ChatGPT-like chatbot built directly from GPT-3. It supports features not possible with ChatGPT, including:
