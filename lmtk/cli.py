@@ -65,6 +65,7 @@ def script(
     path = None
 
   printer.set_syntax_detection(False)
+
   thread = ScriptRuntime.exec(
     name=name,
     path=path,

@@ -54,11 +54,11 @@ class ScriptRuntime:
         if i == 0:
           data = data.lstrip()
         response += data
-        print(data, end='')
+        printer.print(data, end='')
         sys.stdout.flush()
       self.thread.add_message('them', response)
 
-      print('\n')
+      printer.print('\n')
       printer.print_markdown('---')
 
     self.thread.save()

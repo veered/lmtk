@@ -84,8 +84,8 @@ class Printer:
   def set_syntax_detection(self, enabled):
     GuessLexer.enabled = enabled
 
-  def print(self, text, markup=True):
-    self.console.print(text, markup=markup)
+  def print(self, text, markup=True, **kwargs):
+    self.console.print(text, markup=markup, **kwargs)
 
   def to_markdown(self, text, preserve_softbreak=True, code_theme='monokai'):
     if preserve_softbreak:
