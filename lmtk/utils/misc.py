@@ -1,4 +1,4 @@
-import os, re, pyperclip, html, sys, io
+import os, re, pyperclip, html, sys, io, importlib
 from itertools import chain
 from collections.abc import Iterable
 
@@ -17,6 +17,12 @@ def make_list(x):
 
 def expand_path(*args):
   return os.path.abspath(os.path.expanduser(os.path.join(*args)))
+
+def mkdirp(*args):
+  full_path = expand_path(*args)
+  if not os.path.exists(full_path):
+    os.makedirs(full_path)
+  return full_path
 
 # Yeah, sorry not sorry. This is needed because of a
 # confluence of my 3 least favorite parts of Python:
@@ -69,6 +75,11 @@ def copy_to_clipboard(text):
     return True
   except Exception as e:
     return False
+
+def reload_modules(modules):
+  for name in modules:
+    module = importlib.import_module(name)
+    importlib.reload(module)
 
 class CaptureStdout:
 

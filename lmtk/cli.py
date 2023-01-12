@@ -5,8 +5,9 @@ from .config import Config
 from .repl import REPL
 from .repl.search import fuzzy_search_input
 from .modes import list_modes
-from .utils import printer
+from .utils import printer, expand_path
 from .script import ScriptRuntime
+from .search import SearchEngine
 
 config = Config()
 
@@ -86,12 +87,42 @@ def notebook():
 @app.command()
 def modes():
   for mode in list_modes():
-    print(mode)
+    printer.print(mode)
 
 @app.command()
 def threads():
   for thread in config.threads().list():
-    print(thread)
+    printer.print(thread)
+
+@app.command()
+def index(
+    data: str,
+):
+  source_data_dir = expand_path(data)
+  engine = SearchEngine(
+    expand_path(source_data_dir, '.lmtk-data')
+  )
+  with engine:
+    engine.build_index('file_system', source_data_dir)
+
+@app.command()
+def search(
+    data: str,
+    query: str
+):
+  source_data_dir = expand_path(data)
+  engine = SearchEngine(
+    expand_path(source_data_dir, '.lmtk-data')
+  )
+  with engine:
+    results = engine.search(query)
+    output = ''
+    for (i, result) in enumerate(results):
+      output += f'{i+1}. [{result.score:.3f}] {result.meta["path"]}\n'
+
+    printer.print_markdown(output)
+    printer.print('')
+
 
 def apply_aliases():
   if len(sys.argv) < 2:
