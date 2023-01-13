@@ -34,7 +34,9 @@ def repl(
   if thread == '@':
     thread = fuzzy_search_input('thread = @', config.threads().list()) or None
   elif thread == '-':
-    thread = config.threads().list()[0]
+    threads = config.threads().list()
+    if len(threads) > 0:
+      thread = threads[0]
   elif thread == 'i':
     thread = fuzzy_search_input('thread = @', config.threads().list()) or None
     mode = fuzzy_search_input('mode = ', list_modes()) or None
