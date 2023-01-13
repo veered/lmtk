@@ -73,7 +73,7 @@ See `.help` for a full list, but these are some particularly important commands:
 - `.undo`  or `C-x + C-u` to rewrite your most recent message
 
 ## Custom Modes
-Add a Python file that [looks like this](https://github.com/veered/lmtk/blob/main/examples/bruh_mode.py) to `$LMTK_CONFIG_PATH/plugins/`. By default this will be `~/.config/lmtk/plugins/`.
+Add a Python file that [looks like this](https://github.com/veered/lmtk/blob/main/examples/modes/bruh_mode.py) to `$LMTK_CONFIG_PATH/plugins/`. By default this will be `~/.config/lmtk/plugins/`.
 
 See [lmtk/modes](https://github.com/veered/lmtk/tree/main/lmtk/modes) for more complete examples.
 
