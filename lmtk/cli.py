@@ -88,6 +88,7 @@ def notebook():
 
 @app.command()
 def modes():
+  config.load_plugins()
   for mode in list_modes():
     printer.print(mode)
 

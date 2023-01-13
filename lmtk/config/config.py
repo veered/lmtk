@@ -11,7 +11,7 @@ class Config:
   def __init__(self, config_path=None):
     self.config = None
     self.config_path = config_path or os.getenv('LMTK_CONFIG_PATH', self.default_config_path)
-
+    self.plugins_loaded = False
     self.folders = Folders(self.config_path)
 
     config_folders = [
@@ -101,6 +101,10 @@ class Config:
       return file.read()
 
   def load_plugins(self):
+    if self.plugins_loaded:
+      return
+    self.plugins_loaded = True
+
     files = self.folders.get_files('plugins')
     for file in files:
       file_path = self.folders.get_file_path('plugins', file)

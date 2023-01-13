@@ -17,7 +17,7 @@ class SynthChatMode(BaseMode):
     self.load_profile()
 
     self.model = 'text-davinci-003'
-    self.temperature = 0.7
+    self.temperature = 0.3
     self.llm = GPT3()
 
     self.seed = ''
