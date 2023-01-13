@@ -1,3 +1,5 @@
+import os
+
 from ..utils import default, expand_path
 
 from .store_manager import StoreManager
@@ -7,6 +9,8 @@ from .stores import SimpleVectorStore
 from ..llms.open_ai import GPTEmbedder
 
 class SearchEngine:
+
+  default_data_dir = '.lmtk-data'
 
   def __init__(self, data_dir):
     self.data_dir = expand_path(data_dir)
@@ -45,3 +49,13 @@ class SearchEngine:
 
   def search(self, text, top_n=5):
     return self.store_manager.search(text, top_n)
+
+  @classmethod
+  def normalize_path(cls, path, data_dir=''):
+    data_dir = data_dir or cls.default_data_dir
+    path = expand_path(path)
+
+    if os.path.basename(path) == data_dir:
+      return path
+    else:
+      return expand_path(path, data_dir)

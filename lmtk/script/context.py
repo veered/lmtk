@@ -1,7 +1,7 @@
 import sys
 from ..utils import DotDict, default, expand_path
 
-from .helpers import get_web, get_file, shell, ask, show_web, show_code, parse_code_block, run_code
+from .helpers import get_web, get_file, shell, ask, show_web, show_code, parse_code_block, run_code, search_index
 
 class ScriptContext:
 
@@ -29,6 +29,7 @@ class ScriptContext:
       'show_code': show_code,
       'parse_code_block': parse_code_block,
       'run_code': run_code,
+      'search_index': search_index,
     }
 
   def set_var(self, key, val):

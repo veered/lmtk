@@ -5,6 +5,7 @@ from markdown_it import MarkdownIt
 from ..utils import expand_path, printer, CaptureStdout
 from ..config import Config
 from ..repl.prompt import Prompt
+from ..search import SearchEngine
 
 def get_web(url):
   if not url.startswith('http'):
@@ -88,3 +89,19 @@ def run_code(text):
     output = ''.join(traceback.TracebackException.from_exception(e).format())
 
   return output.rstrip('\n')
+
+def search_index(index_path, text, min_score=.75):
+  data_dir = SearchEngine.normalize_path(index_path)
+
+  engine = SearchEngine(data_dir)
+  with engine:
+    results = engine.search(text, top_n=1)
+
+  if len(results) == 0:
+    return ''
+
+  result = results[0]
+  if result.score < min_score:
+    return ''
+
+  return results[0].text
