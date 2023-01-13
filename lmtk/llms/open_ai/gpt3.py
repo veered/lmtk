@@ -1,11 +1,11 @@
 import openai
 from ...errors import LmtkApiError
-from .utils import check_api_key, count_tokens, get_tokenizer
+from .utils import load_api_key, count_tokens, get_tokenizer
 
 class GPT3:
 
   def __init__(self):
-    check_api_key()
+    load_api_key()
     get_tokenizer() # preload tokenizer
 
   def count_tokens(self, text):

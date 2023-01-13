@@ -1,6 +1,6 @@
 import os, re, pyperclip, html, sys, io, importlib
 from itertools import chain
-from collections.abc import Iterable
+from collections.abc import Iterable, Mapping
 
 def peek(gen):
   first = next(gen)
@@ -24,22 +24,25 @@ def mkdirp(*args):
     os.makedirs(full_path)
   return full_path
 
-# Yeah, sorry not sorry. This is needed because of a
-# confluence of my 3 least favorite parts of Python:
-#   1. Shared mutable default parameters
-#   2. Falsey {}, [], etc. For some random class `C`, is
-#      `C()` falsey? Who knows... it is user defined.
-#   3. Ugly and non-linear "ternary" statements
-# I mean... wtf. Aside from some arguably wacky variable
-# scoping and the mess that is package management, that's
-# pretty much the complete list of things I strongly
-# dislike about Python.
-#
-# I know Python doesn't support macros so this can't
-# short-circuit, but whatever. At least `default` isn't
-# a reserved parameter. So rejoice, dear reader.
+# Whatever, I'm a Python n00b and hate the behavior of
+# mutable default parameters + the non-linear ternary
+# statement. I know it doesn't short-circuit evaluate
+# but I can usually accept that.
 def default(val, fallback):
   return val if val != None else fallback
+
+def flatten_dict(d, flat=None, parent_keys=[], sep='.'):
+  flat = default(flat, {})
+  parent_keys = default(parent_keys, [])
+
+  for (key, value) in d.items():
+    keys = parent_keys + [ key ]
+    if not isinstance(value, Mapping):
+      flat[sep.join(keys)] = value
+    else:
+      flatten_dict(value, flat, keys, sep)
+
+  return flat
 
 class DotDict(dict):
   __getattr__ = dict.__getitem__

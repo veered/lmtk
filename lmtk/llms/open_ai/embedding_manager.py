@@ -2,14 +2,14 @@ from dataclasses import dataclass
 import openai
 import numpy as np # openai already depends on this
 
-from .utils import check_api_key
+from .utils import load_api_key
 
 vec_dim = 1536
 
 class GPTEmbeddingManager:
 
   def __init__(self, model='text-embedding-ada-002'):
-    check_api_key()
+    load_api_key()
 
     self.model = model
 

@@ -1,12 +1,12 @@
 import openai
-from .utils import check_api_key
+from .utils import load_api_key
 
 class GPTEmbedder:
 
   vec_dim = 1536
 
   def __init__(self, model='text-embedding-ada-002'):
-    check_api_key()
+    load_api_key()
     self.model = model
 
   def calculate_embeddings(self, texts):

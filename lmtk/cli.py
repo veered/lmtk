@@ -1,3 +1,4 @@
+
 import typer, sys
 from typing import Optional, List
 
@@ -10,7 +11,6 @@ from .script import ScriptRuntime
 from .search import SearchEngine
 
 config = Config()
-
 printer.set_syntax_detection(
   not config.get_setting('disableSyntaxDetection', False)
 )
@@ -123,6 +123,37 @@ def search(
     printer.print_markdown(output)
     printer.print('')
 
+@app.command('config')
+def config_command(
+    field: Optional[str] = typer.Argument(None),
+):
+  # This whole thing is a mess. Let's call it a todo. It
+  # usually works I guess. Of course this will probably
+  # never get fixed. Just don't make any settings with
+  # names containing periods or with true/false string values,
+
+  if not field:
+    options = config.get_settings(sep='.')
+    field = fuzzy_search_input('name = ', options, erase=False)
+
+  if not field:
+    return
+
+  value = input(f'value = ')
+  # if value == None:
+  #   current_value = config.get_setting(field, default_value='', sep='.')
+  #   printer.print(f'current value = "{current_value}"')
+  #   return
+
+  # Yeah yeah...
+  if value == 'true':
+    value = True
+  elif value == 'false':
+    value = False
+  elif value == '':
+    value = None
+
+  config.set_setting(field, value, sep='.')
 
 def apply_aliases():
   if len(sys.argv) < 2:
