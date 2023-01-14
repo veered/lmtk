@@ -1,5 +1,5 @@
 import uuid
-from ..utils import make_iter, SimpleServer, printer, default
+from ..utils import make_iter, SimpleServer, printer, default, count_params
 
 from ..config.profile import Profile
 
@@ -40,11 +40,11 @@ class BaseMode:
     self.state = default(state, {})
     self.profile = profile if profile != None else Profile()
 
-    self.conversation = self.state.get('conversation', [])
-    self.seed = self.state.get('seed', '')
     self.buffers = {}
     self.active = True
-    self.load(self.state)
+
+    self.load_count = 0
+    self.reload(self.state)
 
     if self.web_server_config != None:
       self.__serve()
@@ -60,13 +60,22 @@ class BaseMode:
 
     self.__add_message(message=server_message)
 
+  def reload(self, state):
+    self.state = state
+    self._base_messages = state.get('_base_messages', [])
+
+    if count_params(self.load) == 1:
+      self.load(state)
+    else:
+      self.load(state, self.load_count == 0)
+
+    self.load_count += 1
+
   def save_state(self):
     state = {
-      'conversation': self.conversation,
-      'seed': self.seed,
+      '_base_messages': self._base_messages,
     }
-    sub_state = self.save() or {}
-    state.update(sub_state)
+    state.update(self.save() or {})
     return state
 
   def stop(self):
@@ -76,11 +85,9 @@ class BaseMode:
       self.web_server.stop()
     self.active = False
 
-  def rollback_n(self, n=1):
-    for i in range(n):
-      self.rollback()
-      if len(self.conversation) > 0:
-        self.conversation.pop()
+  @property
+  def conversation(self):
+    return self._base_messages
 
   def __build_message(self, text='', source=''):
     message = {
@@ -93,7 +100,7 @@ class BaseMode:
   def __add_message(self, message=None, text='', source=''):
     if not message:
       message = self.__build_message(text=text, source=source)
-    self.conversation += [ message ]
+    self._base_messages += [ message ]
     return message
 
   def __serve(self):
@@ -125,7 +132,7 @@ class BaseMode:
   def respond(self, query):
     yield ''
 
-  def load(self, state):
+  def load(self, state, first_load):
     pass
 
   def unload(self):
@@ -142,9 +149,6 @@ class BaseMode:
 
   def set_seed(self, seed):
     self.seed = seed
-
-  def rollback(self):
-    pass
 
   def stats(self):
     return ''

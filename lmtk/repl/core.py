@@ -32,8 +32,11 @@ class REPL:
     )
     self.mode_name = self.thread.mode_name
 
-    self.mode = None
     self.first_run = True
+
+  @property
+  def mode(self):
+    return self.thread.get_mode()
 
   def get_user_input(self):
     default = ''
@@ -69,7 +72,7 @@ class REPL:
     else:
       self.warmup_thread()
 
-    self.mode = self.thread.load_mode()
+    self.thread.load_mode()
     self.create_prompt()
 
     self.pretty.intro()
@@ -100,22 +103,18 @@ class REPL:
     self.pretty.their_banner(len(self.thread.get_messages()) + 2, stats=stats, space=3)
 
     try:
-      answer = self.ask(text)
+      answer = self.ask(text, stats=stats)
     except (KeyboardInterrupt, EOFError, LmtkApiError) as error:
       if isinstance(error, LmtkApiError):
         self.pretty.api_error(error)
       self.pretty.request_canceled()
 
       self.auto_fills += [ text ]
-      self.mode.rollback_n(1)
       return
 
     self.pretty.print(answer, newline=True)
 
-    self.thread.add_message('you', text)
-    self.thread.add_message('them', answer, stats=stats)
     self.thread.save()
-
     self.first_run = False
 
   def create_prompt(self):
@@ -133,13 +132,13 @@ class REPL:
 
   def reset(self):
     self.thread.reset(preserve_profile=True)
-    self.mode = self.thread.load_mode()
+    self.thread.load_mode()
     self.thread.save()
 
-  def ask(self, text):
+  def ask(self, text, stats=''):
     delay = 0.25 if self.first_run else self.mode.loader_latency
     with Loader(show_timer=True, delay=delay):
-      gen = iter(self.mode.ask(text))
+      gen = iter(self.thread.ask(text, stats))
       printer.warmup()
       response = peek(gen)[0]
 
@@ -172,3 +171,4 @@ class REPL:
     printer.clear(2)
     with self.pretty.loading_thread():
       printer.warmup()
+

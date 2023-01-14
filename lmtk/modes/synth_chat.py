@@ -20,7 +20,6 @@ class SynthChatMode(BaseMode):
     self.temperature = 0.3
     self.llm = GPT3()
 
-    self.seed = ''
     self.response_prefix = ''
 
     self.max_summaries = 8
@@ -137,18 +136,6 @@ class SynthChatMode(BaseMode):
       message = self.build_message(text=text, source=source)
     self.recent_conversation += [ message ]
     return message
-
-  def delete_message(self, message: dict = None, message_id=None):
-    message = default(message, {})
-    if not message_id:
-      message_id = message['id']
-    self.recent_conversation = [ m for m in self.recent_conversation if m['id'] != message_id ]
-
-  def rollback(self):
-    # TODO : do more stuff
-    if len(self.recent_conversation) > 0:
-      message_id = self.recent_conversation[-1]['id']
-      self.delete_message(message_id=message_id)
 
   def shrink_messages(self):
     for (i, message) in enumerate(self.recent_conversation[:-8]):

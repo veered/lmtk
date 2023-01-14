@@ -94,14 +94,6 @@ class JSSandboxMode(BaseMode):
   def inspect(self):
     return self.get_prompt('{ instruction }')
 
-  def rollback(self):
-    if len(self.history) > 0:
-      msg = self.history.pop()
-      if msg['type'] == 'server':
-        self.code = msg['text']
-    else:
-      self.code = self.starter_code
-
   def get_buffer(self, name):
     return ('code', self.code, '.js')
 

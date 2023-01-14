@@ -1,34 +1,34 @@
-import uuid, re, os, json
-from datetime import datetime
-from .message import Message
+import uuid, re, os, json, copy, typing
+from dataclasses import dataclass, field
+from dataclasses_json import dataclass_json
+
 from ..modes import get_mode
+from .state_store import StateStore
 
 class Thread:
 
   id = ''
   name = ''
   mode_name = ''
-  mode_state = {}
   profile_name = ''
-  seed = ''
-  # timestamp = None
 
   def __init__(self, name, config):
     self.set_name(name)
     self.config = config
+
+    self.state_store = StateStore()
     self.mode = None
 
-    if not self.load():
-      self.reset()
+    self.load()
 
   def load_mode(self):
     if self.mode:
       self.mode.stop()
     self.mode = get_mode(self.mode_name)(
-      state=self.mode_state,
+      state=self.state_store.data['mode_state'],
       profile=self.get_profile(),
     )
-    self.mode.set_seed(self.seed)
+    self.mode.set_seed(self.state_store.data['seed'])
     return self.mode
 
   def stop_mode(self):
@@ -36,10 +36,11 @@ class Thread:
       self.mode.stop()
       self.mode = None
 
-  def set_mode(self, mode_name, state=None, set_default_profile=True):
-    self.mode_name = mode_name
-    self.mode_state = state or self.mode_state
+  def get_mode(self):
+    return self.mode
 
+  def set_mode(self, mode_name, set_default_profile=True):
+    self.mode_name = mode_name
     if set_default_profile and not self.profile_name:
       self.profile_name = get_mode(self.mode_name).default_profile_name
 
@@ -52,6 +53,9 @@ class Thread:
     if profile_name and set_mode:
       self.mode_name = self.config.load_profile(profile_name).mode or self.mode_name
 
+  def set_name(self, name):
+    self.name = self.normalize_name(name)
+
   def get_file_path(self):
     file_name = f'{self.escape_name(self.name)}.json'
     return self.config.folders.get_file_path('threads', file_name)
@@ -59,35 +63,27 @@ class Thread:
   def to_data(self):
     return {
       'id': self.id,
-      'head_id': self.head_id,
       'name': self.name,
-      'all_messages': { msg_id: msg.to_data() for (msg_id, msg) in self.all_messages.items() },
+      'all_messages': { msg_id: msg.to_dict() for (msg_id, msg) in self.all_messages.items() },
       'mode_name': self.mode_name,
-      'mode_state': self.mode_state,
+      'state_store': self.state_store.to_dict(),
       'profile_name': self.profile_name,
-      'seed': self.seed,
-      # 'timestamp': self.timestamp,
     }
 
   def load_data(self, data):
     self.id = data.get('id')
-    self.head_id = data.get('head_id')
     self.name = data.get('name')
     self.all_messages = {
-      msg_id: Message().load_data(msg_data)
+      msg_id: Message.from_dict(msg_data)
       for (msg_id, msg_data) in data.get('all_messages', {}).items()
     }
     self.mode_name = data.get('mode_name')
-    self.mode_state = data.get('mode_state')
+    self.state_store = StateStore(data.get('state_store'))
     self.profile_name = data.get('profile_name')
-    self.seed = data.get('seed')
-    # self.timestamp = data.get('timestamp')
     return self
 
   def save(self, stop=False):
-    if self.mode:
-      self.mode_state = self.mode.save_state()
-      self.seed = self.mode.get_seed()
+    self.commit()
 
     file_path = self.get_file_path()
     with open(file_path, 'w') as thread_file:
@@ -99,48 +95,91 @@ class Thread:
   def load(self):
     file_path = self.get_file_path()
     if not os.path.isfile(file_path):
-      return False
-
-    with open(file_path, 'r') as thread_file:
-      self.load_data(json.load(thread_file))
-    return True
-
-  def set_name(self, name):
-    self.name = self.normalize_name(name)
+      return self.reset()
+    else:
+      with open(file_path, 'r') as thread_file:
+        self.load_data(json.load(thread_file))
 
   def reset(self, preserve_profile=False, preserve_seed=False):
+    seed = self.state_store.data.get('seed') if preserve_seed else ''
+
+    self.state_store.reset()
+    self.state_store.set_state_data(0, {
+      'last_message_id': None,
+      'seed': seed,
+      'mode_state': {},
+    })
+
     self.id = self.id or str(uuid.uuid4())
-    self.head_id = None
     self.all_messages = {}
     self.mode_name = self.mode_name or ''
-    self.mode_state = {}
     self.profile_name = self.profile_name if preserve_profile else ''
-    self.seed = self.seed if preserve_seed else ''
-    # self.timestamp = datetime.now()
 
-  def get_messages(self, head_id=None):
-    head_id = head_id or self.head_id
+  def commit(self):
+    if self.mode:
+      self.state_store.data['mode_state'] = self.mode.save_state()
+      self.state_store.data['seed'] = self.mode.get_seed()
+    return self.state_store.commit()
+
+  def get_messages(self):
+    msg_id = self.state_store.data['last_message_id']
+
     messages = []
-    while head_id:
-      msg = self.all_messages[head_id]
+    while msg_id in self.all_messages:
+      msg = self.all_messages[msg_id]
       messages.insert(0, msg)
-      head_id = msg.parent_id
+      msg_id = msg.parent_id
+
     return messages
 
   def add_message(self, source, text, stats=''):
-    message = Message(source, text, stats=stats, parent_id=self.head_id)
+    message = Message(
+      parent_id=self.state_store.data['last_message_id'],
+      source=source,
+      text=text,
+      stats=stats,
+    )
     self.all_messages[message.id] = message
-    self.head_id = message.id
-    return message
+
+    self.state_store.data['last_message_id'] = message.id
+    message.state_id = self.commit()
+
+    return message.id
+
+  def revert(self, message_id=None, state_id=None):
+    if message_id:
+      state_id = self.all_messages[message_id].state_id
+
+    self.state_store.revert(state_id)
+    self.mode.reload(state=self.state_store.data['mode_state'])
 
   def rollback_n(self, n=1):
-    new_head_id = self.head_id
-    for i in range(n):
-      msg = self.all_messages.get(new_head_id)
-      if not msg:
-        break
-      new_head_id = msg.parent_id
-    self.head_id = new_head_id
+    messages = self.get_messages()
+    if n >= len(messages):
+      self.revert(state_id=0)
+    else:
+      self.revert(message_id=messages[-(n+1)].id)
+
+  def ask(self, text, stats=''):
+    old_state_id = self.commit()
+
+    try:
+      self.state_store.data['last_message_id'] = self.add_message('you', text)
+      self.commit()
+
+      answer = ''
+      for (i, data) in enumerate(self.mode.ask(text)):
+        if i == 0:
+          data = data.lstrip()
+        yield data
+        answer += data
+
+      self.state_store.data['last_message_id'] = self.add_message('them', answer, stats=stats)
+      self.commit()
+
+    except (KeyboardInterrupt, Exception) as e:
+      self.revert(state_id=old_state_id)
+      raise e
 
   @classmethod
   def normalize_name(cls, thread_name):
@@ -150,3 +189,13 @@ class Thread:
   @classmethod
   def escape_name(cls, thread_name):
     return cls.normalize_name(thread_name).replace('-', '_')
+
+@dataclass_json
+@dataclass
+class Message:
+    id: str = field(default_factory=lambda: str(uuid.uuid4()))
+    parent_id: typing.Optional[str] = None
+    state_id: typing.Optional[str] = None
+    source: str = ''
+    text: str = ''
+    stats: str = ''

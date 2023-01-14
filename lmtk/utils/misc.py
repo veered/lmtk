@@ -1,4 +1,4 @@
-import os, re, pyperclip, html, sys, io, importlib
+import os, re, pyperclip, html, sys, io, importlib, inspect
 from itertools import chain
 from collections.abc import Iterable, Mapping
 
@@ -23,6 +23,9 @@ def mkdirp(*args):
   if not os.path.exists(full_path):
     os.makedirs(full_path)
   return full_path
+
+def count_params(f):
+  return len(inspect.signature(f).parameters)
 
 # Whatever, I'm a Python n00b and hate the behavior of
 # mutable default parameters + the non-linear ternary

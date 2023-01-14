@@ -143,7 +143,6 @@ class RedoCommand(BaseCommand):
     if len(history) < 2:
       return 'No message to redo'
 
-    self.repl.mode.rollback_n(2)
     last_message = history[-2].text
     self.repl.thread.rollback_n(2)
 
@@ -164,7 +163,6 @@ class UndoCommand(BaseCommand):
     if len(history) < 2:
       return 'No message to undo'
 
-    self.repl.mode.rollback_n(2)
     last_message = history[-2].text
     self.repl.thread.rollback_n(2)
 

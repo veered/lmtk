@@ -9,7 +9,7 @@ class LangChainMode(BaseMode):
   loader_latency = .25
 
   def load(self, state):
-    llm = OpenAI(temperature=0)
+    llm = OpenAI(temperature=0.3)
 
     self.chain = ConversationChain(llm=llm)
     self.chain.memory.buffer = state.get('buffer', '')

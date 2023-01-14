@@ -11,6 +11,7 @@ classifiers = ["License :: OSI Approved :: MIT License"]
 dynamic = ["version", "description"]
 dependencies = [
   "beautifulsoup4 >=4.0",
+  "dataclasses-json >= 0.5",
   "markdown-it-py[plugins] >=2.0",
   "openai >=0.25",
   "prompt_toolkit >=3.0",

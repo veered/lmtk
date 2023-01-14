@@ -1,30 +1,12 @@
-import uuid
-from datetime import datetime
+# import uuid
+# from dataclasses import dataclass
+# from dataclasses_json import dataclass_json
 
-class Message:
-
-  def __init__(self, source='', text='', stats='', parent_id=''):
-    self.id = str(uuid.uuid4())
-    self.parent_id = parent_id
-    # self.timestamp = datetime.now()
-    self.source = source
-    self.text = text
-    self.stats = stats
-
-  def to_data(self):
-    return {
-      'id': self.id,
-      'parent_id': self.parent_id,
-      'source': self.source,
-      # 'timestamp': self.timestamp,
-      'text': self.text,
-      'stats': self.stats,
-    }
-  def load_data(self, data):
-    self.id = data.get('id')
-    self.parent_id = data.get('parent_id')
-    # self.timestamp = data.get('timestamp')
-    self.source = data.get('source')
-    self.text = data.get('text')
-    self.stats = data.get('stats')
-    return self
+# @dataclass_json
+# @dataclass
+# class Message:
+#     id: str = field(default_factory=lambda: str(uuid.uuid4()))
+#     parent_id: str = ''
+#     source: str = ''
+#     text: str = ''
+#     stats: str = ''
