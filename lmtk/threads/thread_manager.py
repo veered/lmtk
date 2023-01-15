@@ -38,6 +38,6 @@ class ThreadManager:
 
   def make_name(self):
     i = len(self.config.folders.get_files('threads'))
-    while os.path.isfile(f'thread-{i}.json'):
+    while os.path.isfile(f'thread_{i}.json'):
       i += 1
     return f'thread-{i}'
