@@ -1,5 +1,7 @@
 beautifulsoup4 >=4.0
+dataclasses-json >=0.5
 guesslang-experimental >=2.2.3
+jsonpatch >=1.32
 markdown-it-py >=2.0
 openai >=0.25
 prompt_toolkit >=3.0

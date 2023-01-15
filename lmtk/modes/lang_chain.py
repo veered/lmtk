@@ -14,7 +14,9 @@ class LangChainMode(BaseMode):
     from langchain.llms import OpenAI
     from langchain import ConversationChain
 
-    llm = OpenAI(temperature=0.3)
+    temperature = self.profile.config.get('temperature', .3)
+    llm = OpenAI(temperature=temperature)
+
     self.chain = ConversationChain(llm=llm)
     self.chain.memory.buffer = state.get('buffer', '')
 

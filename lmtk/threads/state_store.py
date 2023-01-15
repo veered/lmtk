@@ -1,6 +1,7 @@
 import copy, typing
 from dataclasses import dataclass, field
 from dataclasses_json import dataclass_json
+from jsonpatch import JsonPatch
 
 class StateStore:
 
@@ -41,13 +42,16 @@ class StateStore:
     if state_data == None:
       state_data = self.data
 
-    if state_data == self.build_data(clone=False):
+    last_data = self.build_data()
+    data_diff = self.get_patches(last_data, state_data)
+
+    if len(data_diff) == 0:
       return self.set_head(self.head_id)
 
     state = State(
       id=self.counter,
       parent_id=self.head_id,
-      data=copy.deepcopy(state_data),
+      data_diff=data_diff,
     )
 
     self.counter += 1
@@ -61,15 +65,40 @@ class StateStore:
     if self.head_id == state_id:
       self._data = None
 
-  def build_data(self, state_id=None, clone=True):
+  # If this has performance problems, it would be easy to
+  # add caching so we don't always have to rebuild the data
+  # from the root of the chain.
+  #
+  # It's also possible that deepcopy is slow and can be
+  # replaced with something simpler because the data is
+  # always JSON serializable and has no circular references.
+  def build_data(self, state_id=None):
     if state_id == None:
       state_id = self.head_id
 
-    state = self.states.get(state_id)
-    if state == None:
+    chain = self.get_chain(state_id)
+    if len(chain) == 0:
       return None
 
-    return copy.deepcopy(state.data) if clone else state.data
+    data = None
+    patches = []
+
+    for id in chain:
+      state = self.states[id]
+      if state.data != None:
+        data = state.data
+        patches = []
+      elif state.data_diff != None:
+        patches += state.data_diff
+
+    return self.apply_patches(data, patches)
+
+  def get_patches(self, old_obj, new_obj):
+    patches = JsonPatch.from_diff(old_obj, new_obj).patch
+    return copy.deepcopy(patches)
+
+  def apply_patches(self, old_obj, patches):
+    return JsonPatch(copy.deepcopy(patches)).apply(copy.deepcopy(old_obj))
 
   def get_id(self):
     return self.head_id
@@ -77,6 +106,9 @@ class StateStore:
   def get_chain(self, last_id=None):
     if last_id == None:
       last_id = self.head_id
+
+    if last_id not in self.states:
+      return []
 
     state_ids = [ last_id ]
     while True:
@@ -106,31 +138,4 @@ class State:
     id: str = ''
     parent_id: typing.Optional[str] = None
     data: typing.Optional[dict] = None
-    data_diff: typing.Optional[list] = None
-
-
-# print()
-# from pprint import pprint
-
-# state_store = StateStore()
-# state_store.set_state_data(0, { 'hello': 456 })
-
-# state_store.data = { 'hello': 123, 'msgs': [] }
-# state_store.commit()
-
-# state_store.data = { 'hello': 123, 'msgs': [{ 'a': 'asdf' }] }
-# state_store.commit()
-
-# state_store.commit({ 'yo': 456 })
-
-# pprint(state_store)
-
-# # state_store.rollback_n(5)
-# state_store.rollback_n(1)
-# pprint(state_store)
-
-# state_store = StateStore(state_data)
-# state_store.get(state_id='')
-# state_id = state_store.update(state)
-# state_store.get_current_id()
-# state_store.revert(state_id)
+    data_diff: typing.Optional[list[dict]] = None

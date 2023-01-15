@@ -24,7 +24,7 @@ class ScriptRuntime:
       profile_name=self.meta.get('profile_name')
     )
 
-    self.mode = self.thread.load_mode()
+    self.mode = self.thread.load_mode(store_conversation=True)
     if self.meta.get("temperature") is not None:
       self.mode.temperature = self.meta.get("temperature")
 

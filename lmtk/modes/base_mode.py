@@ -29,6 +29,7 @@ class BaseMode:
   visible = True
   loader_delay=1.5
   default_profile_name = None
+  store_conversation = False
 
   seed = ''
 
@@ -100,7 +101,8 @@ class BaseMode:
   def __add_message(self, message=None, text='', source=''):
     if not message:
       message = self.__build_message(text=text, source=source)
-    self._base_messages += [ message ]
+    if self.store_conversation:
+      self._base_messages += [ message ]
     return message
 
   def __serve(self):

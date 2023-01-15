@@ -6,3 +6,4 @@ from .raw_gpt import RawGPTMode
 from .raw_codex import RawCodexMode
 from .chat_gpt import ChatGPTMode
 from .js_sandbox import JSSandboxMode
+from .lang_chain import LangChainMode

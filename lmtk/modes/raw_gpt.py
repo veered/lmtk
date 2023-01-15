@@ -5,6 +5,7 @@ from ..llms.open_ai import GPT3
 class RawGPTMode(BaseMode):
 
   title = 'RawGPT'
+  store_conversation = True
 
   def load(self, state):
     self.llm = GPT3()

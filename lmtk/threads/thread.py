@@ -21,7 +21,7 @@ class Thread:
 
     self.load()
 
-  def load_mode(self):
+  def load_mode(self, store_conversation=None):
     if self.mode:
       self.mode.stop()
     self.mode = get_mode(self.mode_name)(
@@ -29,6 +29,12 @@ class Thread:
       profile=self.get_profile(),
     )
     self.mode.set_seed(self.state_store.data['seed'])
+
+    # This is usually up to the mode, but it can be
+    # useful to force it.
+    if store_conversation == True:
+      self.mode.store_conversation = True
+
     return self.mode
 
   def stop_mode(self):
