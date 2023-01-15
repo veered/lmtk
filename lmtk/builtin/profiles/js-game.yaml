@@ -6,5 +6,6 @@ starter_code: |-
 inner_html: |-
   <canvas width="700" height="800"></canvas><ui></ui>
 style: |-
+  body { overflow: hidden; }
   ui { position: absolute; top: 20px; left: 20px; }
   canvas { border-style: solid; border-color: lightgray; border-width: 0px 1px 1px 0px; }

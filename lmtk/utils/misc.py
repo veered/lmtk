@@ -103,8 +103,21 @@ class CaptureStdout:
     return self.buffer.getvalue()
 
 # This doesn't really belong here, but it's here for now
-def render_code_display(code='', frame='', language='javascript'):
+def render_code_display(code='', frame_url=None, frame_html=None, language='javascript'):
   formatted_code = html.escape(code)
+
+  if frame_html != None:
+    iframe = f'<iframe width="700" height="800" srcdoc="{html.escape(frame_html)}"></iframe>'
+  elif frame_url != None:
+    iframe = f'<iframe width="700" height="800" src="{frame_url}"></iframe>'
+  else:
+    iframe = ''
+
+  if frame_url != None:
+    fullscreen = f'<a href="{frame_url}" target="_blank" id="fullscreen">Fullscreen</a>'
+  else:
+    fullscreen = ''
+
   return f"""
 <html style="height: 100%">
   <head>
@@ -156,7 +169,7 @@ def render_code_display(code='', frame='', language='javascript'):
   </head>
   <body>
     <div class="row" style="text-align: right">
-      <iframe width="700" height="800" src="{frame}"></iframe>
+      { iframe }
     </div>
     <div class="row" style="text-align: left">
       <pre><code class="language-{language}" id="code">{formatted_code}</code></pre>
@@ -164,7 +177,7 @@ def render_code_display(code='', frame='', language='javascript'):
         hljs.highlightAll();
       </script>
     </div>
-    <a href="{frame}" target="_blank" id="fullscreen">Fullscreen</a>
+    { fullscreen }
   </body>
 </html>
 """

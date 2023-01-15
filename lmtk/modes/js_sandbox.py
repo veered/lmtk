@@ -1,19 +1,13 @@
 import html
-from itertools import chain
-
-# Only used if minify=True. Not sure if it's worth the extra deps
-# from jsmin import jsmin
-# from jsbeautifier import beautify
 
 from .base_mode import BaseMode, register_mode
 from ..llms.open_ai import GPT3
-from ..utils import printer, render_code_display, DotDict
+from ..utils import render_code_display, DotDict
 
 @register_mode('js-sandbox')
 class JSSandboxMode(BaseMode):
 
   title = 'JS Sandbox'
-  minify = False
 
   web_server_config = {
     'host': 'localhost',
@@ -22,7 +16,6 @@ class JSSandboxMode(BaseMode):
 
   prompt_prefix = '```javascript\n'
   stops = [  '/*END*/', '```', '// END', '//END' ]
-  has_logged = False
 
   default_profile_name = 'js-blank'
 
@@ -30,18 +23,12 @@ class JSSandboxMode(BaseMode):
     self.model = 'text-davinci-003'
     self.llm = GPT3()
 
-    self.history = state.get('history', [])
-
     self.sandbox = self.profile.config
+
     self.inner_html = self.sandbox.get('inner_html', '')
     self.bio = self.sandbox.get('bio', 'You are an experienced software engineer')
-
-    sandbox_starter = self.sandbox.get('starter_code', '')
-    min_sandbox_starter = self.sandbox.get('min_starter_code', sandbox_starter)
-
-    self.file_name = 'index.min.js' if self.minify else 'index.js'
-    self.starter_code = min_sandbox_starter if self.minify else sandbox_starter
-    self.code = state.get('code', self.starter_code)
+    self.code = state.get('code', self.sandbox.get('starter_code', ''))
+    self.history = state.get('history', [])
 
   def save(self):
     return {
@@ -54,16 +41,10 @@ class JSSandboxMode(BaseMode):
     code = ''
     results = self.complete(self.get_prompt(query))
 
-    if self.minify:
-      code = ''.join(list(results))
-      yield self.prompt_prefix
-      yield self.beautify_code(code)
-    else:
-      yield self.prompt_prefix
-      for data in results:
-        code += data
-        yield data
-
+    yield self.prompt_prefix
+    for data in results:
+      code += data
+      yield data
     yield '\n```'
 
     self.history += [ { 'text': self.code, 'type': 'server' } ]
@@ -78,19 +59,6 @@ class JSSandboxMode(BaseMode):
       stops=self.stops,
     )
 
-  def request_handler(self, request, path):
-    if path == '/':
-      return render_code_display(
-        code=self.beautify_code(self.code),
-        frame='/sandbox',
-      )
-    elif path == '/sandbox':
-      return self.render_html(
-        code=self.code,
-        inner_html=self.inner_html,
-        style=f'body {{ margin: 0px; }}\n{self.sandbox.get("style", "")}',
-      )
-
   def inspect(self):
     return self.get_prompt('{ instruction }')
 
@@ -103,15 +71,22 @@ class JSSandboxMode(BaseMode):
   def stats(self):
     return f'( tokens={len(self.get_prompt(""))} )'
 
-  @property
-  def loader_delay(self):
-    return .1 if self.minify else 1.5
+  def request_handler(self, request, path):
+    if path == '/':
+      return render_code_display(
+        code=self.code,
+        frame_html=self.render_frame_html(),
+        frame_url='/frame',
+      )
+    elif path == '/frame':
+      return self.render_frame_html()
 
-  def minify_code(self, code):
-    return jsmin(code) if self.minify else code.rstrip()
-
-  def beautify_code(self, code):
-    return beautify(code) if self.minify else code
+  def render_frame_html(self):
+    return self.render_html(
+      code=self.code,
+      inner_html=self.inner_html,
+      style=f'body {{ margin: 0px; }}\n{self.sandbox.get("style", "")}',
+    )
 
   def get_prompt(self, instruction=''):
     return f"""
@@ -121,14 +96,14 @@ web/client/index.html
 ```
 web/client/index.js
 ```javascript
-{self.minify_code(self.code)}
+{self.code.rstrip()}
 /*END*/
 ```
 
 {self.bio}. Make the following modifications to `index.js`:
 {instruction}
 
-web/client/{self.file_name}
+web/client/index.js
 { self.prompt_prefix }"""
 
   def render_html(self, code=None, inner_html='', style=None):
