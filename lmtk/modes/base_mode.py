@@ -27,7 +27,7 @@ class BaseMode:
 
   title = ''
   visible = True
-  loader_latency=1.5
+  loader_delay=1.5
   default_profile_name = None
 
   seed = ''

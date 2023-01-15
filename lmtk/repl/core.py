@@ -136,7 +136,7 @@ class REPL:
     self.thread.save()
 
   def ask(self, text, stats=''):
-    delay = 0.25 if self.first_run else self.mode.loader_latency
+    delay = 0.25 if self.first_run else self.mode.loader_delay
     with Loader(show_timer=True, delay=delay):
       gen = iter(self.thread.ask(text, stats))
       printer.warmup()

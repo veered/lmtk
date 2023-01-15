@@ -104,7 +104,7 @@ class JSSandboxMode(BaseMode):
     return f'( tokens={len(self.get_prompt(""))} )'
 
   @property
-  def loader_latency(self):
+  def loader_delay(self):
     return .1 if self.minify else 1.5
 
   def minify_code(self, code):

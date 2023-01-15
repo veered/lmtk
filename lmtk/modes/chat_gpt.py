@@ -5,7 +5,7 @@ from ..llms.chat_gpt import ChatGPT
 class ChatGPTMode(BaseMode):
 
   title = 'ChatGPT'
-  loader_latency=.25
+  loader_delay=.25
 
   def load(self, state):
     self.chat_gpt = ChatGPT(
