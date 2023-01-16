@@ -143,9 +143,17 @@ class REPL:
       response = peek(gen)[0]
 
     answer = ''
+    last_len = 0
     with printer.live(transient=True) as screen:
       for data in response:
         answer += data
+
+        # Decrease the number of redraws. Mostly matters for code because
+        # it more frequently has <4 character tokens.
+        if len(answer) - last_len < 4 and '\n' not in answer[last_len:]:
+          continue
+        last_len = len(answer)
+
         display_text = self.pretty.partial_response(answer)
         screen.update(display_text)
 
