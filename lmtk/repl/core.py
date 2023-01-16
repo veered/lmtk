@@ -1,4 +1,4 @@
-import sys, re
+import sys, re, time
 
 from .pretty import PrettyPrintREPL
 from .prompt import Prompt
@@ -143,19 +143,22 @@ class REPL:
       response = peek(gen)[0]
 
     answer = ''
-    last_len = 0
+    last_draw = 0
+
     with printer.live(transient=True) as screen:
       for data in response:
         answer += data
 
-        # Decrease the number of redraws. Mostly matters for code because
-        # it more frequently has <4 character tokens.
-        if len(answer) - last_len < 4 and '\n' not in answer[last_len:]:
+        # Throttle the number of redraws. It causes a small
+        # drop in perceived responsiveness but significantly
+        # cuts the number of redraws. This decreases the
+        # overall completion time.
+        if time.time() - last_draw < 50 / 1000:
           continue
-        last_len = len(answer)
 
         display_text = self.pretty.partial_response(answer)
         screen.update(display_text)
+        last_draw = time.time()
 
     return answer.strip()
 
