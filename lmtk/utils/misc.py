@@ -114,7 +114,7 @@ def render_code_display(code='', frame_url=None, frame_html=None, language='java
     iframe = ''
 
   if frame_url != None:
-    fullscreen = f'<a href="{frame_url}" target="_blank" id="fullscreen">Fullscreen</a>'
+    fullscreen = f'<a href="{frame_url}" target="_blank" id="fullscreen" class="button">Fullscreen</a>'
   else:
     fullscreen = ''
 
@@ -150,10 +150,7 @@ def render_code_display(code='', frame_url=None, frame_html=None, language='java
         width: 700px;
         box-shadow: 0px 0px 20px #000;
       }}
-      #fullscreen {{
-        position: fixed;
-        bottom: 1rem;
-        right: 1rem;
+      .button {{
         color: rgb(217,217,227);
         background-color: rgba(52,53,65);
         border-color: rgba(86,88,105);
@@ -161,6 +158,14 @@ def render_code_display(code='', frame_url=None, frame_html=None, language='java
         padding: 10px;
         box-shadow: 0px 0px 3px #000;
         text-decoration: none;
+      }}
+      #download {{
+        margin-right: 10px
+      }}
+      buttons {{
+        position: fixed;
+        bottom: 1.4rem;
+        right: 0.8rem;
       }}
     </style>
     <link  rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
@@ -177,7 +182,10 @@ def render_code_display(code='', frame_url=None, frame_html=None, language='java
         hljs.highlightAll();
       </script>
     </div>
-    { fullscreen }
+    <buttons>
+      <a href="/" target="_blank" id="download" class="button" download>Export</a>'
+      { fullscreen }
+    </buttons>
   </body>
 </html>
 """
