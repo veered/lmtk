@@ -101,6 +101,10 @@ class Config:
       return file.read()
 
   def load_plugins(self):
+    self.load_plugins_folder()
+    self.load_plugin_packages()
+
+  def load_plugins_folder(self):
     if self.plugins_loaded:
       return
     self.plugins_loaded = True
@@ -117,3 +121,8 @@ class Config:
       except Exception as e:
         printer.exception(e)
         continue
+
+  def load_plugin_packages(self):
+    packages = self.config.get('plugins', {}).get('packages', {})
+    for (key, value) in packages.items():
+      importlib.import_module(value)
