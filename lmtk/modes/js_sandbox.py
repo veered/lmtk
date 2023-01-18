@@ -73,11 +73,7 @@ class JSSandboxMode(BaseMode):
 
   def request_handler(self, request, path):
     if path == '/':
-      return render_code_display(
-        code=self.code,
-        frame_html=self.render_frame_html(),
-        frame_url='/frame',
-      )
+      return self.render_display_html()
     elif path == '/frame':
       return self.render_frame_html()
 
@@ -86,6 +82,15 @@ class JSSandboxMode(BaseMode):
       code=self.code,
       inner_html=self.inner_html,
       style=f'body {{ margin: 0px; }}\n{self.sandbox.get("style", "")}',
+    )
+
+  def render_display_html(self, frame_only=False, size=(700, 800)):
+    return render_code_display(
+      code=self.code,
+      frame_html=self.render_frame_html(),
+      frame_url='/frame',
+      frame_only=frame_only,
+      size=size,
     )
 
   def get_prompt(self, instruction=''):

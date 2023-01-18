@@ -50,12 +50,14 @@ class BaseMode:
     if self.web_server_config != None:
       self.__serve()
 
-  def ask(self, query):
+  def ask(self, query, lstrip=False):
     client_message = self.__add_message(text=query, source='client')
     server_message = self.__build_message(source='server')
 
     response = make_iter(self.respond(query))
-    for data in response:
+    for (i, data) in enumerate(response):
+      if i == 0 and lstrip:
+        data = data.lstrip()
       server_message['text'] += data
       yield data
 

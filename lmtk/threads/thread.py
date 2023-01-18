@@ -74,6 +74,7 @@ class Thread:
       'mode_name': self.mode_name,
       'state_store': self.state_store.to_dict(),
       'profile_name': self.profile_name,
+      'metadata': self.metadata,
     }
 
   def load_data(self, data):
@@ -86,6 +87,7 @@ class Thread:
     self.mode_name = data.get('mode_name')
     self.state_store = StateStore(data.get('state_store'))
     self.profile_name = data.get('profile_name')
+    self.metadata = data.get('metadata', {})
     return self
 
   def save(self, stop=False):
@@ -120,12 +122,16 @@ class Thread:
     self.all_messages = {}
     self.mode_name = self.mode_name or ''
     self.profile_name = self.profile_name if preserve_profile else ''
+    self.metadata = {}
 
   def commit(self):
     if self.mode:
       self.state_store.data['mode_state'] = self.mode.save_state()
       self.state_store.data['seed'] = self.mode.get_seed()
     return self.state_store.commit()
+
+  def get_last_message_id(self):
+    return self.state_store.data['last_message_id']
 
   def get_messages(self):
     msg_id = self.state_store.data['last_message_id']
@@ -166,7 +172,7 @@ class Thread:
     else:
       self.revert(message_id=messages[-(n+1)].id)
 
-  def ask(self, text, stats=''):
+  def ask(self, text, stats='', lstrip=True):
     old_state_id = self.commit()
 
     try:
@@ -174,7 +180,7 @@ class Thread:
       self.commit()
 
       answer = ''
-      for (i, data) in enumerate(self.mode.ask(text)):
+      for (i, data) in enumerate(self.mode.ask(text, lstrip=lstrip)):
         if i == 0:
           data = data.lstrip()
         yield data

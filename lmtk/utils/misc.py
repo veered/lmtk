@@ -103,13 +103,15 @@ class CaptureStdout:
     return self.buffer.getvalue()
 
 # This doesn't really belong here, but it's here for now
-def render_code_display(code='', frame_url=None, frame_html=None, language='javascript'):
+def render_code_display(code='', frame_url=None, frame_html=None, frame_only=False, language='javascript', size=(700, 800)):
   formatted_code = html.escape(code)
 
   if frame_html != None:
-    iframe = f'<iframe width="700" height="800" srcdoc="{html.escape(frame_html)}"></iframe>'
+    iframe = f'<iframe width="{size[0]}" height="{size[1]}" srcdoc="{html.escape(frame_html)}"></iframe>'
+    if frame_only:
+      return iframe
   elif frame_url != None:
-    iframe = f'<iframe width="700" height="800" src="{frame_url}"></iframe>'
+    iframe = f'<iframe width="{size[0]}" height="{size[1]}" src="{frame_url}"></iframe>'
   else:
     iframe = ''
 
@@ -146,8 +148,8 @@ def render_code_display(code='', frame_url=None, frame_html=None, language='java
         text-align: left;
       }}
       code {{
-        height: 774px;
-        width: 700px;
+        width: {size[0]}px;
+        height: {size[1]-26}px;
         box-shadow: 0px 0px 20px #000;
       }}
       .button {{
