@@ -125,4 +125,9 @@ class Config:
   def load_plugin_packages(self):
     packages = self.config.get('plugins', {}).get('packages', {})
     for (key, value) in packages.items():
-      importlib.import_module(value)
+      if not value:
+        continue
+      try:
+        importlib.import_module(value)
+      except Exception as e:
+        printer.exception(e)

@@ -3,3 +3,4 @@ from .printer import printer
 from .loader import Loader
 from .editor import open_in_editor
 from .server import SimpleServer
+from .gist import upload_file, upload_notebook
