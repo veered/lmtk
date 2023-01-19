@@ -1,4 +1,4 @@
-import os, re, pyperclip, html, sys, io, importlib, inspect
+import os, re, pyperclip, sys, io, importlib, inspect
 from itertools import chain
 from collections.abc import Iterable, Mapping
 
@@ -82,6 +82,7 @@ def copy_to_clipboard(text):
   except Exception as e:
     return False
 
+# Used when writing notebooks
 def reload_modules(modules):
   for name in modules:
     module = importlib.import_module(name)
@@ -101,93 +102,3 @@ class CaptureStdout:
 
   def value(self):
     return self.buffer.getvalue()
-
-# This doesn't really belong here, but it's here for now
-def render_code_display(code='', frame_url=None, frame_html=None, frame_only=False, language='javascript', size=(700, 800)):
-  formatted_code = html.escape(code)
-
-  if frame_html != None:
-    iframe = f'<iframe width="{size[0]}" height="{size[1]}" srcdoc="{html.escape(frame_html)}"></iframe>'
-    if frame_only:
-      return iframe
-  elif frame_url != None:
-    iframe = f'<iframe width="{size[0]}" height="{size[1]}" src="{frame_url}"></iframe>'
-  else:
-    iframe = ''
-
-  if frame_url != None:
-    fullscreen = f'<a href="{frame_url}" target="_blank" id="fullscreen" class="button">Fullscreen</a>'
-  else:
-    fullscreen = ''
-
-  return f"""
-<html style="height: 100%">
-  <head>
-    <style>
-      html {{
-        height: 100%;
-      }}
-      body {{
-        display: flex;
-        flex-direction: row;
-        background: #444654;
-      }}
-      .row {{
-        flex: 1;
-        margin: 10px;
-        margin-top: 15px;
-      }}
-      iframe {{
-        border: 0px;
-        background: #ededed;
-        box-shadow: 0px 0px 20px #000;
-      }}
-      pre {{
-        display: inline-block;
-        margin-top: 0px;
-        text-align: left;
-      }}
-      code {{
-        width: {size[0]}px;
-        height: {size[1]-26}px;
-        box-shadow: 0px 0px 20px #000;
-      }}
-      .button {{
-        color: rgb(217,217,227);
-        background-color: rgba(52,53,65);
-        border-color: rgba(86,88,105);
-        font-family: Helvetica;
-        padding: 10px;
-        box-shadow: 0px 0px 3px #000;
-        text-decoration: none;
-      }}
-      #download {{
-        margin-right: 10px
-      }}
-      buttons {{
-        position: fixed;
-        bottom: 1.4rem;
-        right: 0.8rem;
-      }}
-    </style>
-    <link  rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/monokai.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
-  </head>
-  <body>
-    <div class="row" style="text-align: right">
-      { iframe }
-    </div>
-    <div class="row" style="text-align: left">
-      <pre><code class="language-{language}" id="code">{formatted_code}</code></pre>
-      <script>
-        hljs.highlightAll();
-      </script>
-    </div>
-    <buttons>
-      <a href="/" target="_blank" id="download" class="button" download>Export</a>'
-      { fullscreen }
-    </buttons>
-  </body>
-</html>
-"""

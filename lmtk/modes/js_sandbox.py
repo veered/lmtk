@@ -1,8 +1,5 @@
-import html
-
 from .base_mode import BaseMode, register_mode
 from ..llms.open_ai import GPT3
-from ..utils import render_code_display, DotDict
 
 @register_mode('js-sandbox')
 class JSSandboxMode(BaseMode):
@@ -39,7 +36,7 @@ class JSSandboxMode(BaseMode):
   def respond(self, query):
     self.history += [ { 'text': query, 'type': 'client' } ]
     code = ''
-    results = self.complete(self.get_prompt(query))
+    results = self.complete(self.build_prompt(query))
 
     yield self.prompt_prefix
     for data in results:
@@ -60,7 +57,7 @@ class JSSandboxMode(BaseMode):
     )
 
   def inspect(self):
-    return self.get_prompt('{ instruction }')
+    return self.build_prompt('{ instruction }')
 
   def get_buffer(self, name):
     return ('code', self.code, '.js')
@@ -69,31 +66,19 @@ class JSSandboxMode(BaseMode):
     self.code = value
 
   def stats(self):
-    return f'( tokens={len(self.get_prompt(""))} )'
+    return f'( tokens={len(self.build_prompt(""))} )'
 
-  def request_handler(self, request, path):
-    if path == '/':
-      return self.render_display_html()
-    elif path == '/frame':
-      return self.render_frame_html()
+  def display_code(self, env):
+    return ('javascript', self.code)
 
-  def render_frame_html(self):
+  def display_html(self, env):
     return self.render_html(
       code=self.code,
       inner_html=self.inner_html,
-      style=f'body {{ margin: 0px; }}\n{self.sandbox.get("style", "")}',
+      style=f'html {{ height: 100%; }}\nbody {{ height: 100%; margin: 0px; }}\n{self.sandbox.get("style", "")}',
     )
 
-  def render_display_html(self, frame_only=False, size=(700, 800)):
-    return render_code_display(
-      code=self.code,
-      frame_html=self.render_frame_html(),
-      frame_url='/frame',
-      frame_only=frame_only,
-      size=size,
-    )
-
-  def get_prompt(self, instruction=''):
+  def build_prompt(self, instruction=''):
     return f"""
 web/client/index.html
 ```html
@@ -111,7 +96,7 @@ web/client/index.js
 web/client/index.js
 { self.prompt_prefix }"""
 
-  def render_html(self, code=None, inner_html='', style=None):
+  def render_html(self, code=None, inner_html='', style=None, head=''):
     if code == None:
       script_tag = '<script src="index.js"></script>'
     else:
@@ -124,7 +109,7 @@ web/client/index.js
 
     return f"""
 <html>
-  <head>{style_tag}</head>
+  <head>{head}{style_tag}</head>
   <body>{inner_html}{script_tag}</body>
 </html>
 """.strip()

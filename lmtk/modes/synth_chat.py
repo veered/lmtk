@@ -10,6 +10,12 @@ class SynthChatMode(BaseMode):
   title = 'ChattyGPT'
   default_profile_name = 'chat-delphi'
 
+  web_server_config = {
+    'host': 'localhost',
+    'port': 8080,
+    'print_message': False,
+  }
+
   line_sep = '---------'
   line_sep_token = '45537'
 

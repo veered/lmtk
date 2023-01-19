@@ -1,5 +1,6 @@
 import uuid
-from ..utils import make_iter, SimpleServer, printer, default, count_params
+from ..utils import make_iter, printer, default, count_params
+from ..web import SimpleServer, render_display_page
 
 from ..config.profile import Profile
 
@@ -115,14 +116,14 @@ class BaseMode:
     )
     success = self.web_server.start()
 
-    if BaseMode.__has_logged:
+    if BaseMode.__has_logged or not self.web_server_config.get('print_message', True):
       return
     BaseMode.__has_logged = True
 
     if success:
-      printer.print(f'[bold]Notice:[/bold] Sandbox available at [bold]{self.web_server.host}:{self.web_server.port}[/bold] \n')
+      printer.print(f'[bold]Notice:[/bold] Preview available at [bold]{self.web_server.host}:{self.web_server.port}[/bold] \n')
     else:
-      printer.print(f'[bold]Warning:[/bold] Failed to start sandbox web server. Port {self.web_server.port} is in use.\n')
+      printer.print(f'[bold]Warning:[/bold] Failed to start preview web server. Port {self.web_server.port} is in use.\n')
 
   # To use ipdb set:
   #   export PYTHONBREAKPOINT=IPython.terminal.debugger.set_trace
@@ -170,4 +171,31 @@ class BaseMode:
     self.buffers[name] = value
 
   def request_handler(self, request, path):
+    (language, code) = self.display_code('web')
+    html = self.display_html('web')
+    frame_size=self.display_frame_size('web')
+
+    if path == '/fullscreen':
+      return html
+    else:
+      return render_display_page(
+        language=language,
+        code=code,
+        html=html,
+        frame_size=frame_size,
+      )
+
+  def display_code(self, env):
+    if env == 'web':
+      return ('text', self.inspect())
+    else:
+      return ('text', '')
+
+  def display_html(self, env):
     return ''
+
+  def display_frame_size(self, env):
+    if env == 'notebook':
+      return (1000, 600)
+    else:
+      return (700, 800)

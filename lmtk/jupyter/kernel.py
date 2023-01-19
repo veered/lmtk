@@ -1,6 +1,7 @@
 from ipykernel.kernelbase import Kernel
 
 from ..config import Config
+from ..web.views import html_as_iframe
 
 class LmtkKernel(Kernel):
   implementation = 'lmtk'
@@ -30,11 +31,12 @@ class LmtkKernel(Kernel):
     log_file.close()
 
   def load_thread(self, thread_name=None):
-    self.thread = self.lmtk_config.threads().load(
-      thread_name=thread_name,
-      mode_name='synth-chat',
-    )
-    # self.thread = self.lmtk_config.threads().load(profile_name='js-web')
+    # self.thread = self.lmtk_config.threads().load(
+    #   thread_name=thread_name,
+    #   mode_name='synth-chat',
+    # )
+    self.thread = self.lmtk_config.threads().load(profile_name='js-web')
+    # self.thread = self.lmtk_config.threads().load(profile_name='js-game')
 
     self.thread.metadata['cells'] = self.thread.metadata.get('cells', [])
     self.cells = self.thread.metadata['cells']
@@ -76,7 +78,7 @@ class LmtkKernel(Kernel):
     self.cells = [
       cell
       for cell in self.cells
-      if cell['id'] not in self.metadata['deletedCells']
+      if cell['id'] not in self.metadata.get('deletedCells', [])
     ]
 
   def ensure_cell(self, cell_id):
@@ -132,8 +134,16 @@ class LmtkKernel(Kernel):
       text += data
       self.update_response(cell_id, text + '█')
 
-    self.update_response(cell_id, text, mime='text/markdown')
-    # self.update_response(cell_id, self.thread.mode.render_display_html(frame_only=True, size=(1000, 400)), mime='text/html')
+    html = self.thread.mode.display_html('notebook')
+    if html:
+      iframe = html_as_iframe(
+        html,
+        self.thread.mode.display_frame_size('notebook'),
+        style='border: 0px; box-shadow: 0px 0px 5px #000; margin-top: 10px; margin-left: 10px;'
+      )
+      self.update_response(cell_id, iframe, mime='text/html')
+    else:
+      self.update_response(cell_id, text, mime='text/markdown')
 
     self.cells[cell_index]['message_id'] = self.thread.get_last_message_id()
     self.thread.save()
