@@ -80,6 +80,15 @@ class JSSandboxMode(BaseMode):
     )
 
   def build_prompt(self, instruction=''):
+    prev_messages = [ msg for msg in self.history if msg['type'] == 'client' ]
+    prev_instructions = ''
+
+    if len(prev_messages) > 0:
+      prev_instructions = '\nPrevious Instructions:\n' + '\n'.join([
+        f'{i+1}. {msg["text"]}'
+        for (i, msg) in enumerate(prev_messages)
+      ]) + '\n'
+
     return f"""
 web/client/index.html
 ```html
@@ -90,7 +99,7 @@ web/client/index.js
 {self.code.rstrip()}
 /*END*/
 ```
-
+{ prev_instructions }
 {self.bio}. Make the following modifications to `index.js`:
 {instruction}
 
