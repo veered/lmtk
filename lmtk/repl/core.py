@@ -131,7 +131,7 @@ class REPL:
     return self.prompt.input(default=default, toolbar=toolbar)
 
   def reset(self):
-    self.thread.reset(preserve_profile=True)
+    self.thread.reset()
     self.thread.load_mode()
     self.thread.save()
 

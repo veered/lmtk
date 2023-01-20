@@ -50,6 +50,7 @@ class JSSandboxMode(BaseMode):
   def complete(self, text):
     return self.llm.complete(
       text,
+      temperature=0.5,
       stream=True,
       max_length=self.llm.get_model_max_tokens(self.model) - self.llm.count_tokens(text),
       model=self.model,

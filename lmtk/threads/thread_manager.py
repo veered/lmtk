@@ -6,9 +6,16 @@ class ThreadManager:
   def __init__(self, config):
     self.config = config
 
-  def load(self, thread_name=None, mode_name=None, profile_name=None, save=True):
+  def load(
+      self,
+      thread_name=None,
+      mode_name=None,
+      profile_name=None,
+      save=True,
+  ):
     if not thread_name:
       thread_name = self.make_name()
+
     thread = Thread(thread_name, self.config)
 
     if not thread.mode_name:
@@ -37,7 +44,17 @@ class ThreadManager:
     return [name for _, name in threads]
 
   def make_name(self):
-    i = len(self.config.folders.get_files('threads'))
-    while os.path.isfile(f'thread_{i}.json'):
+    thread_files = self.config.folders.get_files('threads')
+
+    i = len(thread_files)
+    thread_name = f'thread-{i}'
+
+    while Thread.make_file_name(thread_name) in thread_files:
       i += 1
-    return f'thread-{i}'
+      thread_name = f'thread-{i}'
+
+    return thread_name
+
+  def check_thread_exists(self, thread_name):
+    thread_files = self.config.folders.get_files('threads')
+    return Thread.make_file_name(thread_name) in thread_files

@@ -63,7 +63,7 @@ class Thread:
     self.name = self.normalize_name(name)
 
   def get_file_path(self):
-    file_name = f'{self.escape_name(self.name)}.json'
+    file_name = self.make_file_name(self.name)
     return self.config.folders.get_file_path('threads', file_name)
 
   def to_data(self):
@@ -108,7 +108,7 @@ class Thread:
       with open(file_path, 'r') as thread_file:
         self.load_data(json.load(thread_file))
 
-  def reset(self, preserve_profile=False, preserve_seed=False):
+  def reset(self, preserve_mode=True, preserve_profile=True, preserve_seed=False):
     seed = self.state_store.data.get('seed') if preserve_seed else ''
 
     self.state_store.reset()
@@ -120,7 +120,7 @@ class Thread:
 
     self.id = self.id or str(uuid.uuid4())
     self.all_messages = {}
-    self.mode_name = self.mode_name or ''
+    self.mode_name = (self.mode_name if preserve_mode else '') or ''
     self.profile_name = self.profile_name if preserve_profile else ''
     self.metadata = {}
 
@@ -201,6 +201,10 @@ class Thread:
   @classmethod
   def escape_name(cls, thread_name):
     return cls.normalize_name(thread_name).replace('-', '_')
+
+  @classmethod
+  def make_file_name(cls, thread_name):
+    return f'{cls.escape_name(thread_name)}.json'
 
 @dataclass_json
 @dataclass
