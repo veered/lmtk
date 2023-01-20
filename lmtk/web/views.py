@@ -1,10 +1,10 @@
 from html import escape
 
-def html_as_iframe(html, frame_size, style=''):
+def html_as_iframe(html, frame_size, style='background: white;'):
   # srcdoc based iframes never get useragent stylesheets, which GPT seems to rely on
   html = html.replace('<head>', '<head><style>html { box-sizing: border-box; }\n*, *:before, *:after { box-sizing: inherit; }</style>')
 
-  return f'<div id="frame" style="display: inline-block; width: {frame_size[0]}px; height: {frame_size[1]}px; {style}"><iframe srcdoc="{escape(html)}" style="background: white; height: 100%; width: 100%; border: 0px;"></iframe></div>'
+  return f'<div id="lmtk-frame" style="display: inline-block; width: {frame_size[0]}px; height: {frame_size[1]}px;\n{style}"><iframe srcdoc="{escape(html)}" style="height: 100%; width: 100%; border: 0px;"></iframe></div>'
 
 # Uh, obviously this is because I want to be light-weight or something?
 # It really does need to be a self-contained html file.
@@ -13,9 +13,13 @@ def render_display_page(
     code='',
     html='',
     frame_size=(700, 800),
+    bg_color='#444654',
 ):
   escaped_code = escape(code)
   iframe = html_as_iframe(html, frame_size)
+
+  # download = '<a href="/" target="_blank" class="button" download>Download</a>'
+  download = ''
   fullscreen = ''
 
   return f"""
@@ -24,18 +28,24 @@ def render_display_page(
     <style>
       html {{
         height: 100%;
+        box-sizing: border-box;
+      }}
+      *,
+      *:before,
+      *:after {{
+        box-sizing: inherit;
       }}
       body {{
         display: flex;
         flex-direction: row;
-        background: #444654;
+        background: { bg_color };
       }}
       .row {{
         flex: 1;
         margin: 10px;
         margin-top: 15px;
       }}
-      #frame {{
+      #lmtk-frame {{
         box-shadow: 0px 0px 20px #000 !important;
       }}
       pre {{
@@ -45,7 +55,7 @@ def render_display_page(
       }}
       code {{
         width: {frame_size[0]}px;
-        height: {frame_size[1]-26}px;
+        height: {frame_size[1]}px;
         box-shadow: 0px 0px 20px #000;
         white-space: pre-wrap;
       }}
@@ -80,7 +90,7 @@ def render_display_page(
       </script>
     </div>
     <buttons>
-      <a href="/" target="_blank" class="button" download>Download</a>'
+      { download }
       { fullscreen }
     </buttons>
   </body>

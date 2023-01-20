@@ -196,6 +196,6 @@ class BaseMode:
 
   def display_frame_size(self, env):
     if env == 'notebook':
-      return (1000, 600)
+      return (600, 500)
     else:
       return (700, 800)

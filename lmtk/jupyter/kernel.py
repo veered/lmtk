@@ -1,7 +1,7 @@
 from ipykernel.kernelbase import Kernel
 
 from ..config import Config
-from ..web.views import html_as_iframe
+from ..web.views import html_as_iframe, render_display_page
 
 class LmtkKernel(Kernel):
   implementation = 'lmtk'
@@ -9,7 +9,7 @@ class LmtkKernel(Kernel):
   language = 'no-op'
   language_version = '0.1'
   language_info = {
-    'name': 'Any text',
+    'name': 'Markdown',
     'mimetype': 'text/markdown',
     'file_extension': '.md',
   }
@@ -23,7 +23,11 @@ class LmtkKernel(Kernel):
 
     super().__init__(*args, **kwargs)
 
-  # TODO : On shutdown, close the thread and change the state to be the last message
+  def do_shutdown(self, restart):
+    if self.thread:
+      self.thread.save(stop=True)
+      self.thread = None
+    return super().init_metadata(parent)
 
   def my_log(self, txt, end='\n'):
     log_file = open('/tmp/kernel-log.txt', 'w')
@@ -36,7 +40,7 @@ class LmtkKernel(Kernel):
     #   mode_name='synth-chat',
     # )
     self.thread = self.lmtk_config.threads().load(profile_name='js-web')
-    # self.thread = self.lmtk_config.threads().load(profile_name='js-game')
+    # self.thread = self.lmtk_config.threads().load(profile_name='jupyter-game')
 
     self.thread.metadata['cells'] = self.thread.metadata.get('cells', [])
     self.cells = self.thread.metadata['cells']
@@ -136,10 +140,19 @@ class LmtkKernel(Kernel):
 
     html = self.thread.mode.display_html('notebook')
     if html:
+      (language, code) = self.thread.mode.display_code('notebook')
+      frame_size=self.thread.mode.display_frame_size('notebook')
+      page = render_display_page(
+        language=language,
+        code=code,
+        html=html,
+        frame_size=frame_size,
+        bg_color='transparent',
+      )
       iframe = html_as_iframe(
-        html,
-        self.thread.mode.display_frame_size('notebook'),
-        style='border: 0px; box-shadow: 0px 0px 5px #000; margin-top: 10px; margin-left: 10px;'
+        page,
+        (1260, 550),
+        style='background: transparent; border: 0px; margin-top: 10px;'
       )
       self.update_response(cell_id, iframe, mime='text/html')
     else:
