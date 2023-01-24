@@ -1,4 +1,4 @@
-<h1 align="center">lmtk</h1>
+<h1 align="center">Language Model Tool Kit (LMTK)</h1>
 <p align="center">
     Interactively play with GPT-based tools from the terminal
     <br />
