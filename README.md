@@ -72,7 +72,33 @@ See `.help` for a full list, but these are some particularly important commands:
 - `.redo`  or `C-x + C-r` to resample the response
 - `.undo`  or `C-x + C-u` to rewrite your most recent message
 
-## Custom Modes
+## Modes
+A mode is roughly an underlying language model.
+The most important part of the `mode` API is the `respond()` function.
+This function accepts a query string and returns a response/completion string.
+Ultimately, anything can be a mode as long as it supports this simple API.
+
+TODO document modes
+
+### base_mode
+
+### chat_gpt.py
+
+### cowsay.py
+
+### echo.py
+
+### js_sandbox.py
+
+### lang_chain.py
+
+### raw_codex.py
+
+### raw_gpt.py
+
+### synth_chat.py
+
+### Custom Modes
 Add a Python file that [looks like this](https://github.com/veered/lmtk/blob/main/examples/modes/bruh_mode.py) to `$LMTK_CONFIG_PATH/plugins/`. By default this will be `~/.config/lmtk/plugins/`.
 
 See [lmtk/modes](https://github.com/veered/lmtk/tree/main/lmtk/modes) for more complete examples.
