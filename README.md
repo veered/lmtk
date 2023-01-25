@@ -9,7 +9,7 @@
 
 ## Description
 
-(TODO: Update README with information about other modes, config profiles, scripting, JS sandbox, and Jupyter integration)
+(TODO: Update README with information about config profiles, scripting, JS sandbox, and Jupyter integration)
 
 ChatGPT needs a power-user mode. `lmtk` gives you a terminal UI for interacting with ChatGPT and other GPT-based tools.
 
@@ -20,7 +20,14 @@ The default mode, `synth-chat`, uses a ChatGPT-like chatbot built directly from 
 
 This project is still in the **early stages** of development. It will have bugs and frequent breaking changes.
 
-## Install
+## What LMTK contains:
+
+- _⚙️ Modes_ - these are essentially LLMs (e.g. GPT3, GPTChat, Codex, etc.) ALL of the features of LMTK are built to be _mode independent_ meaning they can be applied to any existing LLM or any LLM that is built in the future.
+- _👤 Profiles_ - simple YAML files that reference modes, profiles give the LLM a _personality_ and some instructions for how to behave. These can be used to evoke assistant-like behavior, engineer-like behavior, or whatever you want!
+- _⌨️ Command Line Interface_ - Access any profile directly from the command line and get all kinds of hotkeys (see below)
+- _🪐 Jupyter Notebook Integration_ - Access any profile _directly from a Jupyter notebook_
+
+## Installation
 
 For now, Python >=3.9 is required. Use `pip3` instead of `pip` if necessary.
 
@@ -111,6 +118,18 @@ These modes are meant primarily as examples to help developers understand the mo
 Add a Python file that [looks like this](https://github.com/veered/lmtk/blob/main/examples/modes/bruh_mode.py) to `$LMTK_CONFIG_PATH/plugins/`. By default this will be `~/.config/lmtk/plugins/`.
 
 See [lmtk/modes](https://github.com/veered/lmtk/tree/main/lmtk/modes) for more complete examples.
+
+## Profiles
+
+Profiles are simple YAML files that build on top of modes. profiles give the LLM a _personality_ and some instructions for how to behave. These can be used to evoke different kinds of behavior. Here are the built-in modes that ship with LMTK, you can of course add more. Because these are just YAML files and not code, this is one of the easiest ways you can extend LMTK for your own use case.
+
+- `chat-delphi.yaml` - a chat assistant with behavior similar to GPTChat
+- `js-blank.yaml`
+- `js-console.yaml`
+- `js-game.yaml`
+- `js-svg.yaml`
+- `js-web.yaml`
+- `jupyter-game.yaml`
 
 ## Development
 
