@@ -7,12 +7,14 @@
     <a href="https://github.com/veered/lmtk/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/github/license/veered/lmtk.svg?style=flat-square"></a>
 </p>
 
+
 ## What LMTK contains
 
 - [_⚙️ Modes_](https://github.com/veered/lmtk/edit/rafaelcosman/improves-README/README.md#modes) - these are interfaces to LLMs (e.g. GPT3, GPTChat, Codex, etc.). ALL of the features of LMTK are built to be _mode independent_ meaning they can be applied to any existing LLM or any LLM that is built in the future.
 - [_👤 Profiles_](https://github.com/veered/lmtk/edit/rafaelcosman/improves-README/README.md#profiles) - simple YAML files that reference modes, profiles give the LLM a _personality_ and some instructions for how to behave. These can be used to evoke assistant-like behavior, engineer-like behavior, or whatever you want!
 - _⌨️ Command Line Interface_ - Access any profile directly from the command line and get all kinds of hotkeys (see below)
 - _🪐 Jupyter Notebook Integration_ - Access any profile _directly from a Jupyter notebook_
+- _📝 Markdown-Based Scripting Language_ - Write simple programs based on language models, using our no-code/low-code framework.
 
 This project is still in the **early stages** of development. It will have bugs and frequent breaking changes.
 
