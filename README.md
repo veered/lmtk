@@ -1,31 +1,21 @@
 <h1 align="center">Language Model Tool Kit (LMTK)</h1>
 <p align="center">
-    Interactively play with GPT-based tools from the terminal
+    The Power-User Interface for Language Models
     <br />
     <br />
     <a href="https://pypi.python.org/pypi/lmtk/"><img alt="PyPi" src="https://img.shields.io/pypi/v/lmtk.svg?style=flat-square"></a>
     <a href="https://github.com/veered/lmtk/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/github/license/veered/lmtk.svg?style=flat-square"></a>
 </p>
 
-## Description
+## What LMTK contains
 
-(TODO: Update README with information about config profiles, scripting, JS sandbox, and Jupyter integration)
-
-ChatGPT needs a power-user mode. `lmtk` gives you a terminal UI for interacting with ChatGPT and other GPT-based tools.
-
-The default mode, `synth-chat`, uses a ChatGPT-like chatbot built directly from GPT-3. It supports features not possible with ChatGPT, including:
-
-- Writing the prefix of the next response
-- Giving instructions that will always be followed and never forgetten
+- [_⚙️ Modes_](https://github.com/veered/lmtk/edit/rafaelcosman/improves-README/README.md#modes) - these are interfaces to LLMs (e.g. GPT3, GPTChat, Codex, etc.). ALL of the features of LMTK are built to be _mode independent_ meaning they can be applied to any existing LLM or any LLM that is built in the future.
+- [_👤 Profiles_](https://github.com/veered/lmtk/edit/rafaelcosman/improves-README/README.md#profiles) - simple YAML files that reference modes, profiles give the LLM a _personality_ and some instructions for how to behave. These can be used to evoke assistant-like behavior, engineer-like behavior, or whatever you want!
+- _⌨️ Command Line Interface_ - Access any profile directly from the command line and get all kinds of hotkeys (see below)
+- _🪐 Jupyter Notebook Integration_ - Access any profile _directly from a Jupyter notebook_
 
 This project is still in the **early stages** of development. It will have bugs and frequent breaking changes.
 
-## What LMTK contains:
-
-- _⚙️ Modes_ - these are essentially LLMs (e.g. GPT3, GPTChat, Codex, etc.) ALL of the features of LMTK are built to be _mode independent_ meaning they can be applied to any existing LLM or any LLM that is built in the future.
-- _👤 Profiles_ - simple YAML files that reference modes, profiles give the LLM a _personality_ and some instructions for how to behave. These can be used to evoke assistant-like behavior, engineer-like behavior, or whatever you want!
-- _⌨️ Command Line Interface_ - Access any profile directly from the command line and get all kinds of hotkeys (see below)
-- _🪐 Jupyter Notebook Integration_ - Access any profile _directly from a Jupyter notebook_
 
 ## Installation
 
