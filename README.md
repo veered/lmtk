@@ -1,6 +1,6 @@
 <h1 align="center">Language Model Tool Kit (LMTK)</h1>
 <p align="center">
-    The Power-User Interface for Language Models
+    Powerful Interfaces for Language Models
     <br />
     <br />
     <a href="https://pypi.python.org/pypi/lmtk/"><img alt="PyPi" src="https://img.shields.io/pypi/v/lmtk.svg?style=flat-square"></a>
@@ -8,18 +8,22 @@
 </p>
 
 
-## What LMTK contains
+# What LMTK contains
 
-- [_⚙️ Modes_](https://github.com/veered/lmtk/edit/rafaelcosman/improves-README/README.md#modes) - these are interfaces to LLMs (e.g. GPT3, GPTChat, Codex, etc.). ALL of the features of LMTK are built to be _mode independent_ meaning they can be applied to any existing LLM or any LLM that is built in the future.
-- [_👤 Profiles_](https://github.com/veered/lmtk/edit/rafaelcosman/improves-README/README.md#profiles) - simple YAML files that reference modes, profiles give the LLM a _personality_ and some instructions for how to behave. These can be used to evoke assistant-like behavior, engineer-like behavior, or whatever you want!
-- _⌨️ Command Line Interface_ - Access any profile directly from the command line and get all kinds of hotkeys (see below)
-- _🪐 Jupyter Notebook Integration_ - Access any profile _directly from a Jupyter notebook_
-- _📝 Markdown-Based Scripting Language_ - Write simple programs based on language models, using our no-code/low-code framework.
+### Three Powerful Interfaces for Language Models
+1. _⌨️ REPL_ - Access any bot & profile directly from the command line and get all kinds of hotkeys (see below). Instatly resample responses, change your previous inputs, and more.
+2. _🪐 Jupyter Notebook Integration_ - Access any bot & profile _directly from a Jupyter notebook_
+3. _📝 Markdown-Based Scripting Language_ - Write simple programs based on language models, using our no-code/low-code framework. These scripts are just Markdown files and can easily be written by non-technical users.
+
+### Powered by Two Core, Extensible Frameworks
+- [_⚙️ Bots_](https://github.com/veered/lmtk/edit/rafaelcosman/improves-README/README.md#bots) - these are interfaces to LLMs (e.g. GPT3, GPTChat, Codex, etc.). ALL of the features of LMTK are built to be _bot independent_ meaning they can be applied to any existing LLM or any LLM that is built in the future.
+- [_👤 Profiles_](https://github.com/veered/lmtk/edit/rafaelcosman/improves-README/README.md#profiles) - simple YAML files that build on top of bots, profiles give the bot a _personality_ and some instructions for how to behave. These can be used to evoke assistant-like behavior, engineer-like behavior, or whatever you want!
+
 
 This project is still in the **early stages** of development. It will have bugs and frequent breaking changes.
 
 
-## Installation
+# Installing LMTK
 
 For now, Python >=3.9 is required. Use `pip3` instead of `pip` if necessary.
 
@@ -41,15 +45,30 @@ If you don't have an OpenAI API key [create one here](https://beta.openai.com/ac
 export OPENAI_API_KEY="<your api key>"
 ```
 
-## Usage
+# Usage
 
+## LMTK REPL
+
+To start a new LMTK REPL, just run:
 ```bash
 lmtk @thread-name [-m mode-name]
 ```
 
+<p align="center">
+<img width="850" alt="Screen Shot 2022-12-16 at 6 09 31 PM" src="https://user-images.githubusercontent.com/247408/208211238-fe134de6-c3f3-4be2-b5bd-9f6bf3ec1fa3.png">
+</p>
+
 Use `lmtk modes` to list available REPL modes and `lmtk threads` to list open threads.
 
 Inside the REPL, type `.help` for a list of commands and keyboard shortcuts.
+
+## LMTK Jupyter Notebook Integration
+
+TODO
+
+## LMTK Scripting Language
+
+See the examples folder for examples of some scripts
 
 ## Tips
 
@@ -82,6 +101,8 @@ See `.help` for a full list, but these are some particularly important commands:
 - `.new` or `C-x + C-n` to reset the thread
 - `.redo` or `C-x + C-r` to resample the response
 - `.undo` or `C-x + C-u` to rewrite your most recent message
+
+# LMTK Internals
 
 ## Modes
 
@@ -123,7 +144,7 @@ Profiles are simple YAML files that build on top of modes. profiles give the LLM
 - `js-web.yaml`
 - `jupyter-game.yaml`
 
-## Development
+# Development
 
 To install `lmtk` from source:
 
@@ -133,9 +154,3 @@ cd lmtk
 pip install -U flit
 flit install -s
 ```
-
-## Screenshot
-
-<p align="center">
-<img width="850" alt="Screen Shot 2022-12-16 at 6 09 31 PM" src="https://user-images.githubusercontent.com/247408/208211238-fe134de6-c3f3-4be2-b5bd-9f6bf3ec1fa3.png">
-</p>
