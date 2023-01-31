@@ -8,11 +8,11 @@
 </p>
 
 ## Description
-(TODO: Update README with information about other modes, config profiles, scripting, JS sandbox, and Jupyter integration)
+(TODO: Update README with information about other bots, config profiles, scripting, JS sandbox, and Jupyter integration)
 
 ChatGPT needs a power-user mode. `lmtk` gives you a terminal UI for interacting with ChatGPT and other GPT-based tools.
 
-The default mode, `synth-chat`, uses a ChatGPT-like chatbot built directly from GPT-3. It supports features not possible with ChatGPT, including:
+The default bot, `synth-chat`, uses a ChatGPT-like chatbot built directly from GPT-3. It supports features not possible with ChatGPT, including:
 - Writing the prefix of the next response
 - Giving instructions that will always be followed and never forgetten
 
@@ -32,7 +32,7 @@ If you are having trouble with the TensorFlow dependency, you can exclude it:
 pip install -U lmtk
 ```
 
-This will disable automatic code syntax detection, but most `lmtk` modes are good about manual syntax annotation.
+This will disable automatic code syntax detection, but the default `lmtk` bots are good about manual syntax annotation.
 
 If you don't have an OpenAI API key [create one here](https://beta.openai.com/account/api-keys) and set it:
 ```bash
@@ -41,10 +41,10 @@ export OPENAI_API_KEY="<your api key>"
 
 ## Usage
 ```bash
-lmtk @thread-name [-m mode-name]
+lmtk @thread-name [-b bot-name]
 ```
 
-Use `lmtk modes` to list available REPL modes and `lmtk threads` to list open threads.
+Use `lmtk bots` to list available REPL bots and `lmtk threads` to list open threads.
 
 Inside the REPL, type `.help` for a list of commands and keyboard shortcuts.
 
@@ -72,10 +72,10 @@ See `.help` for a full list, but these are some particularly important commands:
 - `.redo`  or `C-x + C-r` to resample the response
 - `.undo`  or `C-x + C-u` to rewrite your most recent message
 
-## Custom Modes
-Add a Python file that [looks like this](https://github.com/veered/lmtk/blob/main/examples/modes/bruh_mode.py) to `$LMTK_CONFIG_PATH/plugins/`. By default this will be `~/.config/lmtk/plugins/`.
+## Custom Bots
+Add a Python file that [looks like this](https://github.com/veered/lmtk/blob/main/examples/bots/bruh_bot.py) to `$LMTK_CONFIG_PATH/plugins/`. By default this will be `~/.config/lmtk/plugins/`.
 
-See [lmtk/modes](https://github.com/veered/lmtk/tree/main/lmtk/modes) for more complete examples.
+See [lmtk/bots](https://github.com/veered/lmtk/tree/main/lmtk/bots) for more complete examples.
 
 ## Development
 To install `lmtk` from source:
