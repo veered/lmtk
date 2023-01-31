@@ -1,8 +1,8 @@
-from .base_mode import BaseMode, register_mode
+from .base import BaseBot, register_bot
 from ..llms.chat_gpt import ChatGPT
 
-@register_mode('chat-gpt')
-class ChatGPTMode(BaseMode):
+@register_bot('chat-gpt')
+class ChatGPTBot(BaseBot):
 
   title = 'ChatGPT'
   loader_delay=.25

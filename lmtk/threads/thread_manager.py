@@ -9,7 +9,7 @@ class ThreadManager:
   def load(
       self,
       thread_name=None,
-      mode_name=None,
+      bot_name=None,
       profile_name=None,
       save=True,
   ):
@@ -18,11 +18,11 @@ class ThreadManager:
 
     thread = Thread(thread_name, self.config)
 
-    if not thread.mode_name:
+    if not thread.bot_name:
       if profile_name:
         thread.set_profile(profile_name)
-        mode_name = thread.get_profile().mode or mode_name
-      thread.set_mode(mode_name)
+        bot_name = thread.get_profile().bot or bot_name
+      thread.set_bot(bot_name)
 
     if save:
       thread.save()

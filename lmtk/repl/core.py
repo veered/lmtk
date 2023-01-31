@@ -7,7 +7,7 @@ from ..utils import peek, printer, Loader, default
 from ..config import Config
 from ..errors import LmtkApiError
 
-from ..modes import get_mode
+from ..bots import get_bot
 from .commands import Commands
 
 class REPL:
@@ -15,7 +15,7 @@ class REPL:
   def __init__(
       self,
       thread_name=None,
-      mode_name=None,
+      bot_name=None,
       profile_name=None,
       auto_fills=[],
     ):
@@ -27,16 +27,16 @@ class REPL:
 
     self.thread = self.config.threads().load(
       thread_name,
-      mode_name=mode_name or 'synth-chat',
+      bot_name=bot_name or 'synth-chat',
       profile_name=profile_name
     )
-    self.mode_name = self.thread.mode_name
+    self.bot_name = self.thread.bot_name
 
     self.first_run = True
 
   @property
-  def mode(self):
-    return self.thread.get_mode()
+  def bot(self):
+    return self.thread.get_bot()
 
   def get_user_input(self):
     default = ''
@@ -72,7 +72,7 @@ class REPL:
     else:
       self.warmup_thread()
 
-    self.thread.load_mode()
+    self.thread.load_bot()
     self.create_prompt()
 
     self.pretty.intro()
@@ -99,7 +99,7 @@ class REPL:
     if text == None:
       return
 
-    stats = self.mode.stats()
+    stats = self.bot.stats()
     self.pretty.their_banner(len(self.thread.get_messages()) + 2, stats=stats, space=3)
 
     try:
@@ -123,7 +123,7 @@ class REPL:
     Commands.bind_keys(self.prompt.kb)
 
   def input(self, default=''):
-    seed = self.mode.get_seed()
+    seed = self.bot.get_seed()
     if seed:
       toolbar = f'seed={seed}'
     else:
@@ -132,11 +132,11 @@ class REPL:
 
   def reset(self):
     self.thread.reset()
-    self.thread.load_mode()
+    self.thread.load_bot()
     self.thread.save()
 
   def ask(self, text, stats=''):
-    delay = 0.25 if self.first_run else self.mode.loader_delay
+    delay = 0.25 if self.first_run else self.bot.loader_delay
     with Loader(show_timer=True, delay=delay):
       gen = iter(self.thread.ask(text, stats))
       printer.warmup()

@@ -16,11 +16,11 @@ class Profile:
       self.name = ''
       self.config = DotDict({})
       self.empty = True
-      self.mode = None
+      self.bot = None
     else:
       self.config = DotDict(config)
       self.empty = False
-      self.mode = self.config.get('mode', None)
+      self.bot = self.config.get('bot', None)
 
   def load(self):
     if not self.name or not self.folders:

@@ -5,10 +5,10 @@ from .helpers import get_web, get_file, shell, ask, show_web, show_code, parse_c
 
 class ScriptContext:
 
-  def __init__(self, mode, data='', params: dict = None):
+  def __init__(self, bot, data='', params: dict = None):
     params = default(params, {})
 
-    self.mode = mode
+    self.bot = bot
     self.output_buffer = ''
 
     self.build_vars(data, params)
@@ -37,7 +37,7 @@ class ScriptContext:
 
   def prepare(self):
     self.clear_output()
-    answers = [ m['text'].strip() for m in self.mode.conversation if m['source'] == 'server']
+    answers = [ m['text'].strip() for m in self.bot.conversation if m['source'] == 'server']
     self.live_vars['answers'] = answers
     self.live_vars['__'] = answers if len(answers) > 0 else ''
 

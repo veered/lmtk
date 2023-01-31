@@ -1,4 +1,4 @@
-mode: js-sandbox
+bot: js-sandbox
 bio: You are an experienced video game developer. Avoid code duplication, write self-contained code, and group similar objects into arrays
 starter_code: |-
   let canvas = document.querySelector("canvas");

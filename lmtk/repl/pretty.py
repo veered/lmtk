@@ -14,17 +14,17 @@ class PrettyPrintREPL:
     printer.print('Type "help" for a list of commands. Use "Enter" to submit and "Tab" to start a new line.\n')
 
   def your_banner(self, count, space=0):
-    profile = self.repl.mode.profile
+    profile = self.repl.bot.profile
     if profile.empty:
-      mode_text = f'#{self.repl.mode_name}'
+      bot_text = f'#{self.repl.bot_name}'
     else:
-      mode_text = f'#{self.repl.mode_name} | {profile.name}'
+      bot_text = f'#{self.repl.bot_name} | {profile.name}'
 
     printer.print_banner(
       bg_color='rgb(0,95,135)',
       text=' You:',
       prefix=f' {count} ',
-      suffix=f' @{self.repl.thread.name} [ {mode_text} ]'
+      suffix=f' @{self.repl.thread.name} [ {bot_text} ]'
     )
     if space > 0:
       printer.pad_down(space)
@@ -32,7 +32,7 @@ class PrettyPrintREPL:
   def their_banner(self, count, stats='', space=0):
     printer.print_banner(
       bg_color='spring_green4',
-      text=f' {self.repl.mode.get_title()}:',
+      text=f' {self.repl.bot.get_title()}:',
       prefix=f' {count} ',
       suffix=stats
     )

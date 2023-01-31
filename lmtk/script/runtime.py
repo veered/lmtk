@@ -3,7 +3,7 @@ from markdown_it import MarkdownIt
 from mdit_py_plugins.front_matter import front_matter_plugin
 
 from ..config import Config
-from ..modes import get_mode
+from ..bots import get_bot
 from ..utils import printer, expand_path, default
 
 from .context import ScriptContext
@@ -20,23 +20,23 @@ class ScriptRuntime:
 
     self.thread = config.threads().load(
       thread_name=None,
-      mode_name=self.meta.get('mode', 'synth-chat'),
+      bot_name=self.meta.get('bot', 'synth-chat'),
       profile_name=self.meta.get('profile_name')
     )
 
-    self.mode = self.thread.load_mode(store_conversation=True)
+    self.bot = self.thread.load_bot(store_conversation=True)
     if self.meta.get("temperature") is not None:
-      self.mode.temperature = self.meta.get("temperature")
+      self.bot.temperature = self.meta.get("temperature")
 
     # I'll remove this hard coding soon
-    self.mode.seed = 'You must only respond with exactly what was requested. Don\'t start your response with text like "Here is..."'
-    self.mode.max_response_tokens = 750
+    self.bot.seed = 'You must only respond with exactly what was requested. Don\'t start your response with text like "Here is..."'
+    self.bot.max_response_tokens = 750
 
-    self.context = ScriptContext(self.mode, data=data, params=params)
+    self.context = ScriptContext(self.bot, data=data, params=params)
 
   def run(self):
     for (i, section) in enumerate(self.sections):
-      section.bind(self.mode, self.context)
+      section.bind(self.bot, self.context)
 
       output = section.expand().lstrip('\n')
 
@@ -50,7 +50,7 @@ class ScriptRuntime:
       printer.print_markdown(f'## [{i}] Output')
 
       response = ''
-      for (i, data) in enumerate(self.mode.ask(output)):
+      for (i, data) in enumerate(self.bot.ask(output)):
         if i == 0:
           data = data.lstrip()
         response += data
@@ -62,7 +62,7 @@ class ScriptRuntime:
       printer.print_markdown('---')
 
     self.thread.save()
-    return self.mode.conversation[-1]['text']
+    return self.bot.conversation[-1]['text']
 
   def parse(self, text):
     tokens = self.md.parse(text)

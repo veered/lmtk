@@ -9,8 +9,8 @@ class ScriptSection:
     self.source_text = text
     self.expanded_text = None
 
-  def bind(self, mode, context):
-    self.mode = mode
+  def bind(self, bot, context):
+    self.bot = bot
     self.context = context
 
   def expand(self):

@@ -90,9 +90,9 @@ class LmtkKernel(Kernel):
 
     return index
 
-  def load_thread(self, cell_id, thread_name=None, mode_name=None, profile_name=None):
+  def load_thread(self, cell_id, thread_name=None, bot_name=None, profile_name=None):
     self.my_log(f'{thread_name=}')
-    if not thread_name or (not mode_name and not profile_name):
+    if not thread_name or (not bot_name and not profile_name):
       self.create_response(
         cell_id,
         """
@@ -101,7 +101,7 @@ This cell must have the format:
   %profile PROFILE_NAME
 or:
   %thread THREAD_NAME
-  %mode MODE_NAME
+  %bot BOT_NAME
 By convention, it should be the first cell in the notebook.
 """.lstrip()
       )
@@ -111,14 +111,14 @@ By convention, it should be the first cell in the notebook.
     thread_exists = threads.check_thread_exists(thread_name)
     thread = threads.load(
       thread_name=thread_name,
-      mode_name=mode_name,
+      bot_name=bot_name,
       profile_name=profile_name,
     )
 
     if thread_exists:
-      mode_changed = (mode_name and thread.mode_name != mode_name)
-      if mode_changed:
-        self.create_response(cell_id, f'@{thread_name} already exists and has mode "{thread.mode_name}". The mode cannot be changed. Choose a different thread name.')
+      bot_changed = (bot_name and thread.bot_name != bot_name)
+      if bot_changed:
+        self.create_response(cell_id, f'@{thread_name} already exists and has bot "{thread.bot_name}". The bot cannot be changed. Choose a different thread name.')
         return
 
       profile_changed = (profile_name and thread.profile_name != profile_name)
@@ -133,9 +133,9 @@ By convention, it should be the first cell in the notebook.
     self.thread.metadata['cells'] = self.thread.metadata.get('cells', [])
     self.thread.metadata['cells'] = self.thread.metadata['cells']
 
-    self.thread.load_mode()
+    self.thread.load_bot()
 
-    self.create_response(cell_id, f'thread={self.thread.name}, mode={self.thread.mode_name}, profile={self.thread.profile_name}')
+    self.create_response(cell_id, f'thread={self.thread.name}, bot={self.thread.bot_name}, profile={self.thread.profile_name}')
 
   def run_magic(self, cell_id, code):
     if code.lstrip()[0] != '%':
@@ -143,7 +143,7 @@ By convention, it should be the first cell in the notebook.
 
     commands = {
       'thread': [ None ],
-      'mode': [ None ],
+      'bot': [ None ],
       'profile': [ None ],
     }
 
@@ -155,13 +155,13 @@ By convention, it should be the first cell in the notebook.
     })
 
     thread_name = commands['thread'][0]
-    mode_name = commands['mode'][0]
+    bot_name = commands['bot'][0]
     profile_name = commands['profile'][0]
-    if thread_name or mode_name or profile_name:
+    if thread_name or bot_name or profile_name:
       self.load_thread(
         cell_id,
         thread_name=thread_name,
-        mode_name=mode_name,
+        bot_name=bot_name,
         profile_name=profile_name,
       )
 
@@ -192,7 +192,7 @@ No thread configured. Create or run a cell that looks like:
   %profile PROFILE_NAME
 or:
   %thread THREAD_NAME
-  %mode MODE_NAME
+  %bot BOT_NAME
 By convention, this should be the first cell in the notebook.
 """.lstrip()
       )
@@ -218,10 +218,10 @@ By convention, this should be the first cell in the notebook.
       text += data
       self.update_response(cell_id, text + '█')
 
-    html = self.thread.mode.display_html('notebook')
+    html = self.thread.bot.display_html('notebook')
     if html:
-      (language, code) = self.thread.mode.display_code('notebook')
-      frame_size=self.thread.mode.display_frame_size('notebook')
+      (language, code) = self.thread.bot.display_code('notebook')
+      frame_size=self.thread.bot.display_frame_size('notebook')
       page = render_display_page(
         language=language,
         code=code,

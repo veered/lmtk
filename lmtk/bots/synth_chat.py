@@ -1,11 +1,11 @@
 import math, uuid, re
 
-from .base_mode import BaseMode, register_mode
+from .base import BaseBot, register_bot
 from ..llms.open_ai import GPT3
 from ..utils import default
 
-@register_mode('synth-chat')
-class SynthChatMode(BaseMode):
+@register_bot('synth-chat')
+class SynthChatBot(BaseBot):
 
   title = 'ChattyGPT'
   default_profile_name = 'chat-delphi'

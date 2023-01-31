@@ -1,7 +1,7 @@
-from lmtk.modes import BaseMode, register_mode
+from lmtk.bots import BaseBot, register_bot
 
-@register_mode('langchain')
-class LangChainMode(BaseMode):
+@register_bot('langchain')
+class LangChainBot(BaseBot):
 
   title = 'LangChain'
   loader_delay = 0

@@ -1,8 +1,8 @@
-from .base_mode import BaseMode, register_mode
+from .base import BaseBot, register_bot
 from ..llms.open_ai import GPT3
 
-@register_mode('raw-gpt')
-class RawGPTMode(BaseMode):
+@register_bot('raw-gpt')
+class RawGPTBot(BaseBot):
 
   title = 'RawGPT'
   store_conversation = True

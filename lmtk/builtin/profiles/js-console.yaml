@@ -1,4 +1,4 @@
-mode: js-sandbox
+bot: js-sandbox
 bio: You are an experienced software engineer
 starter_code: let outputDisplay = document.querySelector("pre");
 inner_html: <pre></pre>
