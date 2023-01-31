@@ -67,7 +67,7 @@ class SynthChatBot(BaseBot):
 
     config = self.profile.config
 
-    self.model = config.get('mode', 'text-davinci-003')
+    self.model = config.get('model', 'text-davinci-003')
     self.temperature = config.get('temperature', 0.3)
     self.prompt_header = config.get('prompt_header', '')
 
