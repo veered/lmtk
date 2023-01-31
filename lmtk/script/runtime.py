@@ -21,7 +21,7 @@ class ScriptRuntime:
     self.thread = config.threads().load(
       thread_name=None,
       bot_name=self.meta.get('bot', 'synth-chat'),
-      profile_name=self.meta.get('profile_name')
+      profile_name=self.meta.get('profile')
     )
 
     self.bot = self.thread.load_bot(store_conversation=True)
