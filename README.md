@@ -17,7 +17,7 @@
 
 ### Powered by Two Core, Extensible Frameworks
 
-- [_⚙️ Bots_](https://github.com/veered/lmtk/blob/main/README.md#bots) - these are interfaces to LLMs (e.g. GPT3, GPTChat, Codex, etc.). ALL of the features of LMTK are built to be _bot independent_ meaning they can be applied to any existing LLM or any LLM that is built in the future.
+- [_🤖 Bots_](https://github.com/veered/lmtk/blob/main/README.md#bots) - these are interfaces to LLMs (e.g. GPT3, GPTChat, Codex, etc.). ALL of the features of LMTK are built to be _bot independent_ meaning they can be applied to any existing LLM or any LLM that is built in the future.
 - [_👤 Profiles_](https://github.com/veered/lmtk/blob/main/README.md#profiles) - simple YAML files that build on top of bots, profiles give the bot a _personality_ and some instructions for how to behave. These can be used to evoke assistant-like behavior, engineer-like behavior, or whatever you want!
 
 LMTK is still in the **early stages** of development. It will have bugs and frequent breaking changes.
