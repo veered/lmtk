@@ -139,7 +139,7 @@ Add a Python file that [looks like this](https://github.com/veered/lmtk/blob/mai
 
 See [lmtk/bots](https://github.com/veered/lmtk/tree/main/lmtk/bots) for more complete examples.
 
-## Profiles
+## 👤 Profiles
 
 Profiles are simple YAML files that build on top of bots. profiles give the bot a _personality_ and some instructions for how to behave. These can be used to evoke different kinds of behavior. Here are the built-in modes that ship with LMTK, you can of course add more. Because these are just YAML files and not code, this is one of the easiest ways you can extend LMTK for your own use case.
 
