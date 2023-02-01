@@ -1,7 +1,7 @@
-from .base_mode import BaseMode, register_mode
+from .base import BaseBot, register_bot
 
-@register_mode('cowsay')
-class CowsayMode(BaseMode):
+@register_bot('cowsay')
+class CowsayBot(BaseBot):
 
   title = 'Cow'
 

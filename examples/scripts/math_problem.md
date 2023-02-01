@@ -1,5 +1,5 @@
 ---
-mode: raw-gpt
+bot: raw-gpt
 ---
 
 ```eval

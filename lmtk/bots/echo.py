@@ -1,7 +1,7 @@
-from .base_mode import BaseMode, register_mode
+from .base import BaseBot, register_bot
 
-@register_mode('echo')
-class EchoMode(BaseMode):
+@register_bot('echo')
+class EchoBot(BaseBot):
 
   title = 'Bat'
   visible = False

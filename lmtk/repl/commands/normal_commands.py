@@ -16,14 +16,14 @@ class BufferCommand(BaseCommand):
 
   def run(self):
     name = self.cmd_args[0] if len(self.cmd_args) > 0 else ''
-    (title, buffer, file_type) = self.repl.mode.get_buffer(name)
+    (title, buffer, file_type) = self.repl.bot.get_buffer(name)
     self.banner(name=title)
 
     value = open_in_editor(self.repl.prompt.session, content=buffer, extension=file_type)
-    self.repl.mode.set_buffer(name, value)
+    self.repl.bot.set_buffer(name, value)
 
     printer.clear(2)
-    printer.print(self.repl.mode.get_buffer(name)[1])
+    printer.print(self.repl.bot.get_buffer(name)[1])
 
     return ''
 
@@ -77,10 +77,10 @@ class CopyCommand(BaseCommand):
 class DebugCommand(BaseCommand):
 
   aliases = [ '.db' ]
-  help = 'Triggers a breakpoint in the mode backend.'
+  help = 'Triggers a breakpoint in the bot backend.'
 
   def run(self):
-    self.repl.mode.debug()
+    self.repl.bot.debug()
     return ''
 
 @Commands.register('.edit')
@@ -115,7 +115,7 @@ class PrintCommand(BaseCommand):
 
   def run(self):
     self.banner()
-    printer.print(self.repl.mode.inspect(), markup=False)
+    printer.print(self.repl.bot.inspect(), markup=False)
     return ''
 
 @Commands.register('.publish')
@@ -205,7 +205,7 @@ class SeedCommand(BaseCommand):
 
   def run(self):
     self.banner()
-    self.repl.mode.set_seed(self.cmd_suffix)
+    self.repl.bot.set_seed(self.cmd_suffix)
     return 'Seed updated.'
 
 
@@ -218,12 +218,12 @@ class GetCommand(BaseCommand):
     self.banner()
     if len(self.cmd_args) == 0:
       variables = '\n'.join(
-        sorted([ f'- {var}' for var in self.repl.mode.variables() ])
+        sorted([ f'- {var}' for var in self.repl.bot.variables() ])
       )
-      printer.print_markdown(f'Available mode variables:\n{variables}')
+      printer.print_markdown(f'Available bot variables:\n{variables}')
     else:
       key = self.cmd_args[0]
-      val = getattr(self.repl.mode, key)
+      val = getattr(self.repl.bot, key)
       if val == None or val == '':
         printer.print_markdown(f'**{key}** is empty')
       else:
@@ -239,13 +239,13 @@ class SetCommand(BaseCommand):
     self.banner()
     if len(self.cmd_args) == 0:
       variables = '\n'.join(
-        sorted([ f'- {var}' for var in self.repl.mode.variables() ])
+        sorted([ f'- {var}' for var in self.repl.bot.variables() ])
       )
-      printer.print_markdown(f'Available mode variables:\n{variables}')
+      printer.print_markdown(f'Available bot variables:\n{variables}')
     else:
       key = self.cmd_args[0]
       val = ' '.join(self.cmd_args[1:])
-      setattr(self.repl.mode, key, val)
+      setattr(self.repl.bot, key, val)
       printer.print_markdown(f'**{key}** updated')
     return ''
 
@@ -257,4 +257,4 @@ class SetCommand(BaseCommand):
 
   def run(self):
     self.banner()
-    return self.repl.mode.stats()
+    return self.repl.bot.stats()

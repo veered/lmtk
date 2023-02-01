@@ -1,8 +1,8 @@
-from .base_mode import BaseMode, register_mode
+from .base import BaseBot, register_bot
 from ..llms.open_ai import GPT3
 
-@register_mode('js-sandbox')
-class JSSandboxMode(BaseMode):
+@register_bot('js-sandbox')
+class JSSandboxBot(BaseBot):
 
   title = 'JS Sandbox'
 

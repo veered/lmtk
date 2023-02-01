@@ -7,21 +7,20 @@
     <a href="https://github.com/veered/lmtk/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/github/license/veered/lmtk.svg?style=flat-square"></a>
 </p>
 
-
 # What LMTK contains
 
 ### Three Powerful Interfaces for Language Models
+
 1. _⌨️ REPL_ - Access any bot & profile directly from the command line and get all kinds of hotkeys (see below). Instatly resample responses, change your previous inputs, and more.
 2. _🪐 Jupyter Notebook Integration_ - Access any bot & profile _directly from a Jupyter notebook_
 3. _📝 Markdown-Based Scripting Language_ - Write simple programs based on language models, using our no-code/low-code framework. These scripts are just Markdown files and can easily be written by non-technical users.
 
 ### Powered by Two Core, Extensible Frameworks
+
 - [_⚙️ Bots_](https://github.com/veered/lmtk/edit/rafaelcosman/improves-README/README.md#bots) - these are interfaces to LLMs (e.g. GPT3, GPTChat, Codex, etc.). ALL of the features of LMTK are built to be _bot independent_ meaning they can be applied to any existing LLM or any LLM that is built in the future.
 - [_👤 Profiles_](https://github.com/veered/lmtk/edit/rafaelcosman/improves-README/README.md#profiles) - simple YAML files that build on top of bots, profiles give the bot a _personality_ and some instructions for how to behave. These can be used to evoke assistant-like behavior, engineer-like behavior, or whatever you want!
 
-
 This project is still in the **early stages** of development. It will have bugs and frequent breaking changes.
-
 
 # Installing LMTK
 
@@ -37,7 +36,7 @@ If you are having trouble with the TensorFlow dependency, you can exclude it:
 pip install -U lmtk
 ```
 
-This will disable automatic code syntax detection, but most `lmtk` modes are good about manual syntax annotation.
+This will disable automatic code syntax detection, but the default `lmtk` bots are good about manual syntax annotation.
 
 If you don't have an OpenAI API key [create one here](https://beta.openai.com/account/api-keys) and set it:
 
@@ -50,15 +49,21 @@ export OPENAI_API_KEY="<your api key>"
 ## LMTK REPL
 
 To start a new LMTK REPL, just run:
+
 ```bash
-lmtk @thread-name [-m mode-name]
+lmtk @thread-name [-b bot-name]
 ```
+
+The default bot, `synth-chat`, uses a ChatGPT-like chatbot built directly from GPT-3. It supports features not possible with ChatGPT, including:
+
+- Writing the prefix of the next response
+- Giving instructions that will always be followed and never forgetten
 
 <p align="center">
 <img width="850" alt="Screen Shot 2022-12-16 at 6 09 31 PM" src="https://user-images.githubusercontent.com/247408/208211238-fe134de6-c3f3-4be2-b5bd-9f6bf3ec1fa3.png">
 </p>
 
-Use `lmtk modes` to list available REPL modes and `lmtk threads` to list open threads.
+Use `lmtk bots` to list available REPL bots and `lmtk threads` to list open threads.
 
 Inside the REPL, type `.help` for a list of commands and keyboard shortcuts.
 
@@ -106,10 +111,10 @@ See `.help` for a full list, but these are some particularly important commands:
 
 ## Modes
 
-A mode is roughly an underlying language model.
-The most important part of the `mode` API is the `respond()` function.
+A bot is roughly an underlying language model.
+The most important part of the `bot` API is the `respond()` function.
 This function accepts a query string and returns a response/completion string.
-Ultimately, anything can be a mode as long as it supports this simple API.
+Ultimately, anything can be a bot as long as it supports this simple API.
 
 - `base_mode.py` - not meant to be used directly, base_mode is the superclass of all other modes.
 - `chat_gpt.py` - uses the ChatGPT LLM in `llms/chat_gpt/chat_gpt.py`.
@@ -119,22 +124,22 @@ Ultimately, anything can be a mode as long as it supports this simple API.
 - `raw_codex.py`
 - `raw_gpt.py`
 
-### Example Modes
+### Example Bots
 
-These modes are meant primarily as examples to help developers understand the mode API.
+These modes are meant primarily as examples to help developers understand the Bot API.
 
-- `echo.py` - Very simple example mode, just echos back whatever you say!
-- `cowsay.py` - Example mode where a cow echos back what you said. Worth testing out just to experience the cow ASCII art.
+- `echo.py` - Very simple example bot, just echos back whatever you say!
+- `cowsay.py` - Example bot where a cow echos back what you said. Worth testing out just to experience the cow ASCII art.
 
-### Writing Your Own Modes
+## Custom Bots
 
-Add a Python file that [looks like this](https://github.com/veered/lmtk/blob/main/examples/modes/bruh_mode.py) to `$LMTK_CONFIG_PATH/plugins/`. By default this will be `~/.config/lmtk/plugins/`.
+Add a Python file that [looks like this](https://github.com/veered/lmtk/blob/main/examples/bots/bruh_bot.py) to `$LMTK_CONFIG_PATH/plugins/`. By default this will be `~/.config/lmtk/plugins/`.
 
-See [lmtk/modes](https://github.com/veered/lmtk/tree/main/lmtk/modes) for more complete examples.
+See [lmtk/bots](https://github.com/veered/lmtk/tree/main/lmtk/bots) for more complete examples.
 
 ## Profiles
 
-Profiles are simple YAML files that build on top of modes. profiles give the LLM a _personality_ and some instructions for how to behave. These can be used to evoke different kinds of behavior. Here are the built-in modes that ship with LMTK, you can of course add more. Because these are just YAML files and not code, this is one of the easiest ways you can extend LMTK for your own use case.
+Profiles are simple YAML files that build on top of bots. profiles give the bot a _personality_ and some instructions for how to behave. These can be used to evoke different kinds of behavior. Here are the built-in modes that ship with LMTK, you can of course add more. Because these are just YAML files and not code, this is one of the easiest ways you can extend LMTK for your own use case.
 
 - `chat-delphi.yaml` - a chat assistant with behavior similar to GPTChat
 - `js-blank.yaml`

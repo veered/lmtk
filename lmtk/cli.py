@@ -5,7 +5,7 @@ from typing import Optional, List
 from .config import Config
 from .repl import REPL
 from .repl.search import fuzzy_search_input
-from .modes import list_modes
+from .bots import list_bots
 from .utils import printer, expand_path
 from .script import ScriptRuntime
 from .search import SearchEngine
@@ -26,7 +26,7 @@ app = typer.Typer(
 @app.command()
 def repl(
     thread: Optional[str] = typer.Argument(None),
-    mode: str = typer.Option('synth-chat', '--mode', '-m'),
+    bot: str = typer.Option('synth-chat', '--bot', '-b'),
     profile: str =typer.Option(None, '--profile', '-p'),
 ):
   """
@@ -39,13 +39,13 @@ def repl(
       thread = threads[0]
   elif thread == 'i':
     thread = fuzzy_search_input('thread = @', config.threads().list()) or None
-    mode = fuzzy_search_input('mode = ', list_modes()) or None
+    bot = fuzzy_search_input('bot = ', list_bots()) or None
   if not thread:
     thread = config.threads().make_name()
 
   REPL(
     thread_name=thread,
-    mode_name=mode,
+    bot_name=bot,
     profile_name=profile,
   ).run()
 
@@ -87,10 +87,10 @@ def notebook():
   print('notebook')
 
 @app.command()
-def modes():
+def bots():
   config.load_plugins()
-  for mode in list_modes():
-    printer.print(mode)
+  for bot in list_bots():
+    printer.print(bot)
 
 @app.command()
 def threads():

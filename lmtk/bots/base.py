@@ -4,27 +4,27 @@ from ..web import SimpleServer, render_display_page
 
 from ..config.profile import Profile
 
-mode_registry = {}
+bot_registry = {}
 
-def register_mode(name):
+def register_bot(name):
   def decorator(cls):
-    mode_registry[name] = cls
+    bot_registry[name] = cls
     return cls
   return decorator
 
-def get_mode(name):
-  return mode_registry[name]
+def get_bot(name):
+  return bot_registry[name]
 
-def list_modes(show_hidden=False):
-  modes = []
-  for name, mode in mode_registry.items():
-    if name != 'base' and mode.visible or show_hidden:
-      modes += [ name ]
-  modes.sort()
-  return modes
+def list_bots(show_hidden=False):
+  bots = []
+  for name, bot in bot_registry.items():
+    if name != 'base' and bot.visible or show_hidden:
+      bots += [ name ]
+  bots.sort()
+  return bots
 
-@register_mode('base')
-class BaseMode:
+@register_bot('base')
+class BaseBot:
 
   title = ''
   visible = True
@@ -116,9 +116,9 @@ class BaseMode:
     )
     success = self.web_server.start()
 
-    if BaseMode.__has_logged or not self.web_server_config.get('print_message', True):
+    if BaseBot.__has_logged or not self.web_server_config.get('print_message', True):
       return
-    BaseMode.__has_logged = True
+    BaseBot.__has_logged = True
 
     if success:
       printer.print(f'[bold]Notice:[/bold] Preview available at [bold]{self.web_server.host}:{self.web_server.port}[/bold] \n')

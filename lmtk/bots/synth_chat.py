@@ -1,11 +1,11 @@
 import math, uuid, re
 
-from .base_mode import BaseMode, register_mode
+from .base import BaseBot, register_bot
 from ..llms.open_ai import GPT3
 from ..utils import default
 
-@register_mode('synth-chat')
-class SynthChatMode(BaseMode):
+@register_bot('synth-chat')
+class SynthChatBot(BaseBot):
 
   title = 'ChattyGPT'
   default_profile_name = 'chat-delphi'
@@ -22,8 +22,10 @@ class SynthChatMode(BaseMode):
   def load(self, state):
     self.load_profile()
 
-    self.model = 'text-davinci-003'
-    self.temperature = 0.3
+    # self.model = 'text-davinci-003'
+    # self.temperature = 0.3
+    # self.model = 'text-chat-davinci-002-20230126'
+    # self.temperature = 0.5
     self.llm = GPT3()
 
     self.response_prefix = ''
@@ -64,6 +66,10 @@ class SynthChatMode(BaseMode):
       self.profile_name = self.profile.name
 
     config = self.profile.config
+
+    self.model = config.get('model', 'text-davinci-003')
+    self.temperature = config.get('temperature', 0.3)
+    self.prompt_header = config.get('prompt_header', '')
 
     self.human_name = config.get('human_name', 'Eden')
     self.authority_name = config.get('authority_name', 'Boss')
@@ -191,7 +197,7 @@ class SynthChatMode(BaseMode):
     )
 
   def get_stops(self):
-    return [ f'{self.human_name}>', f'{self.persona_name}>' ]
+    return [ f'{self.human_name}>', f'{self.persona_name}>', '<|im_end|>' ]
 
   def get_prompt_size(self):
     conversation_prompt = self.format_conversation_prompt(self.recent_conversation)
@@ -231,6 +237,7 @@ class SynthChatMode(BaseMode):
 
   def format_conversation_prompt(self, messages, whitespace='\n'):
     lines = [
+      self.prompt_header,
       self.format_persona_bio(),
       self.summary_header(),
       *self.format_summaries(),

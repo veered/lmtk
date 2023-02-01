@@ -1,3 +1,6 @@
+---
+profile: chat-delphi
+---
 {{ show_web(ask('Website to summarize:')) }}
 
 Summarize the above web page in the following format:
