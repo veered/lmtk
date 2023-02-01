@@ -59,13 +59,15 @@ The default bot, `synth-chat`, uses a ChatGPT-like chatbot built directly from G
 - Writing the prefix of the next response
 - Giving instructions that will always be followed and never forgetten
 
-<p align="center">
-<img width="850" alt="Screen Shot 2022-12-16 at 6 09 31 PM" src="https://user-images.githubusercontent.com/247408/208211238-fe134de6-c3f3-4be2-b5bd-9f6bf3ec1fa3.png">
-</p>
-
 Use `lmtk bots` to list available REPL bots and `lmtk threads` to list open threads.
 
 Inside the REPL, type `.help` for a list of commands and keyboard shortcuts.
+
+Screenshot of the LMTK REPL:
+
+<p align="center">
+<img width="850" alt="Screen Shot 2022-12-16 at 6 09 31 PM" src="https://user-images.githubusercontent.com/247408/208211238-fe134de6-c3f3-4be2-b5bd-9f6bf3ec1fa3.png">
+</p>
 
 ## LMTK Jupyter Notebook Integration
 
