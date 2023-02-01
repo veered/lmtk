@@ -88,6 +88,11 @@ def reload_modules(modules):
     module = importlib.import_module(name)
     importlib.reload(module)
 
+def try_import(module):
+  if not importlib.util.find_spec(module):
+    return None
+  return importlib.import_module(module)
+
 class CaptureStdout:
 
   def __init__(self):

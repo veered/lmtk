@@ -22,10 +22,6 @@ class SynthChatBot(BaseBot):
   def load(self, state):
     self.load_profile()
 
-    # self.model = 'text-davinci-003'
-    # self.temperature = 0.3
-    # self.model = 'text-chat-davinci-002-20230126'
-    # self.temperature = 0.5
     self.llm = GPT3()
 
     self.response_prefix = ''

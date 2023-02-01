@@ -9,6 +9,7 @@ from .bots import list_bots
 from .utils import printer, expand_path
 from .script import ScriptRuntime
 from .search import SearchEngine
+from .jupyter.install import run_install_kernel
 
 config = Config()
 printer.set_syntax_detection(
@@ -22,6 +23,9 @@ app = typer.Typer(
   pretty_exceptions_short=False,
   help="Try 'lmtk repl'",
 )
+
+jupyter = typer.Typer()
+app.add_typer(jupyter, name='jupyter')
 
 @app.command()
 def repl(
@@ -82,9 +86,9 @@ def script(
     last_message = thread.get_messages()[-1].text
     printer.print_markdown(f'# Result\n{last_message}')
 
-@app.command()
-def notebook():
-  print('notebook')
+@jupyter.command()
+def install():
+  run_install_kernel()
 
 @app.command()
 def bots():
@@ -173,9 +177,9 @@ def apply_aliases():
   elif cmd[0] == '.':
     sys.argv[1] = 'script'
     sys.argv.insert(2, cmd[1:])
-  elif cmd[0] == '_':
-    sys.argv[1] = 'notebook'
-    sys.argv.insert(2, cmd[1:])
+  # elif cmd[0] == '_':
+  #   sys.argv[1] = 'notebook'
+  #   sys.argv.insert(2, cmd[1:])
   elif cmd.endswith('.md'):
     sys.argv[1] = 'script'
     sys.argv.insert(2, cmd)
