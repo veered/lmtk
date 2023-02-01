@@ -46,7 +46,7 @@ export OPENAI_API_KEY="<your api key>"
 
 # Usage
 
-## LMTK REPL
+## ⌨️ LMTK REPL
 
 To start a new LMTK REPL, just run:
 
@@ -69,11 +69,11 @@ Screenshot of the LMTK REPL:
 <img width="850" alt="Screen Shot 2022-12-16 at 6 09 31 PM" src="https://user-images.githubusercontent.com/247408/208211238-fe134de6-c3f3-4be2-b5bd-9f6bf3ec1fa3.png">
 </p>
 
-## LMTK Jupyter Notebook Integration
+## 🪐 LMTK Jupyter Notebook Integration
 
 TODO
 
-## LMTK Scripting Language
+## 📝 LMTK Scripting Language
 
 See the examples folder for examples of some scripts
 
