@@ -1,6 +1,6 @@
 bot: synth-chat
 
-model: text-chat-davinci-002-20230126
+model: text-chat-davinci-002-20221122
 temperature: 0.5
 
 prompt_header: |-
